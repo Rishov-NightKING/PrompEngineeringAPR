@@ -28,7 +28,7 @@ def remove_extra_spaces(line):
     return line
 
 
-def heuristic_remove_spaces(text):
+def heuristic_adjust_spaces(text):
     # Create a set of all the items to check for membership
     li1 = [
         "%",
@@ -101,23 +101,23 @@ def heuristic_remove_spaces(text):
     return output.strip()
 
 
-def apply_heuristic_remove_spaces(input_file_name, output_file_name):
-    with open(input_file_name, "r") as input_file:
-        lines = input_file.readlines()
+def heuristic_remove_redundant_words(line):
+    redundant_words = ["Refactored code:", "Updated code:", "```", "Fixed code:"]
+    for reds in redundant_words:
+        line = line.replace(reds, "").replace(reds.lower(), "").replace(reds.title(), "")
+    return line.strip()
 
-    output_file = open(output_file_name, "a")
 
-    for line in lines:
-        modified_line = heuristic_remove_spaces(line)
-        output_file.write(modified_line + "\n")
-
-    output_file.close()
+def modify_file_name(file_name, start_index, end_index):
+    file_name_parts = file_name.split(".")
+    file_name = f"{file_name_parts[0]}_{start_index}_{end_index}.{file_name_parts[1]}"
+    return file_name
 
 
 def write_list_to_file(file_name, list_name, start_index=0, end_index=None):
     if end_index is None:
         end_index = len(list_name)
-    file = open(file_name, "a")
+    file = open(file_name, "w")
     file.writelines([item + "\n" for item in list_name[start_index:end_index]])
     file.close()
 
@@ -162,7 +162,7 @@ def get_EM(file1, file2):
         if r == p:
             count += 1
             matches.append(i)
-    print(f"EM: {count/len(refs)*100}%")
+    print(f"EM: {count / len(refs) * 100}%")
     print(f"matched indices: {matches}")
 
 
@@ -204,22 +204,24 @@ def read_raw_tufano_dataset_from_csv(file_path):
         buggy_code.replace("START", "<START>").replace("END", "<END>").replace("\n", "").replace("\t", "")
         for buggy_code in buggy_codes
     ]
-    buggy_codes = [heuristic_remove_spaces(buggy_code) for buggy_code in buggy_codes]
+    buggy_codes = [heuristic_adjust_spaces(buggy_code) for buggy_code in buggy_codes]
 
     target_codes = list(df["after"])
     target_codes = [target_code.replace("\n", "").replace("\t", "") for target_code in target_codes]
-    target_codes = [heuristic_remove_spaces(target_code) for target_code in target_codes]
+    target_codes = [heuristic_adjust_spaces(target_code) for target_code in target_codes]
 
     return code_reviews, buggy_codes, target_codes
 
 
-def get_predictions_from_openapi_and_write_to_file(prediction_file_path, code_reviews, buggy_codes, target_codes):
+def get_predictions_from_openai_and_write_to_file(
+    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+):
     system_command = "You are a coding assistant. You generate only the source code."
     user_command = "Refactor the Buggy Code using the Review without comments"
 
     prediction_list = []
 
-    test_samples = [i for i in range(3)]
+    test_samples = [i for i in range(start_index, end_index)]
 
     for i in test_samples:
         buggy_code = buggy_codes[i]
@@ -229,15 +231,26 @@ def get_predictions_from_openapi_and_write_to_file(prediction_file_path, code_re
         system_prompt = system_command
         user_prompt = f"Buggy Code: {buggy_code}\nReview: {code_review}\n{user_command}"
         prediction = prompt_response(system_prompt, user_prompt)
+        # heuristic 1
+        prediction = heuristic_adjust_spaces(prediction)
+        # heuristic 2
+        prediction = heuristic_remove_redundant_words(prediction)
         prediction_list.append(prediction)
 
         print(f"buggy_code: {buggy_code}")
         print(f"code_review: {code_review}")
         print(f"target code: {target_code}")
-        print(f"response: {prediction.strip()}")
+        print(f"response: {prediction}")
 
         print()
 
         time.sleep(20)
 
+    prediction_file_path = modify_file_name(prediction_file_path, start_index, end_index)
+    ground_truth_path = modify_file_name(ground_truth_path, start_index, end_index)
+    # write predictions to a file
     write_list_to_file(file_name=prediction_file_path, list_name=prediction_list)
+    # write ground truths to a file
+    write_list_to_file(
+        file_name=ground_truth_path, list_name=target_codes, start_index=start_index, end_index=end_index
+    )
