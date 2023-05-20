@@ -1,5 +1,9 @@
 import openai
-from utils import get_env_variable, read_raw_tufano_dataset_from_csv, get_predictions_from_openai_and_write_to_file, run_python_file
+from utils import (
+    get_env_variable,
+    read_raw_tufano_dataset_from_csv,
+    get_predictions_from_openai_and_write_to_file,
+)
 
 
 if __name__ == "__main__":
@@ -29,6 +33,3 @@ if __name__ == "__main__":
         START_INDEX,
         END_INDEX,
     )
-
-    #run_python_file('evaluation/bleu.py', 'outputs/tufano_predictions_raw_31_34.txt', 'outputs/tufano_ground_truths_raw_31_34.txt')
-

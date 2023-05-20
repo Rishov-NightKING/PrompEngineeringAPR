@@ -4,7 +4,6 @@ import subprocess
 import time
 
 
-
 def prompt_response(system_prompt, user_prompt):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -215,13 +214,20 @@ def read_raw_tufano_dataset_from_csv(file_path):
     return code_reviews, buggy_codes, target_codes
 
 
-def run_python_file(python_file_path, ground_truths_file_path, predictions_file_path):
+def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predictions_file_path, lang="java"):
     # Arguments to pass to the Python file
-    arguments = ["--references", ground_truths_file_path, "--predictions", predictions_file_path]
+    arguments = []
+    if bleu_type == "BLEU":
+        arguments = ["--references", ground_truths_file_path, "--predictions", predictions_file_path]
+    elif bleu_type == "CodeBLEU":
+        arguments = ["--refs", ground_truths_file_path, "--hyp", predictions_file_path, "--lang", lang]
 
     try:
         # Run the Python file with arguments
-        subprocess.run(['python', python_file_path] + arguments, check=True)
+        if bleu_type == "CodeBLEU":
+            tree_sitter_build_bash_path = "evaluation/CodeBLEU/parser/build.sh"
+            subprocess.run(["bash", tree_sitter_build_bash_path], check=True)
+        subprocess.run(["python", python_file_path] + arguments, check=True)
         print("Python file executed successfully.")
     except subprocess.CalledProcessError as e:
         print(f"Error while executing Python file: {e}")
@@ -267,4 +273,18 @@ def get_predictions_from_openai_and_write_to_file(
     # write ground truths to a file
     write_list_to_file(
         file_name=ground_truth_path, list_name=target_codes, start_index=start_index, end_index=end_index
+    )
+    # calculate BLEU
+    run_python_file(
+        "BLEU",
+        "evaluation/bleu.py",
+        prediction_file_path,
+        ground_truth_path,
+    )
+    # calculate CodeBLEU
+    run_python_file(
+        "CodeBLEU",
+        "evaluation/CodeBLEU/calc_code_bleu.py",
+        prediction_file_path,
+        ground_truth_path,
     )
