@@ -1,6 +1,8 @@
 import openai
 import pandas as pd
+import subprocess
 import time
+
 
 
 def prompt_response(system_prompt, user_prompt):
@@ -211,6 +213,18 @@ def read_raw_tufano_dataset_from_csv(file_path):
     target_codes = [heuristic_adjust_spaces(target_code) for target_code in target_codes]
 
     return code_reviews, buggy_codes, target_codes
+
+
+def run_python_file(python_file_path, ground_truths_file_path, predictions_file_path):
+    # Arguments to pass to the Python file
+    arguments = ["--references", ground_truths_file_path, "--predictions", predictions_file_path]
+
+    try:
+        # Run the Python file with arguments
+        subprocess.run(['python', python_file_path] + arguments, check=True)
+        print("Python file executed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error while executing Python file: {e}")
 
 
 def get_predictions_from_openai_and_write_to_file(
