@@ -103,7 +103,7 @@ def heuristic_adjust_spaces(text):
 
 
 def heuristic_remove_redundant_words(line):
-    redundant_words = ["Refactored code:", "Updated code:", "```", "Fixed code:"]
+    redundant_words = ["Refactored code :", "Updated code :", "```", "Fixed code :"]
     for reds in redundant_words:
         line = line.replace(reds, "").replace(reds.lower(), "").replace(reds.title(), "")
     return line.strip()
@@ -250,13 +250,21 @@ def get_predictions_from_openai_and_write_to_file(
 
         system_prompt = system_command
         user_prompt = f"Buggy Code: {buggy_code}\nReview: {code_review}\n{user_command}"
-        prediction = prompt_response(system_prompt, user_prompt)
+        
+        try:
+            prediction = prompt_response(system_prompt, user_prompt)
+        except:
+            print(f"An Exception occured at sample: {i}")
+            end_index = i
+            break
+
         # heuristic 1
         prediction = heuristic_adjust_spaces(prediction)
         # heuristic 2
         prediction = heuristic_remove_redundant_words(prediction)
         prediction_list.append(prediction)
 
+        print(f"sample: {i}")
         print(f"buggy_code: {buggy_code}")
         print(f"code_review: {code_review}")
         print(f"target code: {target_code}")
