@@ -26,49 +26,31 @@ def remove_extra_spaces(line):
         line = line.replace("  ", " ")
         if "  " not in line:
             break
-    return line
+    return line.strip()
 
 
 def heuristic_adjust_spaces(text):
     # Create a set of all the items to check for membership
-    li1 = [
+    first_occurrence_list = [
         "%",
-        "%=",
-        "!=",
         "&",
         "?",
         "<",
         ">",
-        "(",
-        ")",
-        "{",
-        "}",
-        "[",
-        "]",
         ",",
         ":",
         ";",
         ".",
         "!",
-        "||",
-        "&&",
         "^",
         "+",
         "-",
         "/",
         "*",
-        "==",
         "=",
-        "<=",
-        ">=",
-        "+=",
-        "-=",
-        "/=",
-        "*=",
-        "++",
-        "--",
     ]
-    li2 = ["<", ">", "=", "+", "-", "/", "*", "&"]
+    second_occurrence_list = ["=", "+", "-", "/", "*", "&"]
+    brackets = ["(", ")", "{", "}", "[", "]"]
     # Initialize the output string
     output = ""
     # Initialize the current index to 0
@@ -76,11 +58,11 @@ def heuristic_adjust_spaces(text):
     # Loop over the characters in the text
     while i < len(text):
         # Check if the current character is in the item set
-        if text[i] in li1:
+        if text[i] in first_occurrence_list:
             # If it is, add it to the output string with a space on either side
 
             # If the current character is a '<', check if the next character is also in the item set
-            if text[i] in li2 and i + 1 < len(text) and text[i + 1] in li1:
+            if i + 1 < len(text) and text[i + 1] in second_occurrence_list:
                 # If it is, add it to the output string as a single unit with a space on either side
                 output += " " + text[i] + text[i + 1] + " "
                 # Move the current index forward by two characters
@@ -89,17 +71,17 @@ def heuristic_adjust_spaces(text):
                 output += " " + text[i] + " "
                 # Otherwise, move the current index forward by one character
                 i += 1
+        elif text[i] in brackets:
+            output += " " + text[i] + " "
+            i += 1
         else:
             # If the current character is not in the item set, add it to the output string
             output += text[i]
             # Move the current index forward by one character
             i += 1
-    while True:
-        output = output.replace("  ", " ")
-        if "  " not in output:
-            break
+    output = remove_extra_spaces(output)
     # Return the output string
-    return output.strip()
+    return output
 
 
 def heuristic_remove_redundant_words(line):
@@ -181,7 +163,7 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
         end_point = code.index(end_comment_tag) + len(end_comment_tag)
 
         code_review = code[:end_point].replace(start_comment_tag, "").replace(end_comment_tag, "")
-        buggy_code = code[end_point + 1 :].replace("\n", "")
+        buggy_code = code[end_point + 1:].replace("\n", "")
 
         code_reviews.append(code_review)
         buggy_codes.append(buggy_code)
@@ -198,18 +180,35 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
 def read_raw_tufano_dataset_from_csv(file_path):
     df = pd.read_csv(file_path)
     code_reviews = list(df["comment"])
-    code_reviews = [code_review.replace("\n", "").replace("\t", "") for code_review in code_reviews]
+    code_reviews = [
+        code_review.replace("\n", " ").replace("\t", " ").replace("\r", " ") for code_review in code_reviews
+    ]
+    code_reviews = [remove_extra_spaces(code_review) for code_review in code_reviews]
 
     buggy_codes = list(df["before_marked"])
     buggy_codes = [
-        buggy_code.replace("START", "<START>").replace("END", "<END>").replace("\n", "").replace("\t", "")
+        buggy_code.replace("START", "<START>")
+        .replace("END", "<END>")
+        .replace("\n", " ")
+        .replace("\t", " ")
+        .replace("\r", " ")
         for buggy_code in buggy_codes
     ]
-    buggy_codes = [heuristic_adjust_spaces(buggy_code) for buggy_code in buggy_codes]
+    buggy_codes = [remove_extra_spaces(buggy_code) for buggy_code in buggy_codes]
 
     target_codes = list(df["after"])
-    target_codes = [target_code.replace("\n", "").replace("\t", "") for target_code in target_codes]
+    target_codes = [
+        target_code.replace("\n", " ").replace("\t", " ").replace("\r", " ") for target_code in target_codes
+    ]
     target_codes = [heuristic_adjust_spaces(target_code) for target_code in target_codes]
+
+    # write raw tufano csv file data to text files
+    # raw_test_cc_src = [
+    #     f"<|startcomment|> {code_review} <|endcomment|> {buggy_code}"
+    #     for code_review, buggy_code in zip(code_reviews, buggy_codes)
+    # ]
+    # write_list_to_file("datasets/tufano/raw_test_CC_src.txt", raw_test_cc_src)
+    # write_list_to_file("datasets/tufano/raw_test_CC_tgt.txt", target_codes)
 
     return code_reviews, buggy_codes, target_codes
 
@@ -234,7 +233,7 @@ def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predic
 
 
 def get_predictions_from_openai_and_write_to_file(
-    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     system_command = "You are a coding assistant. You generate only the source code."
     user_command = "Refactor the Buggy Code using the Review without comments"
@@ -250,7 +249,7 @@ def get_predictions_from_openai_and_write_to_file(
 
         system_prompt = system_command
         user_prompt = f"Buggy Code: {buggy_code}\nReview: {code_review}\n{user_command}"
-        
+
         try:
             prediction = prompt_response(system_prompt, user_prompt)
         except:
