@@ -16,8 +16,8 @@ if __name__ == "__main__":
     R4R_SOURCE_FILE_PATH = "datasets/R4R/test_CC_src.txt"
     R4R_TARGET_FILE_PATH = "datasets/R4R/test_CC_tgt.txt"
 
-    START_INDEX = 31
-    END_INDEX = 34
+    START_INDEX = 0
+    END_INDEX = 100
     # code_reviews, buggy_codes, target_codes = read_dataset(
     #     dataset_name="tufano", source_file_path=TUFANO_SOURCE_FILE_PATH, target_file_path=TUFANO_TARGET_FILE_PATH
     # )

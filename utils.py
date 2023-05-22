@@ -9,7 +9,7 @@ def prompt_response(system_prompt, user_prompt):
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": f"{system_prompt}"}, {"role": "user", "content": f"{user_prompt}"}],
         temperature=0,
-        max_tokens=200,
+        max_tokens=300,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
@@ -93,7 +93,7 @@ def heuristic_remove_redundant_words(line):
 
 def modify_file_name(file_name, start_index, end_index):
     file_name_parts = file_name.split(".")
-    file_name = f"{file_name_parts[0]}_{start_index}_{end_index}.{file_name_parts[1]}"
+    file_name = f"{file_name_parts[0]}_{start_index}_{end_index-1}.{file_name_parts[1]}"
     return file_name
 
 
@@ -252,8 +252,8 @@ def get_predictions_from_openai_and_write_to_file(
 
         try:
             prediction = prompt_response(system_prompt, user_prompt)
-        except:
-            print(f"An Exception occured at sample: {i}")
+        except Exception as e:
+            print(f"An Exception occurred at sample: {i}. Error details: {str(e)}")
             end_index = i
             break
 

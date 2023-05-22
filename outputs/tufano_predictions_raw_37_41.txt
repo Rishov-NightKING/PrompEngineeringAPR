@@ -1,4 +1,0 @@
-public void edit ( VolumeBrickModel object ) { table . setRowData ( new ArrayList < ListModel >( ) ) ; table . edit ( object . getBricks ( ) ) ; Driver . driver . edit ( object ) ; }
-public List < QuickFilter > getQuickFilters ( ) { return quickFilters ; }
-public void testBounds ( ) { assertEquals ( LOW , fCondition . min ( ) ) ; assertEquals ( HIGH , fCondition . max ( ) ) ; }
-public String weather ( ) { String result = restTemplate . getForObject ( "http : // " + WEATHER_SERVICE + " / weather" , String . class ) ; return "Weather Service Response : " + result ; }
