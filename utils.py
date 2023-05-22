@@ -85,7 +85,7 @@ def heuristic_adjust_spaces(text):
 
 
 def heuristic_remove_redundant_words(line):
-    redundant_words = ["Refactored code :", "Updated code :", "```", "Fixed code :"]
+    redundant_words = ["Refactored code :", "Updated code :", "Fixed code :", "Corrected code :", "```"]
     for reds in redundant_words:
         line = line.replace(reds, "").replace(reds.lower(), "").replace(reds.title(), "")
     return line.strip()
@@ -163,7 +163,7 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
         end_point = code.index(end_comment_tag) + len(end_comment_tag)
 
         code_review = code[:end_point].replace(start_comment_tag, "").replace(end_comment_tag, "")
-        buggy_code = code[end_point + 1:].replace("\n", "")
+        buggy_code = code[end_point + 1 :].replace("\n", "")
 
         code_reviews.append(code_review)
         buggy_codes.append(buggy_code)
@@ -233,7 +233,7 @@ def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predic
 
 
 def get_predictions_from_openai_and_write_to_file(
-        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     system_command = "You are a coding assistant. You generate only the source code."
     user_command = "Refactor the Buggy Code using the Review without comments"
@@ -241,6 +241,11 @@ def get_predictions_from_openai_and_write_to_file(
     prediction_list = []
 
     test_samples = [i for i in range(start_index, end_index)]
+
+    log_file_name = (
+        f"logs/LOGS_{prediction_file_path.split('/')[1].replace('.txt', '')}_{start_index}_{end_index-1}.txt"
+    )
+    log_file = open(log_file_name, "w", encoding="UTF-8")
 
     for i in test_samples:
         buggy_code = buggy_codes[i]
@@ -263,13 +268,25 @@ def get_predictions_from_openai_and_write_to_file(
         prediction = heuristic_remove_redundant_words(prediction)
         prediction_list.append(prediction)
 
-        print(f"sample: {i}")
-        print(f"buggy_code: {buggy_code}")
-        print(f"code_review: {code_review}")
-        print(f"target code: {target_code}")
-        print(f"response: {prediction}")
+        SAMPLE_NO = f"sample: {i}"
+        BUGGY_CODE = f"buggy_code: {buggy_code}"
+        CODE_REVIEW = f"code_review: {code_review}"
+        TARGET_CODE = f"target code: {target_code}"
+        PREDICTION = f"response: {prediction}"
 
+        print(SAMPLE_NO)
+        print(BUGGY_CODE)
+        print(CODE_REVIEW)
+        print(TARGET_CODE)
+        print(PREDICTION)
         print()
+
+        log_file.write(SAMPLE_NO + "\n")
+        log_file.write(BUGGY_CODE + "\n")
+        log_file.write(CODE_REVIEW + "\n")
+        log_file.write(TARGET_CODE + "\n")
+        log_file.write(PREDICTION + "\n")
+        log_file.write("\n")
 
         time.sleep(20)
 

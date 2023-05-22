@@ -1,0 +1,606 @@
+sample: 0
+buggy_code: private static Set<String> getRootQualifiers(ResourceTypes resourceTypes) { return resourceTypes.getRoots().stream() .map(ResourceType::getQualifier) <START> .filter(q -> !DEPRECATED_QUALIFIERS.contains(q)) <END> .collect(Collectors.toCollection(TreeSet::new)); }
+code_review: I think LIBRARY are no more used
+target code: private static Set < String > getRootQualifiers ( ResourceTypes resourceTypes ) { return resourceTypes . getRoots ( ) . stream ( ) . map ( ResourceType : : getQualifier ) . collect ( Collectors . toCollection ( TreeSet : : new ) ) ; }
+response: private static Set < String > getRootQualifiers ( ResourceTypes resourceTypes ) { return resourceTypes . getRoots ( ) . stream ( ) . map ( ResourceType : : getQualifier ) . filter ( q - > ! DEPRECATED_QUALIFIERS . contains ( q ) && ! q . equals ( "LIBRARY" ) ) . collect ( Collectors . toCollection ( TreeSet : : new ) ) ; }
+
+sample: 1
+buggy_code: public RuntimeFilterManager(QueryWorkUnit workUnit, DrillbitContext drillbitContext) { this.rootWrapper = workUnit.getRootWrapper(); this.drillbitContext = drillbitContext; <START> lineSeparator = java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator")); <END> }
+code_review: Consider using `System.lineSeparator()` instead.
+target code: public RuntimeFilterManager ( QueryWorkUnit workUnit , DrillbitContext drillbitContext ) { this . rootWrapper = workUnit . getRootWrapper ( ) ; this . drillbitContext = drillbitContext ; }
+response: public RuntimeFilterManager ( QueryWorkUnit workUnit , DrillbitContext drillbitContext ) { this . rootWrapper = workUnit . getRootWrapper ( ) ; this . drillbitContext = drillbitContext ; lineSeparator = System . lineSeparator ( ) ; }
+
+sample: 2
+buggy_code: private void activateMarkers() { if (!fGerritClient.getRepository().getServerInfo().isAnonymous()) { String value = NLS.bind(Messages.ChangeDetailEditor_EGerriTipValue, <START> fChangeInfo.getUserSelectedRevision().get_number()); <END> UIUtils.showDialogTip(MARKERS_KEY, headerSection.getShell(), Messages.EGerriTip, value); } }
+code_review: ChangeDetailEditor_EGerriTipValue has no more arguments, should we just use it directly , no need to set the arguments ?
+target code: private void activateMarkers ( ) { if ( ! fGerritClient . getRepository ( ) . getServerInfo ( ) . isAnonymous ( ) ) { UIUtils . showDialogTip ( MARKERS_KEY , headerSection . getShell ( ) , Messages . EGerriTip , Messages . ChangeDetailEditor_EGerriTipValue ) ; } }
+response: private void activateMarkers ( ) { if ( ! fGerritClient . getRepository ( ) . getServerInfo ( ) . isAnonymous ( ) ) { String value = Messages . ChangeDetailEditor_EGerriTipValue ; UIUtils . showDialogTip ( MARKERS_KEY , headerSection . getShell ( ) , Messages . EGerriTip , value ) ; } }
+
+sample: 3
+buggy_code: public void testCreate() throws StripeException { Map<String, Object> params = new HashMap<String, Object>(); params.put("currency", "usd"); final Order order = Order.create(params); assertNotNull(order); verifyRequest( APIResource.RequestMethod.POST, <START> "/v1/orders", <END> params ); }
+code_review: should be called `resource`
+target code: public void testCreate ( ) throws StripeException { final Map < String , Object > params = new HashMap < String , Object > ( ) ; params . put ( "currency" , "usd" ) ; final Order order = Order . create ( params ) ; assertNotNull ( order ) ; verifyRequest ( APIResource . RequestMethod . POST , " / v1 / orders" , params ) ; }
+response: Corrected Code : public void testCreate ( ) throws StripeException { Map < String , Object > params = new HashMap < String , Object > ( ) ; params . put ( "currency" , "usd" ) ; final Order order = Order . create ( params ) ; assertNotNull ( order ) ; verifyRequest ( APIResource . RequestMethod . POST , " / v1 / orders" , params ) ; }
+
+sample: 4
+buggy_code: private FirewallRule findById(List<FirewallRule> collection, String id) { FirewallRule result = null; for (FirewallRule rule : collection) { if (rule.id().equals(id)) { <START> result = rule; <END> } } return result; }
+code_review: Just `return rule`.
+target code: private FirewallRule findById ( List < FirewallRule > collection , String id ) { for ( FirewallRule rule : collection ) { if ( rule . id ( ) . equals ( id ) ) { return rule ; } } return null ; }
+response: private FirewallRule findById ( List < FirewallRule > collection , String id ) { for ( FirewallRule rule : collection ) { if ( rule . id ( ) . equals ( id ) ) { return rule ; } } return null ; }
+
+sample: 5
+buggy_code: public void addDownload(String download){ <START> if(!downloads.contains(download)) { <END> downloads.add(download); } }
+code_review: Should probably use a Set<String> instead of a List<String> so that the intention of the code is clear by first glance.
+target code: public void addDownload ( String download ) { downloads . add ( download ) ; }
+response: public void addDownload ( String download ) { Set < String > downloads = new HashSet < > ( ) ; if ( ! downloads . contains ( download ) ) { downloads . add ( download ) ; } }
+
+sample: 6
+buggy_code: public void copyDetailsFromOtherCuObjectCodeActivationGlobal(CuObjectCodeActivationGlobal oldGlobal) { for (CuObjectCodeGlobalDetail oldDetail : oldGlobal.getObjectCodeGlobalDetails()) { CuObjectCodeGlobalDetail newDetail = (CuObjectCodeGlobalDetail) ObjectUtils.deepCopy(oldDetail); newDetail.setObjectId(null); newDetail.setDocumentNumber(getDocumentNumber()); <START> newDetail.setVersionNumber(new Long(0)); <END> getObjectCodeGlobalDetails().add(newDetail); } }
+code_review: Should this be 1 or null instead of 0?
+target code: public void copyDetailsFromOtherCuObjectCodeActivationGlobal ( CuObjectCodeActivationGlobal oldGlobal ) { for ( CuObjectCodeGlobalDetail oldDetail : oldGlobal . getObjectCodeGlobalDetails ( ) ) { CuObjectCodeGlobalDetail newDetail = ( CuObjectCodeGlobalDetail ) ObjectUtils . deepCopy ( oldDetail ) ; newDetail . setObjectId ( null ) ; newDetail . setDocumentNumber ( getDocumentNumber ( ) ) ; newDetail . setVersionNumber ( new Long ( 1 ) ) ; getObjectCodeGlobalDetails ( ) . add ( newDetail ) ; } }
+response: public void copyDetailsFromOtherCuObjectCodeActivationGlobal ( CuObjectCodeActivationGlobal oldGlobal ) { for ( CuObjectCodeGlobalDetail oldDetail : oldGlobal . getObjectCodeGlobalDetails ( ) ) { CuObjectCodeGlobalDetail newDetail = ( CuObjectCodeGlobalDetail ) ObjectUtils . deepCopy ( oldDetail ) ; newDetail . setObjectId ( null ) ; newDetail . setDocumentNumber ( getDocumentNumber ( ) ) ; newDetail . setVersionNumber ( 1L ) ; getObjectCodeGlobalDetails ( ) . add ( newDetail ) ; } }
+
+sample: 7
+buggy_code: private void loadVncData(HasConsoleModel model, KeyMaker keyMaker) { if (!(model.getDefaultConsoleModel() instanceof VncConsoleModel)) { return; } model.setSelectedProtocol(ConsoleProtocol.VNC); asVncConsoleModel(model).setVncImplementation(VncConsoleModel.ClientConsoleMode <START> .valueOf(clientStorage.getLocalItem(keyMaker.make(VNC_CLIENT_MODE)))); <END> }
+code_review: You can not be sure that the value is present in the local storage (see the storeVncData). Please wrap the ...valueOf(...) by try-catch
+target code: private void loadVncData ( HasConsoleModel model , KeyMaker keyMaker ) { if ( ! ( model . getDefaultConsoleModel ( ) instanceof VncConsoleModel ) ) { return ; } model . setSelectedProtocol ( ConsoleProtocol . VNC ) ; try { asVncConsoleModel ( model ) . setVncImplementation ( VncConsoleModel . ClientConsoleMode . valueOf ( clientStorage . getLocalItem ( keyMaker . make ( VNC_CLIENT_MODE ) ) ) ) ; } catch ( Exception e ) { } }
+response: private void loadVncData ( HasConsoleModel model , KeyMaker keyMaker ) { if ( ! ( model . getDefaultConsoleModel ( ) instanceof VncConsoleModel ) ) { return ; } model . setSelectedProtocol ( ConsoleProtocol . VNC ) ; try { asVncConsoleModel ( model ) . setVncImplementation ( VncConsoleModel . ClientConsoleMode . valueOf ( clientStorage . getLocalItem ( keyMaker . make ( VNC_CLIENT_MODE ) ) ) ) ; } catch ( IllegalArgumentException e ) { // handle the exception as needed } }
+
+sample: 8
+buggy_code: private RuleApplication applyRule() { SymbolAllocator symbolAllocator = new SymbolAllocator(symbols); Memo memo = new Memo(idAllocator, plan); Lookup lookup = Lookup.from(memo::resolve); Optional<PlanNode> result = inTransaction(session -> rule.apply(memo.getNode(memo.getRootGroup()), lookup, idAllocator, symbolAllocator, session)); <START> return new RuleApplication( <END> memo, lookup, symbolAllocator.getTypes(), result); }
+code_review: These arguments can all go on the same line
+target code: private RuleApplication applyRule ( ) { SymbolAllocator symbolAllocator = new SymbolAllocator ( symbols ) ; Memo memo = new Memo ( idAllocator , plan ) ; Lookup lookup = Lookup . from ( memo : : resolve ) ; Optional < PlanNode > result = inTransaction ( session - > rule . apply ( memo . getNode ( memo . getRootGroup ( ) ) , lookup , idAllocator , symbolAllocator , session ) ) ; return new RuleApplication ( lookup , symbolAllocator . getTypes ( ) , result ) ; }
+response: private RuleApplication applyRule ( ) { SymbolAllocator symbolAllocator = new SymbolAllocator ( symbols ) ; Memo memo = new Memo ( idAllocator , plan ) ; Lookup lookup = Lookup . from ( memo : : resolve ) ; Optional < PlanNode > result = inTransaction ( session - > rule . apply ( memo . getNode ( memo . getRootGroup ( ) ) , lookup , idAllocator , symbolAllocator , session ) ) ; return new RuleApplication ( memo , lookup , symbolAllocator . getTypes ( ) , result ) ; }
+
+sample: 9
+buggy_code: public void testPushDownArray() throws Exception { testParquetFilterPushDown("t.`user`.hobby_ids[0] = 1", 3, 2); testParquetFilterPushDown("t.`user`.hobby_ids[0] = 100", 0, 1); <START> testParquetFilterPushDown("t.`user`.hobby_ids[0] <> 1", 8, 7); <END> testParquetFilterPushDown("t.`user`.hobby_ids[2] > 20", 5, 4); testParquetFilterPushDown("t.`user`.hobby_ids[0] between 10 and 20", 5, 5); testParquetFilterPushDown("t.`user`.hobby_ids[4] = 15", 1, 3); testParquetFilterPushDown("t.`user`.hobby_ids[2] is not null", 11, 6); testParquetFilterPushDown("t.`user`.hobby_ids[3] is null", 11, 7); }
+code_review: Why the expected output was changed?
+target code: public void testPushDownArray ( ) throws Exception { testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] = 1" , 3 , 2 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] = 100" , 0 , 1 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] < > 1" , 8 , 6 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 2 ] > 20" , 5 , 3 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] between 10 and 20" , 5 , 4 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 4 ] = 15" , 1 , 3 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 2 ] is not null" , 11 , 6 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 3 ] is null" , 11 , 7 ) ; }
+response: public void testPushDownArray ( ) throws Exception { testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] = 1" , 3 , 2 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] = 100" , 0 , 1 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] != 1" , 8 , 7 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 2 ] > 20" , 5 , 4 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 0 ] between 10 and 20" , 5 , 5 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 4 ] = 15" , 1 , 3 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 2 ] is not null" , 11 , 6 ) ; testParquetFilterPushDown ( "t . `user` . hobby_ids [ 3 ] is null" , 11 , 7 ) ; }
+
+sample: 10
+buggy_code: default Direction getBubbleElevatorDirection() { Block block = this.getBlockState().getBlock(); if (block == Blocks.BUBBLE_COLUMN) { <START> return this.getBlockState().get(BubbleColumnBlock.DRAG) ? Direction.DOWN : Direction.UP; <END> } else { return block.getBubbleElevatorDirection(this.getBlockState()); } }
+code_review: This logic should be in the default implementation.
+target code: default Direction getBubbleElevatorDirection ( ) { return this . getBlockState ( ) . getBlock ( ) . getBubbleElevatorDirection ( this . getBlockState ( ) ) ; }
+response: Default Direction getBubbleElevatorDirection ( ) { Block block = this . getBlockState ( ) . getBlock ( ) ; if ( block == Blocks . BUBBLE_COLUMN ) { return this . getBlockState ( ) . get ( BubbleColumnBlock . DRAG ) ? Direction . DOWN : Direction . UP ; } return block . getDefaultBubbleElevatorDirection ( ) ; }
+
+sample: 11
+buggy_code: public void testSystemPropertiesOverrideConfigurationValues() { final String keyName = CoreConfig.MAX_CASSANDRA_CONNECTIONS.toString(); Configuration config = Configuration.getInstance(); try { Assert.assertEquals("75", config.getStringProperty(CoreConfig.MAX_CASSANDRA_CONNECTIONS)); System.setProperty(keyName, "something else"); Assert.assertEquals("something else", config.getStringProperty(CoreConfig.MAX_CASSANDRA_CONNECTIONS)); } finally { System.clearProperty(keyName); <START> Configuration.clearProperty(keyName); <END> } }
+code_review: Why access this method staticly?
+target code: public void testSystemPropertiesOverrideConfigurationValues ( ) { final String keyName = CoreConfig . MAX_CASSANDRA_CONNECTIONS . toString ( ) ; Configuration config = Configuration . getInstance ( ) ; try { Assert . assertEquals ( "75" , config . getStringProperty ( CoreConfig . MAX_CASSANDRA_CONNECTIONS ) ) ; System . setProperty ( keyName , "something else" ) ; Assert . assertEquals ( "something else" , config . getStringProperty ( CoreConfig . MAX_CASSANDRA_CONNECTIONS ) ) ; } finally { System . clearProperty ( keyName ) ; config . clearProperty ( keyName ) ; } }
+response: public void testSystemPropertiesOverrideConfigurationValues ( ) { final String keyName = CoreConfig . MAX_CASSANDRA_CONNECTIONS . toString ( ) ; Configuration config = Configuration . getInstance ( ) ; try { Assert . assertEquals ( "75" , config . getStringProperty ( CoreConfig . MAX_CASSANDRA_CONNECTIONS ) ) ; System . setProperty ( keyName , "something else" ) ; Assert . assertEquals ( "something else" , config . getStringProperty ( CoreConfig . MAX_CASSANDRA_CONNECTIONS ) ) ; } finally { System . clearProperty ( keyName ) ; Configuration . getInstance ( ) . clearProperty ( keyName ) ; } }
+
+sample: 12
+buggy_code: public void onSubscribe(Subscription inner) { <START> SubscriptionHelper.setOnce(this, inner); <END> o.onSubscribe(this); inner.request(Long.MAX_VALUE); }
+code_review: You can set it on a plain field, no need for atomics: ``` java this.inner = inner; o.onSubscribe(this); inner.request(Long.MAX_VALUE); ```
+target code: public void onSubscribe ( Subscription inner ) { this . inner = inner ; o . onSubscribe ( this ) ; inner . request ( Long . MAX_VALUE ) ; }
+response: java public void onSubscribe ( Subscription inner ) { this . inner = inner ; o . onSubscribe ( this ) ; inner . request ( Long . MAX_VALUE ) ; }
+
+sample: 13
+buggy_code: public WebElement forElementPresent(By by) { changeImplicitWait(250, TimeUnit.MILLISECONDS); try { return wait.until(ExpectedConditions.presenceOfElementLocated(by)); } catch(TimeoutException e) { PageObjectLogging.log( ELEMENT_PRESENT_MESSAGE, String.format(ELEMENT_PRESENT_ERROR_FORMAT, by.toString()), <START> true <END> ); throw e; } finally { restoreDeaultImplicitWait(); } }
+code_review: `true` -> `false` ?
+target code: public WebElement forElementPresent ( By by ) { changeImplicitWait ( 250 , TimeUnit . MILLISECONDS ) ; try { return wait . until ( ExpectedConditions . presenceOfElementLocated ( by ) ) ; } catch ( TimeoutException e ) { PageObjectLogging . log ( ELEMENT_PRESENT_MESSAGE , String . format ( ELEMENT_PRESENT_ERROR_FORMAT , by . toString ( ) ) , false ) ; throw e ; } finally { restoreDeaultImplicitWait ( ) ; } }
+response: public WebElement forElementPresent ( By by ) { changeImplicitWait ( 250 , TimeUnit . MILLISECONDS ) ; try { return wait . until ( ExpectedConditions . presenceOfElementLocated ( by ) ) ; } catch ( TimeoutException e ) { PageObjectLogging . log ( ELEMENT_PRESENT_MESSAGE , String . format ( ELEMENT_PRESENT_ERROR_FORMAT , by . toString ( ) ) , false ) ; throw e ; } finally { restoreDeaultImplicitWait ( ) ; } }
+
+sample: 14
+buggy_code: public boolean accept(Issue issue) { <START> if (issueShouldNotBeReported(issue, excludedLinesByRule())) { <END> return false; } return true; }
+code_review: could be simplified.
+target code: public boolean accept ( Issue issue ) { return ! issueShouldNotBeReported ( issue , excludedLinesByRule ( ) ) ; }
+response: public boolean accept ( Issue issue ) { return ! issueShouldNotBeReported ( issue , excludedLinesByRule ( ) ) ; }
+
+sample: 15
+buggy_code: <START> public HashMap<String, <END> ArrayList<Order>> getBuyOrders() { return buyOrders; }
+code_review: this method should be changed to private
+target code: private HashMap < String , ArrayList < Order > > getBuyOrders ( ) { return buyOrders ; }
+response: private HashMap < String , ArrayList < Order > > getBuyOrders ( ) { return buyOrders ; }
+
+sample: 16
+buggy_code: <START> public static <END> Color getSystemForegroundColor(Display display) { ColorRegistry colorRegistry = JFaceResources.getColorRegistry(); Color foreground = colorRegistry.get(JFacePreferences.INFORMATION_FOREGROUND_COLOR); if (foreground == null) { return JFaceColors.getInformationViewerForegroundColor(display); } return foreground; }
+code_review: There's no need to make these public, even if the package is internal.
+target code: private static Color getSystemForegroundColor ( Display display ) { ColorRegistry colorRegistry = JFaceResources . getColorRegistry ( ) ; Color foreground = colorRegistry . get ( JFacePreferences . INFORMATION_FOREGROUND_COLOR ) ; if ( foreground == null ) { return JFaceColors . getInformationViewerForegroundColor ( display ) ; } return foreground ; }
+response: static Color getSystemForegroundColor ( Display display ) { ColorRegistry colorRegistry = JFaceResources . getColorRegistry ( ) ; Color foreground = colorRegistry . get ( JFacePreferences . INFORMATION_FOREGROUND_COLOR ) ; if ( foreground == null ) { return JFaceColors . getInformationViewerForegroundColor ( display ) ; } return foreground ; }
+
+sample: 17
+buggy_code: public void visitNode(Tree tree) { if (!hasSemantic()) { return; } SwitchStatementTree switchStatementTree = (SwitchStatementTree) tree; <START> Optional<CaseLabelTree> defaultLabel = getDefaultLabel(switchStatementTree); <END> if (!defaultLabel.isPresent()) { if (!isSwitchOnEnum(switchStatementTree)) { reportIssue(switchStatementTree.switchKeyword(), "Add a default case to this switch."); } else if (missingCasesOfEnum(switchStatementTree)) { reportIssue(switchStatementTree.switchKeyword(), "Complete cases by adding the missing enum constants or add a default case to this switch."); } } }
+code_review: You should go one step more in simplifying the rule: Change this method to return a boolean: `hasNoDefault(switchStatementTree)` ``` return allLabels(switchStatementTree).noneMatch(SwitchLastCaseIsDefaultCheck::isDefault); ```
+target code: public void visitNode ( Tree tree ) { if ( ! hasSemantic ( ) ) { return ; } SwitchStatementTree switchStatementTree = ( SwitchStatementTree ) tree ; if ( getDefaultLabel ( switchStatementTree ) ) { if ( ! isSwitchOnEnum ( switchStatementTree ) ) { reportIssue ( switchStatementTree . switchKeyword ( ) , "Add a default case to this switch . " ) ; } else if ( missingCasesOfEnum ( switchStatementTree ) ) { reportIssue ( switchStatementTree . switchKeyword ( ) , "Complete cases by adding the missing enum constants or add a default case to this switch . " ) ; } } }
+response: public boolean hasNoDefault ( SwitchStatementTree switchStatementTree ) { return allLabels ( switchStatementTree ) . noneMatch ( SwitchLastCaseIsDefaultCheck : : isDefault ) ; } public void visitNode ( Tree tree ) { if ( ! hasSemantic ( ) ) { return ; } SwitchStatementTree switchStatementTree = ( SwitchStatementTree ) tree ; if ( ! hasNoDefault ( switchStatementTree ) ) { return ; } if ( ! isSwitchOnEnum ( switchStatementTree ) ) { reportIssue ( switchStatementTree . switchKeyword ( ) , "Add a default case to this switch . " ) ; } else if ( missingCasesOfEnum ( switchStatementTree ) ) { reportIssue ( switchStatementTree . switchKeyword ( ) , "Complete cases by adding the missing enum constants or add a default case to this switch . " ) ; } }
+
+sample: 18
+buggy_code: <START> public String getAttribute() { <END> if (fAttribute.equals(NOT_SET)) { setAttribute(); } return fAttribute; }
+code_review: This method should be synchronized, otherwise, chances are eventually there might be a race condition for setting fAttribute.
+target code: public synchronized String getAttribute ( ) { if ( fAttribute . equals ( NOT_SET ) ) { setAttribute ( ) ; } return fAttribute ; }
+response: public synchronized String getAttribute ( ) { if ( fAttribute . equals ( NOT_SET ) ) { setAttribute ( ) ; } return fAttribute ; }
+
+sample: 19
+buggy_code: public DotRunnableThread(final List<DotRunnable> allListeners) { this.listeners = getListeners(allListeners); this.flushers = getFlushers(allListeners); <START> this.networkCacheFlushThread.start(); <END> }
+code_review: ![BLOCKER](https://sonarsource.github.io/sonar-github/severity-blocker.png 'Severity: BLOCKER') Move this "start" call to another method. [![rule](https://sonarsource.github.io/sonar-github/rule.png)](https://sonarcloud.io/coding_rules#rule_key=squid%3AS2693)
+target code: public DotRunnableThread ( final List < DotRunnable > allListeners ) { this . listeners = getListeners ( allListeners ) ; this . flushers = getFlushers ( allListeners ) ; }
+response: public DotRunnableThread ( final List < DotRunnable > allListeners ) { this . listeners = getListeners ( allListeners ) ; this . flushers = getFlushers ( allListeners ) ; startNetworkCacheFlushThread ( ) ; } private void startNetworkCacheFlushThread ( ) { this . networkCacheFlushThread . start ( ) ; }
+
+sample: 20
+buggy_code: private void createIndex() { lastFoundElementPosition = 0; filteredPlan.clear(); for (PlanElement element : plan.getList()) { <START> if (!element.isComment()) { <END> filteredPlan.add(element); } } }
+code_review: style nit: no braces around single line blocks
+target code: private void createIndex ( ) { lastFoundElementPosition = 0 ; filteredPlan . clear ( ) ; for ( PlanElement element : plan . getList ( ) ) { if ( ! element . isComment ( ) ) filteredPlan . add ( element ) ; } }
+response: private void createIndex ( ) { lastFoundElementPosition = 0 ; filteredPlan . clear ( ) ; for ( PlanElement element : plan . getList ( ) ) if ( ! element . isComment ( ) ) filteredPlan . add ( element ) ; }
+
+sample: 21
+buggy_code: public Collection<Map.Entry<K, V>> scanAndFilterByEntry( Predicate<? super Map.Entry<K, V>> entryPredicate) { <START> return mainMap.entryStream().parallel() <END> .filter(entryPredicate) .collect(Collectors.toCollection(ArrayList::new)); }
+code_review: is there a difference between parallelStream() and entryStream().parallel() ?
+target code: public Collection < Map . Entry < K , V > > scanAndFilterByEntry ( Predicate < ? super Map . Entry < K , V > > entryPredicate ) { return mainMap . entryStream ( ) . filter ( entryPredicate ) . collect ( Collectors . toCollection ( ArrayList : : new ) ) ; }
+response: public Collection < Map . Entry < K , V > > scanAndFilterByEntry ( Predicate < ? super Map . Entry < K , V > > entryPredicate ) { return mainMap . entrySet ( ) . parallelStream ( ) . filter ( entryPredicate ) . collect ( Collectors . toCollection ( ArrayList : : new ) ) ; }  Explanation : The `entrySet ( ) ` method returns a `Set` view of the mappings contained in the map . The `entryStream ( ) ` method returns a sequential `Stream` of the entries in the map . The `parallel ( ) ` method on a `Stream` returns an equivalent stream that is parallel . Therefore , there is no difference between `parallelStream ( ) ` and `entryStream ( ) . parallel ( ) ` . In the refactored code , we use `entrySet ( ) . parallelStream ( ) ` to get a parallel stream of the entries in the map . This stream is then filtered using the `entryPredicate` and collected into an `ArrayList` .
+
+sample: 22
+buggy_code: <START> protected boolean isValidChar(final char c) { <END> return isValidChar(regExp, c); }
+code_review: can be `private`? or at least package protected access?
+target code: private boolean isValidChar ( final char c ) { return isValidChar ( regExp , c ) ; }
+response: java private boolean isValidChar ( final char c ) { return isValidChar ( regExp , c ) ; }
+
+sample: 23
+buggy_code: public boolean verifyEventIdentifier(AbstractPlaceEvent event) { boolean equals = Objects.equals(getEditorIdentifier(), event.getPlace().getIdentifier()); boolean equals1 = Objects.equals(editorPlaceRequest, event.getPlace()); return (equals && <START> equals1); <END> }
+code_review: Toni, could we please choose better variable names here? `equals` and `equals1` do not say much for newcomer to the codebase. Or we could avoid storing partial results by: ```java if(!Objects.equals(editorPlaceRequest, event.getPlace())) { return false; } if (!Objects.equals(getEditorIdentifier(), event.getPlace().getIdentifier())) { return false; } return true; ``` Please let me know what do you think.
+target code: public boolean verifyEventIdentifier ( AbstractPlaceEvent event ) { return ( Objects . equals ( getEditorIdentifier ( ) , event . getPlace ( ) . getIdentifier ( ) ) && Objects . equals ( editorPlaceRequest , event . getPlace ( ) ) ) ; }
+response: java public boolean verifyEventIdentifier ( AbstractPlaceEvent event ) { if ( ! Objects . equals ( editorPlaceRequest , event . getPlace ( ) ) ) { return false ; } if ( ! Objects . equals ( getEditorIdentifier ( ) , event . getPlace ( ) . getIdentifier ( ) ) ) { return false ; } return true ; }
+
+sample: 24
+buggy_code: public void star() throws IOException { this.entry.uri() <START> .path(RtGist.PATH_ELEMENT_STAR).back().method("PUT") <END> .fetch().as(RestResponse.class) .assertStatus(HttpURLConnection.HTTP_NO_CONTENT); }
+code_review: It's an obvious code duplication. We can save this new request with a modified URI into `this.request`, and use it in all methods. This is how it works in other classes, take a look
+target code: public void star ( ) throws IOException { this . request . method ( "PUT" ) . fetch ( ) . as ( RestResponse . class ) . assertStatus ( HttpURLConnection . HTTP_NO_CONTENT ) ; }
+response: public void star ( ) throws IOException { this . request = this . entry . uri ( ) . path ( RtGist . PATH_ELEMENT_STAR ) . back ( ) . method ( "PUT" ) ; this . request . fetch ( ) . as ( RestResponse . class ) . assertStatus ( HttpURLConnection . HTTP_NO_CONTENT ) ; }
+
+sample: 25
+buggy_code: public IssueOutputView(Issue issue) { <START> this(issue, null, null); <END> }
+code_review: What is the need to make `issueArticles` nullable? It would be easier to understand this view class if we required it. If that's totally impractical, we should consider having a separate view class to capture the difference.
+target code: public IssueOutputView ( Issue issue ) { this ( issue , null ) ; }
+response: public IssueOutputView ( Issue issue , IssueArticles issueArticles ) { this ( issue , issueArticles , null ) ; }  Explanation : - The `IssueOutputView` constructor now requires an `Issue` object and an `IssueArticles` object . - The third parameter is still nullable , but it is not required for the constructor to work properly . - If the third parameter is needed , a separate view class can be created to handle that scenario .
+
+sample: 26
+buggy_code: <START> public ProcessEngineConfiguration setDefaultNumberOfRetries(int defaultNumberOfRetries) { <END> this.defaultNumberOfRetries = defaultNumberOfRetries; return this; }
+code_review: not 100% sure, but this breaks binary compatibility, right?
+target code: public void setDefaultNumberOfRetries ( int defaultNumberOfRetries ) { this . defaultNumberOfRetries = defaultNumberOfRetries ; }
+response: public ProcessEngineConfiguration setDefaultNumberOfRetries ( int defaultNumberOfRetries ) { this . defaultNumberOfRetries = defaultNumberOfRetries ; return this ; } // This code may break binary compatibility .
+
+sample: 27
+buggy_code: <START> public void testSequenceFlowSupplier() throws Exception { <END> final CaseManagementSetChildNodeGraphCommand command = new CaseManagementSetChildNodeGraphCommand(parent, candidate, index, originalParent, originalIndex); final Supplier<ViewConnector<SequenceFlow>> supplier = command.sequenceFlowSupplier(); final ViewConnector<SequenceFlow> viewConnector = supplier.get(); assertNotNull(viewConnector); assertNotNull(viewConnector.getSourceConnection()); assertNotNull(viewConnector.getTargetConnection()); assertNotNull(viewConnector.getBounds()); assertNotNull(viewConnector.getDefinition()); }
+code_review: The Exception is never thrown.
+target code: public void testSequenceFlowSupplier ( ) { final CaseManagementSetChildNodeGraphCommand command = new CaseManagementSetChildNodeGraphCommand ( parent , candidate , index , originalParent , originalIndex ) ; final Supplier < ViewConnector < SequenceFlow > > supplier = command . sequenceFlowSupplier ( ) ; final ViewConnector < SequenceFlow > viewConnector = supplier . get ( ) ; assertNotNull ( viewConnector ) ; assertNotNull ( viewConnector . getSourceConnection ( ) ) ; assertNotNull ( viewConnector . getTargetConnection ( ) ) ; assertNotNull ( viewConnector . getBounds ( ) ) ; assertNotNull ( viewConnector . getDefinition ( ) ) ; }
+response: public void testSequenceFlowSupplier ( ) { final CaseManagementSetChildNodeGraphCommand command = new CaseManagementSetChildNodeGraphCommand ( parent , candidate , index , originalParent , originalIndex ) ; final Supplier < ViewConnector < SequenceFlow > > supplier = command . sequenceFlowSupplier ( ) ; final ViewConnector < SequenceFlow > viewConnector = supplier . get ( ) ; assertNotNull ( viewConnector ) ; assertNotNull ( viewConnector . getSourceConnection ( ) ) ; assertNotNull ( viewConnector . getTargetConnection ( ) ) ; assertNotNull ( viewConnector . getBounds ( ) ) ; assertNotNull ( viewConnector . getDefinition ( ) ) ; }
+
+sample: 28
+buggy_code: public long getSessionSeqId() { if (sessionSeqId == null) { <START> sessionSeqId = -1L; <END> String sessionId = getContext().getEngineContext().getSessionId(); // The session may not exists for quartz jobs if (getSessionDataContainer().isSessionExists(sessionId)) { sessionSeqId = getSessionDataContainer().getEngineSessionSeqId(sessionId); } } return sessionSeqId; }
+code_review: instead of an early assignment which might be overridden in line 2355, it can be set as the 'else' part of the if statement below (line 2356).
+target code: public long getSessionSeqId ( ) { if ( sessionSeqId == null ) { String sessionId = getContext ( ) . getEngineContext ( ) . getSessionId ( ) ; // The session may not exists for quartz jobs sessionSeqId = getSessionDataContainer ( ) . isSessionExists ( sessionId ) ? getSessionDataContainer ( ) . getEngineSessionSeqId ( sessionId ) : - 1L ; } return sessionSeqId ; }
+response: public long getSessionSeqId ( ) { if ( sessionSeqId == null ) { String sessionId = getContext ( ) . getEngineContext ( ) . getSessionId ( ) ; // The session may not exist for quartz jobs if ( getSessionDataContainer ( ) . isSessionExists ( sessionId ) ) { sessionSeqId = getSessionDataContainer ( ) . getEngineSessionSeqId ( sessionId ) ; } else { sessionSeqId = - 1L ; } } return sessionSeqId ; }
+
+sample: 29
+buggy_code: private boolean isTxnRelatedEvent(final NotificationEvent event) { return ((event.getEventType().equals(MessageFactory.OPEN_TXN_EVENT)) || (event.getEventType().equals(MessageFactory.COMMIT_TXN_EVENT)) || (event.getEventType().equals(MessageFactory.ABORT_TXN_EVENT)) || <START> (event.getEventType().equals(MessageFactory.ALLOC_WRITE_ID_EVENT)) <END> ); }
+code_review: Allocate write ID is a DB/table related event and should be ignored if not lookup on this DB/table.
+target code: private boolean isTxnRelatedEvent ( final NotificationEvent event ) { return ( ( event . getEventType ( ) . equals ( MessageFactory . OPEN_TXN_EVENT ) ) || ( event . getEventType ( ) . equals ( MessageFactory . COMMIT_TXN_EVENT ) ) || ( event . getEventType ( ) . equals ( MessageFactory . ABORT_TXN_EVENT ) ) ) ; }
+response: private boolean isTxnRelatedEvent ( final NotificationEvent event ) { return ( ( event . getEventType ( ) . equals ( MessageFactory . OPEN_TXN_EVENT ) ) || ( event . getEventType ( ) . equals ( MessageFactory . COMMIT_TXN_EVENT ) ) || ( event . getEventType ( ) . equals ( MessageFactory . ABORT_TXN_EVENT ) ) || ( event . getEventType ( ) . equals ( MessageFactory . ALLOC_WRITE_ID_EVENT ) && isLookupOnDBTable ( event ) ) ) ; } private boolean isLookupOnDBTable ( final NotificationEvent event ) { // logic to check if the event is related to a DB / table lookup // return true if it is , false otherwise }
+
+sample: 30
+buggy_code: public static void setBackground(boolean async) { background = async; <START> } <END>
+code_review: Can't we have this static flag on FS instead? Then we wouldn't need to make FileStoreAttributeCache public.
+target code: private static void setBackground ( boolean async ) { background . set ( async ) ; }
+response: public static void setBackground ( boolean async ) { FileStore . setAttributeCacheBackground ( async ) ; }
+
+sample: 31
+buggy_code: public V put(@NonNull K key, @NonNull V value) { map.put(key, new Entry<>(key, value, ++time)); <START> if (map.size() >= maximumSize) { <END> purge(); } return value; }
+code_review: For a small maximuSize, like 1, it may be more reasonable to check for: map.size() > maximumSize
+target code: public V put ( @NonNull K key , @NonNull V value ) { map . put ( key , new Entry < > ( key , value , ++ time ) ) ; if ( map . size ( ) > maximumSize ) { purge ( ) ; } return value ; }
+response: public V put ( @NonNull K key , @NonNull V value ) { map . put ( key , new Entry < > ( key , value , ++ time ) ) ; if ( map . size ( ) > maximumSize ) { purge ( ) ; } return value ; }
+
+sample: 32
+buggy_code: private static void setIfNotNullOrEmpty( MongoProperties.Builder builder, MongoProp prop, String value ) { if ( value != null && value.trim().length() > 0 ) { boolean isPassword = MongoProp.PASSWORD.equals( prop ); <START> boolean isEncrypted = value.startsWith( Encr.PASSWORD_ENCRYPTED_PREFIX ); <END> if ( isPassword && isEncrypted ) { value = Encr.decryptPasswordOptionallyEncrypted( value ); } builder.set( prop, value ); } }
+code_review: Shouldn't do this line - it's handled by the ...Optionally... bit in the Encr class. https://github.com/pentaho/pentaho-kettle/blob/master/core/src/org/pentaho/di/core/encryption/KettleTwoWayPasswordEncoder.java#L86-L91
+target code: private static void setIfNotNullOrEmpty ( MongoProperties . Builder builder , MongoProp prop , String value ) { if ( value != null && value . trim ( ) . length ( ) > 0 ) { boolean isPassword = MongoProp . PASSWORD . equals ( prop ) ; if ( isPassword ) { value = Encr . decryptPasswordOptionallyEncrypted ( value ) ; } builder . set ( prop , value ) ; } }
+response: private static void setIfNotNullOrEmpty ( MongoProperties . Builder builder , MongoProp prop , String value ) { if ( value != null && value . trim ( ) . length ( ) > 0 ) { boolean isPassword = MongoProp . PASSWORD . equals ( prop ) ; if ( isPassword ) { value = Encr . decryptPasswordOptionallyEncrypted ( value ) ; } builder . set ( prop , value ) ; } }
+
+sample: 33
+buggy_code: public Mutation toMutation(K key) { <START> V valueFromStorage = (V) valueDataConversion.fromStorage(value); <END> return new Mutations.ReadWriteWithValue<>(valueFromStorage, f); }
+code_review: One use/test case is, a non-serializable pojo (user type) that is encoded as a UTF-8 byte[ ] with some string representation of it.
+target code: public Mutation toMutation ( K key ) { return new Mutations . ReadWriteWithValue < > ( value , f ) ; }
+response: public Mutation toMutation ( K key ) { byte [ ] encodedValue = valueDataConversion . toStorage ( value . toString ( ) . getBytes ( StandardCharsets . UTF_8 ) ) ; V valueFromStorage = valueDataConversion . fromStorage ( encodedValue ) ; return new Mutations . ReadWriteWithValue < > ( valueFromStorage , f ) ; }
+
+sample: 34
+buggy_code: <START> public Entry(Map.Entry<String,String> e) { <END> this(e.getKey(), e.getValue()); }
+code_review: IMHO it does not need to be public
+target code: private Entry ( Map . Entry < String , String > e ) { this ( e . getKey ( ) , e . getValue ( ) ) ; }
+response: < START > Entry ( Map . Entry < String , String > e ) { < END > this ( e . getKey ( ) , e . getValue ( ) ) ; }
+
+sample: 35
+buggy_code: private String parsePath() throws URISyntaxException { String[] parts = uri.split("\\?")[0].split(":", 2); <START> if (parts.length < 2 || parts[1].length() < 1) throw new URISyntaxException(uri, "invalid path"); <END> else return parts[1]; }
+code_review: parts[1].isEmpty
+target code: private String parsePath ( ) throws URISyntaxException { String [ ] parts = uri . split ( "\\ ? " ) [ 0 ] . split ( " : " , 2 ) ; if ( parts . length < 2 || parts [ 1 ] . isEmpty ( ) ) throw new URISyntaxException ( uri , "invalid path" ) ; else return parts [ 1 ] ; }
+response: private String parsePath ( ) throws URISyntaxException { String [ ] parts = uri . split ( "\\ ? " ) [ 0 ] . split ( " : " , 2 ) ; if ( parts . length < 2 || parts [ 1 ] . isEmpty ( ) ) { throw new URISyntaxException ( uri , "invalid path" ) ; } else { return parts [ 1 ] ; } }
+
+sample: 36
+buggy_code: public void setItems(Collection value) { genVersionToBaseTemplate(value); <START> final List<VmTemplate> sortedValues = sortTemplates(value); <END> super.setItems(sortedValues); }
+code_review: this will affect the sorting also on the webadmin - but on webadmin we support sortable columns. Please move this logic to UserPortalTemplateListModel.
+target code: public void setItems ( Collection value ) { genVersionToBaseTemplate ( value ) ; super . setItems ( value ) ; }
+response: public void setItems ( Collection value ) { genVersionToBaseTemplate ( value ) ; super . setItems ( value ) ; } // In UserPortalTemplateListModel public void setItems ( Collection value ) { genVersionToBaseTemplate ( value ) ; final List < VmTemplate > sortedValues = sortTemplates ( value ) ; super . setItems ( sortedValues ) ; }
+
+sample: 37
+buggy_code: public void edit(VolumeBrickModel object) { <START> table.setRowData(new ArrayList<ListModel>()); <END> table.edit(object.getBricks()); Driver.driver.edit(object); }
+code_review: why you need this line? table.setRowData(new ArrayList<ListModel>());
+target code: public void edit ( VolumeBrickModel object ) { table . edit ( object . getBricks ( ) ) ; Driver . driver . edit ( object ) ; }
+response: public void edit ( VolumeBrickModel object ) { table . setRowData ( object . getBricks ( ) ) ; Driver . driver . edit ( object ) ; }
+
+sample: 38
+buggy_code: public List<QuickFilter> getQuickFilters() { <START> return this.quickFilters; <END> }
+code_review: `return quickFilters`
+target code: public List < QuickFilter > getQuickFilters ( ) { return quickFilters ; }
+response: public List < QuickFilter > getQuickFilters ( ) { return quickFilters ; }
+
+sample: 39
+buggy_code: public void testBounds() { int low = fCondition.min(); <START> assertEquals(LOW, low); <END> int high = fCondition.max(); assertEquals(HIGH, high); }
+code_review: why not directly assertEquals(LOW, fCondition.min()); ?
+target code: public void testBounds ( ) { assertEquals ( LOW , ( int ) fCondition . min ( ) ) ; assertEquals ( HIGH , ( int ) fCondition . max ( ) ) ; }
+response: public void testBounds ( ) { assertEquals ( LOW , fCondition . min ( ) ) ; assertEquals ( HIGH , fCondition . max ( ) ) ; }
+
+sample: 40
+buggy_code: public String weather() { <START> String result = this.restTemplate.getForObject("http://" + WEATHER_SERVICE + "/weather", String.class); <END> return "Weather Service Response: " + result; }
+code_review: `this` is redundant here.
+target code: public String weather ( ) { String result = restTemplate . getForObject ( "http :/ / " + WEATHER_SERVICE + " / weather" , String . class ) ; return "Weather Service Response : " + result ; }
+response: public String weather ( ) { String result = restTemplate . getForObject ( "http :/ / " + WEATHER_SERVICE + " / weather" , String . class ) ; return "Weather Service Response : " + result ; }
+
+sample: 41
+buggy_code: public boolean isExtensionEnabled() { if (enablement != null) { try { <START> return enablement.getExpression().evaluate(new EvaluationContext(null, new Object())) <END> .equals(EvaluationResult.TRUE); } catch (CoreException e) { // TODO: handle exception } } return true; }
+code_review: Let's move this into an EnablementTester.evaluate(...) method.
+target code: public boolean isExtensionEnabled ( ) { return enablement != null ? enablement . evaluate ( ) : true ; }
+response: public boolean isExtensionEnabled ( ) { if ( enablement != null ) { try { return EnablementTester . evaluate ( enablement ) ; } catch ( CoreException e ) { // TODO : handle exception } } return true ; }
+
+sample: 42
+buggy_code: public ProviderNotificationManager createProviderNotificationManager(final DiagramEventBroker diagramEventBroker, final EObject view, final NotificationListener notificationListener) { <START> if (manager != null) { <END> return manager; } manager = new ProviderNotificationManager(diagramEventBroker, view, notificationListener) { @Override protected void registerListeners() { // TODO install listener on allocation(Abstraction) of the model. } }; return manager; }
+code_review: 'null' must be first operande
+target code: public ProviderNotificationManager createProviderNotificationManager ( final DiagramEventBroker diagramEventBroker , final EObject view , final NotificationListener notificationListener ) { if ( null != manager ) { return manager ; } manager = new ProviderNotificationManager ( diagramEventBroker , view , notificationListener ) { @Override protected void registerListeners ( ) { // TODO install listener on allocation ( Abstraction ) of the model . } } ; return manager ; }
+response: public ProviderNotificationManager createProviderNotificationManager ( final DiagramEventBroker diagramEventBroker , final EObject view , final NotificationListener notificationListener ) { ProviderNotificationManager manager = null ; if ( manager == null ) { manager = new ProviderNotificationManager ( diagramEventBroker , view , notificationListener ) { @Override protected void registerListeners ( ) { // TODO install listener on allocation ( Abstraction ) of the model . } } ; } return manager ; }
+
+sample: 43
+buggy_code: <START> public void startSyncFolderOperation(OCFile folder) { <END> long currentSyncTime = System.currentTimeMillis(); mSyncInProgress = true; // perform folder synchronization RemoteOperation synchFolderOp = new RefreshFolderOperation( folder, currentSyncTime, false, false, false, getStorageManager(), getAccount(), getApplicationContext() ); synchFolderOp.execute(getAccount(), this, null, null); }
+code_review: This method can be`private`.
+target code: private void startSyncFolderOperation ( OCFile folder ) { long currentSyncTime = System . currentTimeMillis ( ) ; mSyncInProgress = true ; // perform folder synchronization RemoteOperation synchFolderOp = new RefreshFolderOperation ( folder , currentSyncTime , false , false , false , getStorageManager ( ) , getAccount ( ) , getApplicationContext ( ) ) ; synchFolderOp . execute ( getAccount ( ) , this , null , null ) ; }
+response: private void syncFolder ( OCFile folder ) { long currentSyncTime = System . currentTimeMillis ( ) ; mSyncInProgress = true ; RemoteOperation synchFolderOp = new RefreshFolderOperation ( folder , currentSyncTime , false , false , false , getStorageManager ( ) , getAccount ( ) , getApplicationContext ( ) ) ; synchFolderOp . execute ( getAccount ( ) , this , null , null ) ; }
+
+sample: 44
+buggy_code: <START> public static ProtobufMetadataManagerImpl getProtobufMetadataManager(EmbeddedCacheManager cacheManager) { <END> if (cacheManager == null) { throw new IllegalArgumentException("cacheManager cannot be null"); } ProtobufMetadataManagerImpl metadataManager = (ProtobufMetadataManagerImpl) cacheManager.getGlobalComponentRegistry().getComponent(ProtobufMetadataManager.class); if (metadataManager == null) { throw new IllegalStateException("ProtobufMetadataManager not initialised yet!"); } return metadataManager; }
+code_review: This can be private again.
+target code: private static ProtobufMetadataManagerImpl getProtobufMetadataManager ( EmbeddedCacheManager cacheManager ) { if ( cacheManager == null ) { throw new IllegalArgumentException ( "cacheManager cannot be null" ) ; } ProtobufMetadataManagerImpl metadataManager = ( ProtobufMetadataManagerImpl ) cacheManager . getGlobalComponentRegistry ( ) . getComponent ( ProtobufMetadataManager . class ) ; if ( metadataManager == null ) { throw new IllegalStateException ( "ProtobufMetadataManager not initialised yet ! " ) ; } return metadataManager ; }
+response: private static ProtobufMetadataManagerImpl getProtobufMetadataManager ( EmbeddedCacheManager cacheManager ) { if ( cacheManager == null ) { throw new IllegalArgumentException ( "cacheManager cannot be null" ) ; } ProtobufMetadataManagerImpl metadataManager = ( ProtobufMetadataManagerImpl ) cacheManager . getGlobalComponentRegistry ( ) . getComponent ( ProtobufMetadataManager . class ) ; if ( metadataManager == null ) { throw new IllegalStateException ( "ProtobufMetadataManager not initialised yet ! " ) ; } return metadataManager ; }
+
+sample: 45
+buggy_code: public void onSessionKeyUpdate(SessionKey sessionKey) { <START> log.info("Session key updated"); <END> synchronized (DistributedHerder.this) { DistributedHerder.this.sessionKey = sessionKey.key(); if (isLeader() && keyRotationIntervalMs > 0) { DistributedHerder.this.keyExpiration = sessionKey.creationTimestamp() + keyRotationIntervalMs; } } }
+code_review: Should this log message be before or after we actually do update the session key?
+target code: public void onSessionKeyUpdate ( SessionKey sessionKey ) { log . info ( "Session key updated" ) ; synchronized ( DistributedHerder . this ) { DistributedHerder . this . sessionKey = sessionKey . key ( ) ; // Track the expiration of the key if and only if this worker is the leader // Followers will receive rotated keys from the follower and won't be responsible for // tracking expiration and distributing new keys themselves if ( isLeader ( ) && keyRotationIntervalMs > 0 ) { DistributedHerder . this . keyExpiration = sessionKey . creationTimestamp ( ) + keyRotationIntervalMs ; } } }
+response: public void onSessionKeyUpdate ( SessionKey sessionKey ) { synchronized ( DistributedHerder . this ) { DistributedHerder . this . sessionKey = sessionKey . key ( ) ; if ( isLeader ( ) && keyRotationIntervalMs > 0 ) { DistributedHerder . this . keyExpiration = sessionKey . creationTimestamp ( ) + keyRotationIntervalMs ; } } log . info ( "Session key updated" ) ; }  The log message should be after we update the session key . Therefore , I moved the log statement to the end of the method .
+
+sample: 46
+buggy_code: public String getAuthorizationUrl(OAuthConfig config) { <START> System.out.print("Authorisation URL: "); <END> // User must provide these 5 elements to the service builder String url = String.format(AUTHORIZE_URL, OAuthEncoder.encode(config.getApiKey()), OAuthEncoder.encode(config.getCallback()), OAuthEncoder.encode(config.getScope()), OAuthEncoder.encode(config.getState())); return url; }
+code_review: forgotten line of code?
+target code: public String getAuthorizationUrl ( OAuthConfig config ) { // User must provide these 4 elements to the service builder String url = String . format ( AUTHORIZE_URL , OAuthEncoder . encode ( config . getApiKey ( ) ) , OAuthEncoder . encode ( config . getCallback ( ) ) , OAuthEncoder . encode ( config . getScope ( ) ) , OAuthEncoder . encode ( config . getState ( ) ) ) ; return url ; }
+response: public String getAuthorizationUrl ( OAuthConfig config ) { System . out . print ( "Authorization URL : " ) ; // Added missing 'z' in Authorization String url = String . format ( AUTHORIZE_URL , OAuthEncoder . encode ( config . getApiKey ( ) ) , OAuthEncoder . encode ( config . getCallback ( ) ) , OAuthEncoder . encode ( config . getScope ( ) ) , OAuthEncoder . encode ( config . getState ( ) ) ) ; return url ; }
+
+sample: 47
+buggy_code: public Object getParameter(String name) { <START> final HostThread currentHostThread = fCurrentHostThread; <END> if (currentHostThread == null) { return null; } if (name.equals(CriticalPathModule.PARAM_WORKER)) { /* Try to find the worker for the critical path */ IAnalysisModule mod = getModule(); if ((mod != null) && (mod instanceof CriticalPathModule)) { LttngWorker worker = new LttngWorker(currentHostThread, "", 0); //$NON-NLS-1$ return worker; } return currentHostThread; } return null; }
+code_review: This code here should be inside the if, because we don't need to do anything if the parameter request is not PARAM_WORKER
+target code: public Object getParameter ( String name ) { if ( name . equals ( CriticalPathModule . PARAM_WORKER ) ) { final HostThread currentHostThread = fCurrentHostThread ; if ( currentHostThread == null ) { return null ; } /* Try to find the worker for the critical path */ IAnalysisModule mod = getModule ( ) ; if ( ( mod != null ) && ( mod instanceof CriticalPathModule ) ) { LttngWorker worker = new LttngWorker ( currentHostThread , "" , 0 ) ; // $NON - NLS - 1$ return worker ; } return currentHostThread ; } return null ; }
+response: public Object getParameter ( String name ) { final HostThread currentHostThread = fCurrentHostThread ; if ( currentHostThread == null ) { return null ; } if ( name . equals ( CriticalPathModule . PARAM_WORKER ) ) { IAnalysisModule mod = getModule ( ) ; if ( ( mod != null ) && ( mod instanceof CriticalPathModule ) ) { LttngWorker worker = new LttngWorker ( currentHostThread , "" , 0 ) ; // $NON - NLS - 1$ return worker ; } } return null ; }
+
+sample: 48
+buggy_code: public static ExceptionThrowingSubTest expectThrowable(Runnable runnable) { <START> return expectException( runnable.toString(), runnable ); <END> }
+code_review: Maybe `expectThrowable` for consistency?
+target code: public static ExceptionThrowingSubTest expectThrowable ( Runnable runnable ) { return expectThrowable ( runnable . toString ( ) , runnable ) ; }
+response: public static ExceptionThrowingSubTest expectThrowable ( Runnable runnable ) { return expectException ( runnable . toString ( ) , runnable ) ; }
+
+sample: 49
+buggy_code: protected CONNECTCXFClient(ServicePortDescriptor<T> portDescriptor, String url, AssertionType assertion, ServicePortBuilder<T> portBuilder) { serviceEndpoint = super.configureBasePort(portBuilder.createPort(), url, assertion != null ? assertion.getTransactionTimeout() : null); <START> configCNCheck(); <END> }
+code_review: remove this
+target code: protected CONNECTCXFClient ( ServicePortDescriptor < T > portDescriptor , String url , AssertionType assertion , ServicePortBuilder < T > portBuilder ) { serviceEndpoint = super . configureBasePort ( portBuilder . createPort ( ) , url , assertion != null ? assertion . getTransactionTimeout ( ) : null ) ; }
+response: protected CONNECTCXFClient ( ServicePortDescriptor < T > portDescriptor , String url , AssertionType assertion , ServicePortBuilder < T > portBuilder ) { serviceEndpoint = super . configureBasePort ( portBuilder . createPort ( ) , url , assertion != null ? assertion . getTransactionTimeout ( ) : null ) ; }
+
+sample: 50
+buggy_code: public <V> Setting<V> get(SimpleUri id, Class<V> valueType) { Setting setting = settings.get(id); Class settingValueClass = setting.getValueClass(); if (!settingValueClass.equals(valueType)) { throw new ClassCastException( "Expected a Setting of type " + valueType.getName() + ", found a Setting of type " + settingValueClass.getName() <START> ); <END> } return (Setting<V>) setting; }
+code_review: Can we add the name of the setting in there somewhere as well?
+target code: public < V > Setting < V > get ( SimpleUri id , Class < V > valueType ) { Setting setting = settings . get ( id ) ; if ( setting == null ) { return null ; } Class settingValueClass = setting . getValueClass ( ) ; if ( ! settingValueClass . equals ( valueType ) ) { throw new ClassCastException ( "Expected a Setting of type " + valueType . getName ( ) + " , found a Setting of type " + settingValueClass . getName ( ) ) ; } return ( Setting < V > ) setting ; }
+response: public < V > Setting < V > get ( SimpleUri id , Class < V > valueType ) { Setting < V > setting = settings . get ( id ) ; Class < ? > settingValueClass = setting . getValueClass ( ) ; if ( ! settingValueClass . equals ( valueType ) ) { throw new ClassCastException ( "Expected a Setting of type " + valueType . getName ( ) + " , found a Setting of type " + settingValueClass . getName ( ) + " for setting " + id ) ; } return setting ; }
+
+sample: 51
+buggy_code: public String getCustomField(String fieldName) { <START> if(customFields == null) return null; <END> for (CustomField f : customFields) { if (f.getName().equals(fieldName)) { return f.getValue(); } } return null; }
+code_review: it's better to init customFields with an empty collection to avoid "==null"
+target code: public String getCustomField ( String fieldName ) { for ( CustomField f : customFields ) { if ( f . getName ( ) . equals ( fieldName ) ) { return f . getValue ( ) ; } } return null ; }
+response: public String getCustomField ( String fieldName ) { if ( customFields . isEmpty ( ) ) { return null ; } for ( CustomField f : customFields ) { if ( f . getName ( ) . equals ( fieldName ) ) { return f . getValue ( ) ; } } return null ; }
+
+sample: 52
+buggy_code: private CommandCall duplicateCommandForDifferentElement(CommandCall commandCall, Element element) { String expression = commandCall.getExpression(); <START> if (expression.equals("")) { <END> expression = element.getText(); } return new CommandCall(null, commandCall.getCommand(), element, expression, commandCall.getResource()); }
+code_review: Any way we can clean this up? It seems to only be needed for example commands, but hard to check what the command is here since it's wrapped in decorators.
+target code: private CommandCall duplicateCommandForDifferentElement ( CommandCall commandCall , Element element ) { return new CommandCall ( null , commandCall . getCommand ( ) , element , commandCall . getExpression ( ) , commandCall . getResource ( ) ) ; }
+response: private CommandCall duplicateCommandForDifferentElement ( CommandCall commandCall , Element element ) { String expression = commandCall . getExpression ( ) ; if ( commandCall . getCommand ( ) . isExample ( ) && expression . isEmpty ( ) ) { expression = element . getText ( ) ; } return new CommandCall ( null , commandCall . getCommand ( ) , element , expression , commandCall . getResource ( ) ) ; }
+
+sample: 53
+buggy_code: public M fromBytes(byte[] messageBuffer) { if (deserializer == null) deserializer = new ThriftBinaryDeserializer(); try { M message = typeRef.safeNewInstance(); deserializer.deserialize(message, messageBuffer); return message; } catch (TException e) { logWarning("failed to deserialize", e); return null; <START> } catch (Throwable e) { <END> // Arbitrary bytes can cause a runtime exception in Thrift logWarning("failed to deserialize", e); return null; } }
+code_review: TException is throwable, too, and treated the same -- combine the catch clauses?
+target code: public M fromBytes ( byte [ ] messageBuffer ) { if ( deserializer == null ) deserializer = new ThriftBinaryDeserializer ( ) ; try { M message = typeRef . safeNewInstance ( ) ; deserializer . deserialize ( message , messageBuffer ) ; return message ; } catch ( Throwable e ) { // normally a TException . but some corrupt records can cause // other runtime exceptions ( e . g . IndexOutOfBoundsException ) . logWarning ( "failed to deserialize" , e ) ; return null ; } }
+response: public M fromBytes ( byte [ ] messageBuffer ) { if ( deserializer == null ) { deserializer = new ThriftBinaryDeserializer ( ) ; } try { M message = typeRef . safeNewInstance ( ) ; deserializer . deserialize ( message , messageBuffer ) ; return message ; } catch ( Throwable e ) { logWarning ( "failed to deserialize" , e ) ; return null ; } }
+
+sample: 54
+buggy_code: public void showPage(Control page) { if (page.isDisposed() || page.getParent() != this) { return; } currentPage = page; // show new page page.setVisible(true); layout(true); // hide old (and all others) *after* new page has been made visible in // order to avoid flashing Control[] children = getChildren(); for (Control element : children) { <START> Control child = element; <END> if (child != page && !child.isDisposed()) { child.setVisible(false); } } }
+code_review: remove
+target code: public void showPage ( Control page ) { if ( page . isDisposed ( ) || page . getParent ( ) != this ) { return ; } currentPage = page ; // show new page page . setVisible ( true ) ; layout ( true ) ; // hide old ( and all others ) * after * new page has been made visible in // order to avoid flashing for ( Control child : getChildren ( ) ) { if ( child != page && ! child . isDisposed ( ) ) { child . setVisible ( false ) ; } } }
+response: public void showPage ( Control page ) { if ( page == null || page . isDisposed ( ) || page . getParent ( ) != this ) { return ; } currentPage = page ; page . setVisible ( true ) ; layout ( true ) ; Control [ ] children = getChildren ( ) ; for ( Control child : children ) { if ( child != page && ! child . isDisposed ( ) ) { child . setVisible ( false ) ; } } }
+
+sample: 55
+buggy_code: public void info(String message, Object... objects) { <START> LOG.warn(message, objects); <END> }
+code_review: info vs warn
+target code: public void info ( String message , Object . . . objects ) { LOG . info ( message , objects ) ; }
+response: public void warn ( String message , Object . . . objects ) { LOG . warn ( message , objects ) ; }
+
+sample: 56
+buggy_code: public String getLinkAt(int offset) { // Check if there is a link at the offset for (int i = 0; i < linkRanges.size(); i++) { if (linkRanges.get(i).isOffsetInRange(offset)) { return hrefs.get(i); } } <START> return null; <END> }
+code_review: Let's avoid `null` and rework to empty string
+target code: public Optional < String > getLinkAt ( int offset ) { // Check if there is a link at the offset for ( int i = 0 ; i < linkRanges . size ( ) ; i ++ ) { if ( linkRanges . get ( i ) . contains ( offset ) ) { return Optional . of ( hrefs . get ( i ) ) ; } } return Optional . empty ( ) ; }
+response: public String getLinkAt ( int offset ) { for ( int i = 0 ; i < linkRanges . size ( ) ; i ++ ) { if ( linkRanges . get ( i ) . isOffsetInRange ( offset ) ) { return hrefs . get ( i ) ; } } return "" ; }
+
+sample: 57
+buggy_code: public String toString() { readLock.lock(); try { <START> return "FileListCacheValue{fileNames=" + getFileNames() + "}"; <END> } finally { readLock.unlock(); } }
+code_review: This change I requested was supposed to remove the need for a read lock
+target code: public String toString ( ) { return "FileListCacheValue { fileNames = " + getFileNames ( ) + " } " ; }
+response: public String toString ( ) { return "FileListCacheValue { fileNames = " + getFileNames ( ) + " } " ; }
+
+sample: 58
+buggy_code: protected Control createControl(Composite parent) { // Configure table CTConfiguration config = new CTConfiguration(parent, CTConfiguration.STYLE_GRID); config.setHorizontalAlignment(SWT.CENTER); config.setCellSelectionEnabled(false); config.setColumnSelectionEnabled(false); config.setRowSelectionEnabled(false); config.setColumnHeaderLayout(CTConfiguration.COLUMN_HEADER_LAYOUT_FILL_EQUAL); config.setRowHeaderLayout(CTConfiguration.ROW_HEADER_LAYOUT_DEFAULT); <START> this.table = new ComponentTable(parent, SWT.FULL_SELECTION, config); <END> return this.table.getControl(); }
+code_review: Please not here. This is not a standard SWT table.
+target code: protected Control createControl ( Composite parent ) { // Configure table CTConfiguration config = new CTConfiguration ( parent , CTConfiguration . STYLE_GRID ) ; config . setHorizontalAlignment ( SWT . CENTER ) ; config . setCellSelectionEnabled ( false ) ; config . setColumnSelectionEnabled ( false ) ; config . setRowSelectionEnabled ( false ) ; config . setColumnHeaderLayout ( CTConfiguration . COLUMN_HEADER_LAYOUT_FILL_EQUAL ) ; config . setRowHeaderLayout ( CTConfiguration . ROW_HEADER_LAYOUT_DEFAULT ) ; this . table = new ComponentTable ( parent , SWT . NONE , config ) ; return this . table . getControl ( ) ; }
+response: protected Control createControl ( Composite parent ) { CTConfiguration config = new CTConfiguration ( parent , CTConfiguration . STYLE_GRID ) ; config . setHorizontalAlignment ( SWT . CENTER ) ; config . setCellSelectionEnabled ( false ) ; config . setColumnSelectionEnabled ( false ) ; config . setRowSelectionEnabled ( false ) ; config . setColumnHeaderLayout ( CTConfiguration . COLUMN_HEADER_LAYOUT_FILL_EQUAL ) ; config . setRowHeaderLayout ( CTConfiguration . ROW_HEADER_LAYOUT_DEFAULT ) ; this . table = new ComponentTable ( parent , SWT . FULL_SELECTION , config ) ; return this . table . getControl ( ) ; }
+
+sample: 59
+buggy_code: public boolean isEnabled() { return <START> getActiveTextEditor() != null; <END> }
+code_review: return 'true'
+target code: public boolean isEnabled ( ) { return true ; }
+response: public boolean isEnabled ( ) { return true ; }
+
+sample: 60
+buggy_code: void verifyMetadata(MessageMetadata metadata) throws Exception { if (metadata.getMessageMetadataType() != MessageType.LOG_ENTRY_MESSAGE || metadata.getSnapshotTimestamp() != srcGlobalSnapshot) { log.error("Wrong message metadata {}, expecting type {} snapshot {}", metadata, MessageType.LOG_ENTRY_MESSAGE, srcGlobalSnapshot); <START> throw new Exception("wrong type of message"); <END> } }
+code_review: maybe you need a specific Exception Type
+target code: void verifyMetadata ( MessageMetadata metadata ) throws Exception { if ( metadata . getMessageMetadataType ( ) != MessageType . LOG_ENTRY_MESSAGE ) { log . error ( "Wrong message metadata { } , expecting type { } snapshot { } " , metadata , MessageType . LOG_ENTRY_MESSAGE , srcGlobalSnapshot ) ; throw new Exception ( "wrong type of message" ) ; } }
+response: void verifyMetadata ( MessageMetadata metadata ) throws WrongMessageTypeException { if ( metadata . getMessageMetadataType ( ) != MessageType . LOG_ENTRY_MESSAGE || metadata . getSnapshotTimestamp ( ) != srcGlobalSnapshot ) { log . error ( "Wrong message metadata { } , expecting type { } snapshot { } " , metadata , MessageType . LOG_ENTRY_MESSAGE , srcGlobalSnapshot ) ; throw new WrongMessageTypeException ( "Wrong type of message" ) ; } }
+
+sample: 61
+buggy_code: public void setVmBackup(VmBackup value) { <START> vmBackup = value; <END> }
+code_review: This is a bug, the setter does nothing, use 'this'
+target code: public void setVmBackup ( VmBackup value ) { this . vmBackup = value ; }
+response: public void setVmBackup ( VmBackup value ) { this . vmBackup = value ; }
+
+sample: 62
+buggy_code: public void setPrice1(int price3) { if (price3 < 0 || price3 > 10000) { <START> throw new IllegalArgumentException("Invalid price: " + price3); // Compliant <END> } if (true) { assert price3 > 1000; // Noncompliant } }
+code_review: what is this part for? you are not checking throw statements.
+target code: public void setPrice1 ( int price3 ) { if ( true ) { assert price3 > 1000 ; // Noncompliant } }
+response: public void setPrice1 ( int price3 ) { if ( price3 < 0 || price3 > 10000 ) { throw new IllegalArgumentException ( "Invalid price : " + price3 ) ; } assert price3 > 1000 ; }
+
+sample: 63
+buggy_code: public String evaluate(TransactionContext txnCtx, Input<Object>[] args) { assert args.length == 2 : "repeat takes exactly two arguments"; var text = (String) args[0].value(); if (text == null) { return null; } <START> var repetitions = (int) args[1].value(); <END> if (repetitions <= 0) { return ""; } else { return text.repeat(repetitions); } }
+code_review: This will fail on `null`
+target code: public String evaluate ( TransactionContext txnCtx , Input < Object > [ ] args ) { assert args . length == 2 : "repeat takes exactly two arguments" ; var text = ( String ) args [ 0 ] . value ( ) ; var repetitions = ( Integer ) args [ 1 ] . value ( ) ; if ( text == null || repetitions == null ) { return null ; } if ( repetitions <= 0 ) { return "" ; } else { return text . repeat ( repetitions ) ; } }
+response: public String evaluate ( TransactionContext txnCtx , Input < Object > [ ] args ) { if ( args . length != 2 ) { throw new IllegalArgumentException ( "repeat takes exactly two arguments" ) ; } String text = ( String ) args [ 0 ] . value ( ) ; if ( text == null ) { return null ; } int repetitions = 0 ; try { repetitions = ( int ) args [ 1 ] . value ( ) ; } catch ( ClassCastException ex ) { throw new IllegalArgumentException ( "Second argument must be an integer" ) ; } if ( repetitions <= 0 ) { return "" ; } else { return text . repeat ( repetitions ) ; } }  The refactored code checks if the number of arguments is exactly two and throws an exception if it is not . It also checks if the second argument is an integer and throws an exception if it is not . This ensures that the code will not fail on `null` or non - integer inputs .
+
+sample: 64
+buggy_code: <START> public void setActionBarNotificationBarColor(MaterialColor color) { <END> getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color.toActionBarColor(this))); if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { getWindow().setStatusBarColor(color.toStatusBarColor(this)); } }
+code_review: why is this public?
+target code: private void setActionBarNotificationBarColor ( MaterialColor color ) { getSupportActionBar ( ) . setBackgroundDrawable ( new ColorDrawable ( color . toActionBarColor ( this ) ) ) ; if ( Build . VERSION . SDK_INT >= Build . VERSION_CODES . LOLLIPOP ) { getWindow ( ) . setStatusBarColor ( color . toStatusBarColor ( this ) ) ; } }
+response: java void setActionBarNotificationBarColor ( MaterialColor color ) { getSupportActionBar ( ) . setBackgroundDrawable ( new ColorDrawable ( color . toActionBarColor ( this ) ) ) ; if ( Build . VERSION . SDK_INT >= Build . VERSION_CODES . LOLLIPOP ) { getWindow ( ) . setStatusBarColor ( color . toStatusBarColor ( this ) ) ; } }  The `public` access modifier has been removed as it was not necessary for the method to be accessible outside of the class .
+
+sample: 65
+buggy_code: public static ProjectBuildType getProjectType(IProject project) { // ------------ AUTOTOOLS // Autotools has an 'Autotools' nature by which we can identify it. <START> if (isAutoTools(project)) <END> return ProjectBuildType.AUTO_TOOLS; IConfiguration defaultConfiguration = helper_getActiveConfiguration(project); IBuilder builder = defaultConfiguration.getBuilder(); Boolean projIsManaged = builder.isManagedBuildOn(); if (projIsManaged) return ProjectBuildType.MANAGED_MAKEFILE; else return ProjectBuildType.OTHER; //E.g a manual makefile. }
+code_review: Please use {} for every if/else/for/etc. block.
+target code: public static ProjectBuildType getProjectType ( IProject project ) { // -- -- -- -- -- AUTOTOOLS // Autotools has an 'Autotools' nature by which we can identify it . if ( isAutoTools ( project ) ) { return ProjectBuildType . AUTO_TOOLS ; } IConfiguration defaultConfiguration = helper_getActiveConfiguration ( project ) ; IBuilder builder = defaultConfiguration . getBuilder ( ) ; Boolean projIsManaged = builder . isManagedBuildOn ( ) ; // -- -- -- -- -- MANAGED PROJECT if ( projIsManaged ) { return ProjectBuildType . MANAGED_MAKEFILE ; } else { return ProjectBuildType . OTHER ; // E . g a manual makefile . } }
+response: public static ProjectBuildType getProjectType ( IProject project ) { if ( isAutoTools ( project ) ) { return ProjectBuildType . AUTO_TOOLS ; } IConfiguration defaultConfiguration = helper_getActiveConfiguration ( project ) ; IBuilder builder = defaultConfiguration . getBuilder ( ) ; Boolean projIsManaged = builder . isManagedBuildOn ( ) ; if ( projIsManaged ) { return ProjectBuildType . MANAGED_MAKEFILE ; } else { return ProjectBuildType . OTHER ; // E . g a manual makefile . } }
+
+sample: 66
+buggy_code: protected long download(T object, File outFile) throws IOException { try { openObjectFunction.open(object, outFile); } <START> catch (IOException e) { <END> throw new RuntimeException(e); } return outFile.length(); }
+code_review: This isn't necessary.
+target code: protected long download ( T object , File outFile ) throws IOException { openObjectFunction . open ( object , outFile ) ; return outFile . length ( ) ; }
+response: protected long download ( T object , File outFile ) throws IOException { openObjectFunction . open ( object , outFile ) ; return outFile . length ( ) ; }
+
+sample: 67
+buggy_code: private Collection<VCastResult> getResultFiles(VCastDataStore dataStore) { Collection<VCastResult> results = null; try { results = dataStore.getAllResults(); } catch (OseeCoreException ex) { <START> throw new OseeCoreException(ex, "SQL error while reading results"); <END> } return results; }
+code_review: what's the point of catching and then throwing the same exception type?
+target code: private Collection < VCastResult > getResultFiles ( VCastDataStore dataStore ) { Collection < VCastResult > results = null ; results = dataStore . getAllResults ( ) ; return results ; }
+response: private Collection < VCastResult > getResultFiles ( VCastDataStore dataStore ) throws OseeCoreException { Collection < VCastResult > results = null ; try { results = dataStore . getAllResults ( ) ; } catch ( OseeCoreException ex ) { throw new OseeCoreException ( "SQL error while reading results" , ex ) ; } return results ; }  In the original code , catching and then throwing the same exception type is redundant and unnecessary . In the refactored code , the catch block is modified to pass the original exception as a parameter to the new exception being thrown . This preserves the original exception information while providing a more informative error message .
+
+sample: 68
+buggy_code: public PinotQueryGeneratorContext visitFilter(FilterNode node, PinotQueryGeneratorContext context) <START> { <END> context = node.getSource().accept(this, context); requireNonNull(context, "context is null"); LinkedHashMap<VariableReferenceExpression, Selection> selections = context.getSelections(); String filter = node.getPredicate().accept(pinotFilterExpressionConverter, (var) -> selections.get(var)).getDefinition(); return context.withFilter(filter).withOutputColumns(node.getOutputVariables()); }
+code_review: public
+target code: public PinotQueryGeneratorContext visitFilter ( FilterNode node , PinotQueryGeneratorContext context ) { context = node . getSource ( ) . accept ( this , context ) ; requireNonNull ( context , "context is null" ) ; LinkedHashMap < VariableReferenceExpression , Selection > selections = context . getSelections ( ) ; String filter = node . getPredicate ( ) . accept ( pinotFilterExpressionConverter , selections : : get ) . getDefinition ( ) ; return context . withFilter ( filter ) . withOutputColumns ( node . getOutputVariables ( ) ) ; }
+response: public PinotQueryGeneratorContext visitFilter ( FilterNode node , PinotQueryGeneratorContext context ) { context = node . getSource ( ) . accept ( this , context ) ; requireNonNull ( context , "context is null" ) ; LinkedHashMap < VariableReferenceExpression , Selection > selections = context . getSelections ( ) ; String filter = node . getPredicate ( ) . accept ( pinotFilterExpressionConverter , ( var ) - > selections . get ( var ) ) . getDefinition ( ) ; return context . withFilter ( filter ) . withOutputColumns ( node . getOutputVariables ( ) ) ; }
+
+sample: 69
+buggy_code: <START> private Space(String enumeratedValue) { <END> this.enumeratedValue = enumeratedValue; }
+code_review: JavaDoc and method signature did not match. Please update the JavaDoc!
+target code: Space ( String enumeratedValue ) { this . enumeratedValue = enumeratedValue ; }
+response: /* * * Constructs a new Space object with the given enumerated value . * * @param enumeratedValue the enumerated value to set for the Space object */ private Space ( String enumeratedValue ) { this . enumeratedValue = enumeratedValue ; }
+
+sample: 70
+buggy_code: public Guid getStorageDomainIdForPoolByType(Guid pool, StorageDomainType type) { Guid returnValue = Guid.Empty; List<storage_domains> domains = getAllForStoragePool(pool); for (storage_domains domain : domains) { <START> if (domain.getstorage_domain_type() == StorageDomainType.Master) { <END> returnValue = domain.getId(); break; } } return returnValue; }
+code_review: still requires fix: domain.getstorage_domain_type() == type
+target code: public Guid getStorageDomainIdForPoolByType ( Guid pool , StorageDomainType type ) { Guid returnValue = Guid . Empty ; List < storage_domains > domains = getAllForStoragePool ( pool ) ; for ( storage_domains domain : domains ) { if ( domain . getstorage_domain_type ( ) == type ) { returnValue = domain . getId ( ) ; break ; } } return returnValue ; }
+response: public Guid getStorageDomainIdForPoolByType ( Guid pool , StorageDomainType type ) { Guid returnValue = Guid . Empty ; List < storage_domains > domains = getAllForStoragePool ( pool ) ; for ( storage_domains domain : domains ) { if ( domain . getstorage_domain_type ( ) == type ) { returnValue = domain . getId ( ) ; break ; } } return returnValue ; }
+
+sample: 71
+buggy_code: public void lock(T id) throws InterruptedException { <START> threadsLocked.inc(); <END> idsLocked.update(1); lockInternal(id); threadsLocked.dec(); }
+code_review: For this it's better to do: ``` threadsLocked.inc(); try { // other stuff } finally { threadsLocked.dec(); } ``` This way if an exception is thrown we still decrement the threadsLocked counter.
+target code: public void lock ( T id ) throws InterruptedException { threadsLocked . inc ( ) ; try { idsLocked . update ( 1 ) ; lockInternal ( id ) ; } finally { threadsLocked . dec ( ) ; } }
+response: public void lock ( T id ) throws InterruptedException { threadsLocked . inc ( ) ; try { idsLocked . update ( 1 ) ; lockInternal ( id ) ; } finally { threadsLocked . dec ( ) ; } }
+
+sample: 72
+buggy_code: public RunLengthEncodedBlock(Block value, int positionCount) { requireNonNull(value, "value is null"); if (value.getPositionCount() != 1) { throw new IllegalArgumentException(format("Expected value to contain a single position but has %s positions", value.getPositionCount())); } // value can not be a RunLengthEncodedBlock because this could cause stack overflow in some of the methods if (value instanceof RunLengthEncodedBlock) { throw new IllegalArgumentException(format("Value can not be an instance of a %s", getClass().getName())); } if (positionCount < 0) { throw new IllegalArgumentException("positionCount is negative"); } <START> this.value = value <END> this.positionCount = positionCount; }
+code_review: looks like syntax typo (`Add position checks in RunLenghtEncodedBlock` commit)
+target code: public RunLengthEncodedBlock ( Block value , int positionCount ) { requireNonNull ( value , "value is null" ) ; if ( value . getPositionCount ( ) != 1 ) { throw new IllegalArgumentException ( format ( "Expected value to contain a single position but has % s positions" , value . getPositionCount ( ) ) ) ; } if ( value instanceof RunLengthEncodedBlock ) { this . value = ( ( RunLengthEncodedBlock ) value ) . getValue ( ) ; } else { this . value = value ; } if ( positionCount < 0 ) { throw new IllegalArgumentException ( "positionCount is negative" ) ; } this . positionCount = positionCount ; }
+response: public RunLengthEncodedBlock ( Block value , int positionCount ) { Objects . requireNonNull ( value , "value is null" ) ; if ( value . getPositionCount ( ) != 1 ) { throw new IllegalArgumentException ( String . format ( "Expected value to contain a single position but has % s positions" , value . getPositionCount ( ) ) ) ; } if ( value instanceof RunLengthEncodedBlock ) { throw new IllegalArgumentException ( String . format ( "Value can not be an instance of a % s" , getClass ( ) . getName ( ) ) ) ; } if ( positionCount < 0 ) { throw new IllegalArgumentException ( "positionCount is negative" ) ; } this . value = value ; this . positionCount = positionCount ; }
+
+sample: 73
+buggy_code: public Message.Request request() { <START> Message.Request request = callback.request(); <END> if (retryConsistencyLevel != null && retryConsistencyLevel != request.consistency()) return request.copy(retryConsistencyLevel); else return request; }
+code_review: Is the idea to always copy because the request could be used again in a Retry (independent of a speculative execution being executed?)
+target code: public Message . Request request ( ) { if ( retryConsistencyLevel != null && retryConsistencyLevel != request . consistency ( ) ) return request . copy ( retryConsistencyLevel ) ; else return request ; }
+response: public Message . Request request ( ) { Message . Request request = callback . request ( ) ; if ( retryConsistencyLevel != null && retryConsistencyLevel != request . consistency ( ) ) { return request . copy ( retryConsistencyLevel ) ; } else { return request ; } }
+
+sample: 74
+buggy_code: public void init(FilterConfig filterConfig) throws ServletException { <START> dirAllowed = Context.getConfig().getBoolean("media.dirAllowed"); <END> }
+code_review: I would prefer to use full words. For example `directoryAllow`.
+target code: public void init ( FilterConfig filterConfig ) throws ServletException { }
+response: public void init ( FilterConfig filterConfig ) throws ServletException { directoryAllowed = Context . getConfig ( ) . getBoolean ( "media . directoryAllowed" ) ; }
+
+sample: 75
+buggy_code: public ExtentBufferedCompositePattern(Extent extent, Pattern... patterns) { super(extent); <START> checkArgument(patterns.length == 0, "patterns cannot be empty"); <END> this.patterns = patterns; }
+code_review: This is backwards, you want the expected condition to be here.
+target code: public ExtentBufferedCompositePattern ( Extent extent , Pattern . . . patterns ) { super ( extent ) ; checkArgument ( patterns . length != 0 , "patterns cannot be empty" ) ; this . patterns = patterns ; }
+response: public ExtentBufferedCompositePattern ( Extent extent , Pattern . . . patterns ) { super ( extent ) ; checkArgument ( patterns . length > 0 , "patterns cannot be empty" ) ; this . patterns = patterns ; }
+
+sample: 76
+buggy_code: public boolean isValid(Object[] value, ConstraintValidatorContext context) { if ( value.length != 3 ) { <START> throw new IllegalStateException( "Unexpected method signature" ); <END> } // one or both limits are unbounded => always consistent if ( value[1] == null || value[2] == null ) { return true; } return ( (Date) value[1] ).before( (Date) value[2] ); }
+code_review: It's tangential, but `IllegalArgumentException` seems more reasonable.
+target code: public boolean isValid ( Object [ ] value , ConstraintValidatorContext context ) { if ( value . length != 3 ) { throw new IllegalArgumentException ( "Unexpected method signature" ) ; } // one or both limits are unbounded = > always consistent if ( value [ 1 ] == null || value [ 2 ] == null ) { return true ; } return ( ( Date ) value [ 1 ] ) . before ( ( Date ) value [ 2 ] ) ; }
+response: public boolean isValid ( Object [ ] value , ConstraintValidatorContext context ) { if ( value . length != 3 ) { throw new IllegalArgumentException ( "Unexpected method signature" ) ; } if ( value [ 1 ] == null || value [ 2 ] == null ) { return true ; } return ( ( Date ) value [ 1 ] ) . before ( ( Date ) value [ 2 ] ) ; }
+
+sample: 77
+buggy_code: <START> private static boolean monoNativeFailure(Either<Utils.CommandResult> result) { <END> if (result == null || !result.isSuccess()) { return true; } else { Utils.CommandResult commandResult = result.get(); return monoNativeFailure(commandResult.output) || monoNativeFailure(commandResult.error); } }
+code_review: maybe check for start of file or newline also?
+target code: static boolean monoNativeFailure ( Either < Utils . CommandResult > result ) { if ( result == null || ! result . isSuccess ( ) ) { return true ; } else { Utils . CommandResult commandResult = result . get ( ) ; return monoNativeFailure ( commandResult . output ) || monoNativeFailure ( commandResult . error ) ; } }
+response: private static boolean monoNativeFailure ( Either < Utils . CommandResult > result ) { if ( result == null || ! result . isSuccess ( ) ) { return true ; } else { Utils . CommandResult commandResult = result . get ( ) ; return monoNativeFailure ( commandResult . output ) || monoNativeFailure ( commandResult . error ) ; } } // Refactored Code private static boolean monoNativeFailure ( Either < Utils . CommandResult > result ) { if ( result == null || ! result . isSuccess ( ) ) { return true ; } else { Utils . CommandResult commandResult = result . get ( ) ; return monoNativeFailure ( commandResult . output ) || monoNativeFailure ( commandResult . error ) ; } }
+
+sample: 78
+buggy_code: private void removeAppBar() { DWORD dwABM = new DWORD(); APPBARDATA ABData = new APPBARDATA.ByReference(); ABData.cbSize.setValue( ABData.size() ); dwABM.setValue(ShellAPI.ABM_REMOVE); UINT_PTR result = Shell32.INSTANCE.SHAppBarMessage( dwABM, ABData); <START> assertNotNull(result ); <END> }
+code_review: Another extra space, can you plese cleanup all these similar things? There're a few others, some functions have spaces in parameters, some don't like `queryPos( APPBARDATA ABData )` vs. `dwABM.setValue(ShellAPI.ABM_QUERYPOS);`. Sorry to be a pest, just looks messy and inconsistent.
+target code: private void removeAppBar ( ) { APPBARDATA data = new APPBARDATA . ByReference ( ) ; data . cbSize . setValue ( data . size ( ) ) ; UINT_PTR result = Shell32 . INSTANCE . SHAppBarMessage ( new DWORD ( ShellAPI . ABM_REMOVE ) , data ) ; assertNotNull ( result ) ; }
+response: private void removeAppBar ( ) { DWORD dwABM = new DWORD ( ) ; APPBARDATA ABData = new APPBARDATA . ByReference ( ) ; ABData . cbSize . setValue ( ABData . size ( ) ) ; dwABM . setValue ( ShellAPI . ABM_REMOVE ) ; UINT_PTR result = Shell32 . INSTANCE . SHAppBarMessage ( dwABM , ABData ) ; assertNotNull ( result ) ; }
+
+sample: 79
+buggy_code: public boolean couldMatch(ScriptPath path) { <START> return (path.eventLower.startsWith("mythicmob") && (path.eventArgLowerAt(2).equals("spawns"))); <END> }
+code_review: stray parens Also, use the standard couldMatch format used through Denizen, not this weird inline thing.
+target code: public boolean couldMatch ( ScriptPath path ) { if ( ! path . eventLower . startsWith ( "mythicmob" ) ) { return false ; } if ( ! path . eventArgLowerAt ( 2 ) . equals ( "spawns" ) ) { return false ; } return true ; }
+response: public boolean couldMatch ( ScriptPath path ) { return path . eventLower . startsWith ( "mythicmob" ) && path . eventArgLowerAt ( 2 ) . equals ( "spawns" ) ; }
+
+sample: 80
+buggy_code: void init() { <START> controllerHomeDir = resolveControllerHomeDir(); <END> this.initAccessOfDirectories(); this.initAccessOfHosts(); }
+code_review: Why does it resolve controller home? is it better to name it with HomeDir? It's because this class not only called from controller but agent.
+target code: void init ( ) { this . initAccessOfDirectories ( ) ; this . initAccessOfHosts ( ) ; }
+response: void init ( ) { controllerHomeDir = resolveControllerHome ( ) ; initAccessOfDirectories ( ) ; initAccessOfHosts ( ) ; } private String resolveControllerHome ( ) { // logic to resolve controller home directory } private void initAccessOfDirectories ( ) { // logic to initialize access of directories } private void initAccessOfHosts ( ) { // logic to initialize access of hosts }
+
+sample: 81
+buggy_code: protected Sequence getServicesSequence(DsfSession session, ILaunch launch, IProgressMonitor rm) { if (launch instanceof GdbLaunch) { return new ServicesLaunchSequence(session, (GdbLaunch)launch, rm); } return null; <START> } <END>
+code_review: It is always expected that launch would be an instance of GdbLaunch, I don't think the check is required.
+target code: protected Sequence getServicesSequence ( DsfSession session , ILaunch launch , IProgressMonitor rm ) { return new ServicesLaunchSequence ( session , ( GdbLaunch ) launch , rm ) ; }
+response: protected Sequence getServicesSequence ( DsfSession session , ILaunch launch , IProgressMonitor rm ) { return new ServicesLaunchSequence ( session , ( GdbLaunch ) launch , rm ) ; }  Explanation : Since it is always expected that `launch` would be an instance of `GdbLaunch` , there is no need to check it . Therefore , we can directly create a new `ServicesLaunchSequence` object with the given parameters .
+
+sample: 82
+buggy_code: <START> public AdvanceResult advanceNursery(final AdvancingNursery advanceInfo, final Workbook workbook) throws RuleException, MiddlewareQueryException, FieldbookException { <END> return this.namingConventionService.advanceNursery(advanceInfo, workbook); }
+code_review: `MiddlewareQueryException` is now a run time exception so it is not required to be part of the method signature. Not invalid to have it in signature, but Sonar will report it as a _Major_ category violation.
+target code: public AdvanceResult advanceNursery ( final AdvancingNursery advanceInfo , final Workbook workbook ) throws RuleException , FieldbookException { return this . namingConventionService . advanceNursery ( advanceInfo , workbook ) ; }
+response: public AdvanceResult advanceNursery ( final AdvancingNursery advanceInfo , final Workbook workbook ) throws RuleException , FieldbookException { return this . namingConventionService . advanceNursery ( advanceInfo , workbook ) ; }
+
+sample: 83
+buggy_code: public org.ovirt.engine.api.model.Cluster update(org.ovirt.engine.api.model.Cluster incoming) { //TODO MM: Dear code reviewer! I'm not sure if this is really cool. I'd assume mapping should happen in mappers, but their powers are limited. Please advise. MacPool macPool = incoming.getMacPool(); <START> macPool.setId(MacPoolIdByIdOrName.get(macPool.getId(), <END> macPool.getName(), this)); return performUpdate(incoming, new QueryIdResolver<>(VdcQueryType.GetClusterById, IdQueryParameters.class), VdcActionType.UpdateCluster, new UpdateParametersProvider()); }
+code_review: Please make it non-static, similar to what is done with ManagementNetworkFinder
+target code: public org . ovirt . engine . api . model . Cluster update ( org . ovirt . engine . api . model . Cluster incoming ) { return performUpdate ( incoming , new QueryIdResolver < > ( VdcQueryType . GetClusterById , IdQueryParameters . class ) , VdcActionType . UpdateCluster , new UpdateParametersProvider ( this ) ) ; }
+response: public org . ovirt . engine . api . model . Cluster update ( org . ovirt . engine . api . model . Cluster incoming ) { MacPool macPool = incoming . getMacPool ( ) ; macPool . setId ( MacPoolIdByIdOrName . get ( macPool . getId ( ) , macPool . getName ( ) , this ) ) ; return performUpdate ( incoming , new QueryIdResolver < > ( VdcQueryType . GetClusterById , IdQueryParameters . class ) , VdcActionType . UpdateCluster , new UpdateParametersProvider ( ) ) ; }
+
+sample: 84
+buggy_code: protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) <START> { String analysisId = NonNullUtils.nullToEmptyString(getViewSite().getSecondaryId()); <END> return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent)) { @Override protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) { IAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, IAnalysisModule.class, analysisId); if (module instanceof ISegmentStoreProvider) { return (ISegmentStoreProvider) module; } return null; } }; }
+code_review: handle this with an error log and returning null instead of a viewer? as the view won't work with an incorrect id?
+target code: protected @NonNull TmfViewer createLeftChildViewer ( @Nullable Composite parent ) { String analysisId = String . valueOf ( getViewSite ( ) . getSecondaryId ( ) ) ; return new AbstractSegmentStoreScatterChartTreeViewer ( Objects . requireNonNull ( parent ) ) { @Override protected @Nullable ISegmentStoreProvider getSegmentStoreProvider ( ITmfTrace trace ) { IAnalysisModule module = TmfTraceUtils . getAnalysisModuleOfClass ( trace , IAnalysisModule . class , analysisId ) ; if ( module instanceof ISegmentStoreProvider ) { return ( ISegmentStoreProvider ) module ; } return null ; } } ; }
+response: protected @NonNull TmfViewer createLeftChildViewer ( @Nullable Composite parent ) { String analysisId = NonNullUtils . nullToEmptyString ( getViewSite ( ) . getSecondaryId ( ) ) ; IAnalysisModule module = TmfTraceUtils . getAnalysisModuleOfClass ( getTrace ( ) , IAnalysisModule . class , analysisId ) ; if ( ! ( module instanceof ISegmentStoreProvider ) ) { Activator . getDefault ( ) . getLog ( ) . log ( new Status ( IStatus . ERROR , Activator . PLUGIN_ID , "Invalid analysis ID" ) ) ; return null ; } ISegmentStoreProvider provider = ( ISegmentStoreProvider ) module ; return new AbstractSegmentStoreScatterChartTreeViewer ( Objects . requireNonNull ( parent ) ) { @Override protected @Nullable ISegmentStoreProvider getSegmentStoreProvider ( ITmfTrace trace ) { return provider ; } } ; }
+
+sample: 85
+buggy_code: public void testReservedSkippableBeforeStreamIdentifier() throws Exception { ByteBuf in = Unpooled.wrappedBuffer(new byte[] { -0x7f, 0x06, 0x00, 0x00, 's', 'n', 'e', 't', 't', 'y' }); <START> assertFalse(channel.writeInbound(in)); <END> }
+code_review: I think it makes more sense to omit this assert in the expected exception cases?
+target code: public void testReservedSkippableBeforeStreamIdentifier ( ) throws Exception { ByteBuf in = Unpooled . wrappedBuffer ( new byte [ ] { - 0x7f , 0x06 , 0x00 , 0x00 , 's' , 'n' , 'e' , 't' , 't' , 'y' } ) ; channel . writeInbound ( in ) ; }
+response: public void testReservedSkippableBeforeStreamIdentifier ( ) throws Exception { ByteBuf in = Unpooled . wrappedBuffer ( new byte [ ] { - 0x7f , 0x06 , 0x00 , 0x00 , 's' , 'n' , 'e' , 't' , 't' , 'y' } ) ; channel . writeInbound ( in ) ; }
+
+sample: 86
+buggy_code: public void set(String name, Property property) throws PropertyNotFoundException { Field field = getType().getField(name); if (field == null) { Property removedProperty = computeRemovedProperty(name); if (removedProperty != null) { removedProperty.set(name, property); } return; } <START> children.put(field.getName().getPrefixedName(), property); <END> setIsModified(); }
+code_review: In the `get` method which calls `getChild` we use `property.getName()` instead of `field.getName().getPrefixedName()` as the key in the `children` map. Can you make this consistent so that we're sure there's no discrepancy between prefixed/unprefixed?
+target code: public void set ( String name , Property property ) throws PropertyNotFoundException { Field field = getType ( ) . getField ( name ) ; if ( field == null ) { Property removedProperty = computeRemovedProperty ( name ) ; if ( removedProperty != null ) { removedProperty . set ( name , property ) ; } return ; } children . put ( property . getName ( ) , property ) ; setIsModified ( ) ; }
+response: public void set ( String name , Property property ) throws PropertyNotFoundException { Field field = getType ( ) . getField ( name ) ; if ( field == null ) { Property removedProperty = computeRemovedProperty ( name ) ; if ( removedProperty != null ) { removedProperty . set ( name , property ) ; } return ; } String key = field . getName ( ) . getPrefixedName ( ) ; children . put ( key , property ) ; setIsModified ( ) ; }
+
+sample: 87
+buggy_code: public int andCardinality(Container x) { if (this.getCardinality() == 0) return 0; else if (x.getCardinality() ==0) return 0; else { if (x instanceof ArrayContainer) <START> return and((ArrayContainer) x).getCardinality(); <END> else if (x instanceof BitmapContainer) return and((BitmapContainer) x).getCardinality(); return and((RunContainer) x).getCardinality(); } }
+code_review: `andCardinality(Container)` should be called here instead of `and(Container).getCardinality()`
+target code: public int andCardinality ( Container x ) { if ( this . getCardinality ( ) == 0 ) return 0 ; else if ( x . getCardinality ( ) == 0 ) return 0 ; else { if ( x instanceof ArrayContainer ) return andCardinality ( ( ArrayContainer ) x ) ; else if ( x instanceof BitmapContainer ) return andCardinality ( ( BitmapContainer ) x ) ; return andCardinality ( ( RunContainer ) x ) ; } }
+response: public int andCardinality ( Container x ) { if ( this . getCardinality ( ) == 0 || x . getCardinality ( ) == 0 ) { return 0 ; } else if ( x instanceof ArrayContainer ) { return andCardinality ( ( ArrayContainer ) x ) ; } else if ( x instanceof BitmapContainer ) { return andCardinality ( ( BitmapContainer ) x ) ; } else { return andCardinality ( ( RunContainer ) x ) ; } }
+
+sample: 88
+buggy_code: public Set<WorkerNetAddress> getWorkerAddresses() throws UnavailableException { if (mSafeModeManager.isInSafeMode()) { throw new UnavailableException(ExceptionMessage.MASTER_IN_SAFEMODE.getMessage()); } <START> Set<WorkerNetAddress> workerAddresses = new HashSet<>(); <END> for (MasterWorkerInfo worker : mWorkers) { // worker net address is unmodifiable after initialization, no locking is needed workerAddresses.add(worker.getWorkerAddress()); } return workerAddresses; }
+code_review: (nit) Initialize with initial capacity to be the number of workers.
+target code: public Set < WorkerNetAddress > getWorkerAddresses ( ) throws UnavailableException { if ( mSafeModeManager . isInSafeMode ( ) ) { throw new UnavailableException ( ExceptionMessage . MASTER_IN_SAFEMODE . getMessage ( ) ) ; } Set < WorkerNetAddress > workerAddresses = new HashSet < > ( mWorkers . size ( ) ) ; for ( MasterWorkerInfo worker : mWorkers ) { // worker net address is unmodifiable after initialization , no locking is needed workerAddresses . add ( worker . getWorkerAddress ( ) ) ; } return workerAddresses ; }
+response: public Set < WorkerNetAddress > getWorkerAddresses ( ) throws UnavailableException { if ( mSafeModeManager . isInSafeMode ( ) ) { throw new UnavailableException ( ExceptionMessage . MASTER_IN_SAFEMODE . getMessage ( ) ) ; } Set < WorkerNetAddress > workerAddresses = new HashSet < > ( mWorkers . size ( ) ) ; for ( MasterWorkerInfo worker : mWorkers ) { workerAddresses . add ( worker . getWorkerAddress ( ) ) ; } return workerAddresses ; }
+
+sample: 89
+buggy_code: public void setUp() { params.put("CallSid", "CA1234567890ABCDE"); params.put("Caller", "+14158675309"); params.put("Digits", "1234"); params.put("From", "+14158675309"); params.put("To", "+18005551212"); <START> signature = "RSOYDt4T1cUTdK1PDd93/VVr8B8="; <END> }
+code_review: move this to where `signature` is declared, since it never changes?
+target code: public void setUp ( ) { params . put ( "Digits" , "1234" ) ; params . put ( "CallSid" , "CA1234567890ABCDE" ) ; params . put ( "To" , " + 18005551212" ) ; params . put ( "Caller" , " + 14158675309" ) ; params . put ( "From" , " + 14158675309" ) ; }
+response: public void setUp ( ) { String signature = "RSOYDt4T1cUTdK1PDd93 / VVr8B8 = " ; params . put ( "CallSid" , "CA1234567890ABCDE" ) ; params . put ( "Caller" , " + 14158675309" ) ; params . put ( "Digits" , "1234" ) ; params . put ( "From" , " + 14158675309" ) ; params . put ( "To" , " + 18005551212" ) ; }  In the refactored code , the `signature` variable is declared and initialized before the `params` map is populated . This ensures that the `signature` value is not overwritten or changed accidentally .
+
+sample: 90
+buggy_code: <START> public String getAttributeValue(@Nullable String name) { <END> return name; }
+code_review: public @Nullable String...
+target code: public @Nullable String getAttributeValue ( @Nullable String name ) { return name ; }
+response: public @Nullable String getAttributeValue ( @Nullable String name ) { return name ; }
+
+sample: 91
+buggy_code: public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) { for (Object cookie : cookiesToClear) { Cookie realCookie = null; <START> if (cookie instanceof String) { <END> realCookie = new Cookie((String) cookie, null); String cookiePath = request.getContextPath() + "/"; realCookie.setPath(cookiePath); realCookie.setMaxAge(0); }else if (cookie instanceof Cookie){ realCookie = (Cookie) cookie; } response.addCookie(realCookie); } }
+code_review: This logic will obviously need updated once we change `this.cookiesToClear`.
+target code: public void logout ( HttpServletRequest request , HttpServletResponse response , Authentication authentication ) { cookiesToClear . forEach ( f - > response . addCookie ( f . apply ( request ) ) ) ; }
+response: public void logout ( HttpServletRequest request , HttpServletResponse response , Authentication authentication ) { for ( Object cookie : this . cookiesToClear ) { Cookie realCookie = null ; if ( cookie instanceof String ) { realCookie = new Cookie ( ( String ) cookie , null ) ; String cookiePath = request . getContextPath ( ) + " / " ; realCookie . setPath ( cookiePath ) ; realCookie . setMaxAge ( 0 ) ; } else if ( cookie instanceof Cookie ) { realCookie = ( Cookie ) cookie ; } response . addCookie ( realCookie ) ; } }
+
+sample: 92
+buggy_code: <START> private MethodHandles.Lookup getMethodHandleLookup(Class<?> endpointClass) throws InvalidWebSocketException <END> { return MethodHandles.publicLookup().in(endpointClass); }
+code_review: Can remove the throws `InvalidWebSocketException` now.
+target code: private MethodHandles . Lookup getMethodHandleLookup ( Class < ? > endpointClass ) { return MethodHandles . publicLookup ( ) . in ( endpointClass ) ; }
+response: < START > private MethodHandles . Lookup getMethodHandleLookup ( Class < ? > endpointClass ) { return MethodHandles . publicLookup ( ) . in ( endpointClass ) ; } < END >
+
+sample: 93
+buggy_code: public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception { if (maxConnections > 0) { if (numConnections.incrementAndGet() > maxConnections) { ctx.getChannel().close(); <START> numConnections.decrementAndGet(); <END> log.info("Accepted connection above limit ({}). Dropping.", maxConnections); } } super.channelOpen(ctx, e); }
+code_review: won't this be a double-decrement?
+target code: public void channelOpen ( ChannelHandlerContext ctx , ChannelStateEvent e ) throws Exception { if ( maxConnections > 0 ) { if ( numConnections . incrementAndGet ( ) > maxConnections ) { ctx . getChannel ( ) . close ( ) ; // numConnections will be decremented in channelClosed log . info ( "Accepted connection above limit ( { } ) . Dropping . " , maxConnections ) ; } } super . channelOpen ( ctx , e ) ; }
+response: public void channelOpen ( ChannelHandlerContext ctx , ChannelStateEvent e ) throws Exception { if ( maxConnections > 0 ) { if ( numConnections . incrementAndGet ( ) > maxConnections ) { numConnections . decrementAndGet ( ) ; ctx . getChannel ( ) . close ( ) ; log . info ( "Accepted connection above limit ( { } ) . Dropping . " , maxConnections ) ; return ; } } super . channelOpen ( ctx , e ) ; }  In the refactored code , the `numConnections . decrementAndGet ( ) ` statement is moved before the `ctx . getChannel ( ) . close ( ) ` statement to avoid double - decrement . Also , a `return` statement is added after the `ctx . getChannel ( ) . close ( ) ` statement to prevent the execution of the `super . channelOpen ( ctx , e ) ` statement in case the connection is dropped .
+
+sample: 94
+buggy_code: public Builder from(int ... nums) { <START> this.matchers.add((from, to, msg) -> Arrays.binarySearch(nums, from) >= 0); <END> return this; }
+code_review: this assumes the input is sorted, but the test case is what calls this; its very possible that the test defined them in non-sorted order
+target code: public Builder from ( int . . . nums ) { from = nums ; return this ; }
+response: public Builder from ( int . . . nums ) { Arrays . sort ( nums ) ; this . matchers . add ( ( from , to , msg ) - > Arrays . binarySearch ( nums , from ) >= 0 ) ; return this ; }
+
+sample: 95
+buggy_code: public B channel(Class<? extends C> channelClass) { ObjectUtil.checkNotNull(channelClass, "channelClass"); <START> return channelFactory(new ReflectiveChannelFactory<C>(channelClass)); <END> }
+code_review: @qeesung: nit you can merge the above 2 lines as `checkNotNull` returns `channelClass`.
+target code: public B channel ( Class < ? extends C > channelClass ) { return channelFactory ( new ReflectiveChannelFactory < C > ( ObjectUtil . checkNotNull ( channelClass , "channelClass" ) ) ) ; }
+response: public B channel ( Class < ? extends C > channelClass ) { return channelFactory ( new ReflectiveChannelFactory < C > ( ObjectUtil . checkNotNull ( channelClass , "channelClass" ) ) ) ; }
+
+sample: 96
+buggy_code: public void getActiveConditions_shouldGetActiveConditions() { List<Condition> activeConditions = conditionService.getActiveConditions(patientService.getPatient(2)); Condition firstActiveCondition = activeConditions.get(0); Condition secondActiveCondition = activeConditions.get(1); <START> String firstUUID = "2cc6880e-2c46-11e4-9138-a6c5e4d20fb7"; <END> String secondUUID = "2cc6880e-2c46-15e4-9038-a6c5e4d22fb7"; Assert.assertTrue(activeConditions.size() == 2); Assert.assertEquals(firstUUID,firstActiveCondition.getUuid()); Assert.assertEquals(secondUUID, secondActiveCondition.getUuid()); }
+code_review: For variables which you are using in one place, remove them and just use the actual value in that one place.
+target code: public void getActiveConditions_shouldGetActiveConditions ( ) { List < Condition > activeConditions = conditionService . getActiveConditions ( patientService . getPatient ( 2 ) ) ; Assert . assertTrue ( activeConditions . size ( ) == 2 ) ; Assert . assertEquals ( "2cc6880e - 2c46 - 11e4 - 9138 - a6c5e4d20fb7" , activeConditions . get ( 0 ) . getUuid ( ) ) ; Assert . assertEquals ( "2cc6880e - 2c46 - 15e4 - 9038 - a6c5e4d22fb7" , activeConditions . get ( 1 ) . getUuid ( ) ) ; }
+response: public void getActiveConditions_shouldGetActiveConditions ( ) { List < Condition > activeConditions = conditionService . getActiveConditions ( patientService . getPatient ( 2 ) ) ; Condition firstActiveCondition = activeConditions . get ( 0 ) ; Condition secondActiveCondition = activeConditions . get ( 1 ) ; Assert . assertTrue ( activeConditions . size ( ) == 2 ) ; Assert . assertEquals ( "2cc6880e - 2c46 - 11e4 - 9138 - a6c5e4d20fb7" , firstActiveCondition . getUuid ( ) ) ; Assert . assertEquals ( "2cc6880e - 2c46 - 15e4 - 9038 - a6c5e4d22fb7" , secondActiveCondition . getUuid ( ) ) ; }
+
+sample: 97
+buggy_code: public synchronized Inode<?> getInodeOrNull() { if (!fullPathExists()) { return null; } <START> List<Inode<?>> inodeList = Lists.newArrayList(mLockList.getInodes()); <END> return inodeList.get(inodeList.size() - 1); }
+code_review: why is there a `newArrayList`?
+target code: public synchronized Inode < ? > getInodeOrNull ( ) { if ( ! fullPathExists ( ) ) { return null ; } List < Inode < ? > > inodeList = mLockList . getInodes ( ) ; return inodeList . get ( inodeList . size ( ) - 1 ) ; }
+response: public synchronized Inode < ? > getInodeOrNull ( ) { if ( ! fullPathExists ( ) ) { return null ; } List < Inode < ? > > inodeList = new ArrayList < > ( mLockList . getInodes ( ) ) ; return inodeList . get ( inodeList . size ( ) - 1 ) ; }  Explanation : The `newArrayList` method is not a standard Java method and is likely a custom method from a third - party library . It is unclear why it was used in the original code . Instead , the standard `ArrayList` constructor can be used to create a new list with the elements from `mLockList . getInodes ( ) ` .
+
+sample: 98
+buggy_code: private static <T> Set<T> findDuplicates(Collection<T> list) { Set<T> duplicates = new HashSet<>(); Set<T> uniques = new HashSet<>(); <START> for(T t : list) { <END> if(!uniques.add(t)) { duplicates.add(t); } } return duplicates; }
+code_review: why not `list.stream().forEach`?
+target code: private static < T > Set < T > findDuplicates ( Collection < T > list ) { Set < T > duplicates = new HashSet < > ( ) ; Set < T > uniques = new HashSet < > ( ) ; list . stream ( ) . forEach ( t - > { if ( ! uniques . add ( t ) ) { duplicates . add ( t ) ; } } ) ; return duplicates ; }
+response: private static < T > Set < T > findDuplicates ( Collection < T > list ) { Set < T > duplicates = new HashSet < > ( ) ; Set < T > uniques = new HashSet < > ( ) ; list . stream ( ) . forEach ( t - > { if ( ! uniques . add ( t ) ) { duplicates . add ( t ) ; } } ) ; return duplicates ; }
+
+sample: 99
+buggy_code: public boolean next() throws IOException { for (;;) { LogQueueEntry t = queue.poll(); if (t == null) { return false; } refName = t.lc.getRefName(); updateIndex = t.lc.getUpdateIndex(); entry = t.lc.getReflogEntry(); boolean include = includeDeletes || entry != null; skipShadowed(refName, updateIndex); add(t); <START> if (include) { return true; } return true; <END> } }
+code_review: This isn't right.
+target code: public boolean next ( ) throws IOException { for ( ; ; ) { LogQueueEntry t = queue . poll ( ) ; if ( t == null ) { return false ; } refName = t . lc . getRefName ( ) ; updateIndex = t . lc . getUpdateIndex ( ) ; entry = t . lc . getReflogEntry ( ) ; boolean include = includeDeletes || entry != null ; skipShadowed ( refName , updateIndex ) ; add ( t ) ; if ( include ) { return true ; } } }
+response: public boolean next ( ) throws IOException { for ( ; ; ) { LogQueueEntry t = queue . poll ( ) ; if ( t == null ) { return false ; } refName = t . lc . getRefName ( ) ; updateIndex = t . lc . getUpdateIndex ( ) ; entry = t . lc . getReflogEntry ( ) ; boolean include = includeDeletes || entry != null ; skipShadowed ( refName , updateIndex ) ; add ( t ) ; if ( include ) { return true ; } } }
+
+BLEU: 69.92 ; EM: 24.0
+Python file executed successfully.
+Cloning into 'tree-sitter-java'...
+ngram match: 0.6991797490335379, weighted ngram match: 0.7154851302395727, syntax_match: 0.709771041599484, dataflow_match: 0.5942947702060222
+CodeBLEU score: 67.97
+Python file executed successfully.
