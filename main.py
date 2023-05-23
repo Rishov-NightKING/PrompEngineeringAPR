@@ -16,10 +16,10 @@ if __name__ == "__main__":
     R4R_SOURCE_FILE_PATH = "datasets/R4R/test_CC_src.txt"
     R4R_TARGET_FILE_PATH = "datasets/R4R/test_CC_tgt.txt"
 
-    START_INDEX = 0
-    END_INDEX = 100
+    START_INDEX = 800
+    END_INDEX = 1000
     # code_reviews, buggy_codes, target_codes = read_dataset(
-    #     dataset_name="tufano", source_file_path=TUFANO_SOURCE_FILE_PATH, target_file_path=TUFANO_TARGET_FILE_PATH
+    #     dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
     # )
 
     code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
