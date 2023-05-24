@@ -1,11 +1,11 @@
 import openai
-from utils import (
-    get_env_variable,
-    read_raw_tufano_dataset_from_csv,
-    get_predictions_from_openai_and_write_to_file,
-    get_bleu_and_codebleu
-)
 
+from utils import (
+    get_bleu_and_codebleu,
+    get_env_variable,
+    get_predictions_from_openai_and_write_to_file,
+    read_raw_tufano_dataset_from_csv,
+)
 
 if __name__ == "__main__":
     openai.api_key = get_env_variable("OPENAI_API_KEY")

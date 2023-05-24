@@ -1,9 +1,10 @@
-import openai
-import pandas as pd
-import subprocess
-import time
 import os
 import re
+import subprocess
+import time
+
+import openai
+import pandas as pd
 
 
 def prompt_response(system_prompt, user_prompt):
