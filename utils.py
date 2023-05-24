@@ -2,6 +2,8 @@ import openai
 import pandas as pd
 import subprocess
 import time
+import os
+import re
 
 
 def prompt_response(system_prompt, user_prompt):
@@ -234,6 +236,23 @@ def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predic
         print(f"Error while executing Python file: {e}")
 
 
+def get_bleu_and_codebleu(prediction_file_path, ground_truth_path):
+    # calculate BLEU
+    run_python_file(
+        "BLEU",
+        "evaluation/bleu.py",
+        prediction_file_path,
+        ground_truth_path,
+    )
+    # calculate CodeBLEU
+    run_python_file(
+        "CodeBLEU",
+        "evaluation/CodeBLEU/calc_code_bleu.py",
+        prediction_file_path,
+        ground_truth_path,
+    )
+
+
 def get_predictions_from_openai_and_write_to_file(
     prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
@@ -298,20 +317,8 @@ def get_predictions_from_openai_and_write_to_file(
     write_list_to_file(
         file_name=ground_truth_path, list_name=target_codes, start_index=start_index, end_index=end_index
     )
-    # calculate BLEU
-    run_python_file(
-        "BLEU",
-        "evaluation/bleu.py",
-        prediction_file_path,
-        ground_truth_path,
-    )
-    # calculate CodeBLEU
-    run_python_file(
-        "CodeBLEU",
-        "evaluation/CodeBLEU/calc_code_bleu.py",
-        prediction_file_path,
-        ground_truth_path,
-    )
+    # calculate BLEU and CodeBLEU
+    get_bleu_and_codebleu(prediction_file_path, ground_truth_path)
 
 
 def transfer_content_to_another_file(keyword, input_file, output_file):
@@ -325,3 +332,29 @@ def transfer_content_to_another_file(keyword, input_file, output_file):
             output_lines.append(output_line)
 
     write_list_to_file(file_name=output_file, list_name=output_lines)
+
+
+def tryint(s):
+    """
+    Return an int if possible, or `s` unchanged.
+    """
+    try:
+        return int(s)
+    except ValueError:
+        return s
+
+
+def combine_output_files(keyword, directory_path, combined_file_name):
+    file_list = [f for f in os.listdir(directory_path) if keyword in f]
+    file_list = sorted(file_list, key=lambda file_name: [tryint(c) for c in re.split("([0-9]+)", file_name)])
+
+    # for file in file_list:
+    #     print(os.path.join(directory_path, file))
+
+    combined_file = open(os.path.join(directory_path,combined_file_name), "w", encoding="UTF-8")
+    for file in file_list:
+        input_file = open(os.path.join(directory_path, file), "r", encoding="UTF-8")
+        input_lines = input_file.readlines()
+        combined_file.writelines(input_lines)
+
+    combined_file.close()

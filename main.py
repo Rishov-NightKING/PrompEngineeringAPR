@@ -3,7 +3,7 @@ from utils import (
     get_env_variable,
     read_raw_tufano_dataset_from_csv,
     get_predictions_from_openai_and_write_to_file,
-    transfer_content_to_another_file,
+    get_bleu_and_codebleu
 )
 
 
@@ -25,15 +25,15 @@ if __name__ == "__main__":
 
     code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
 
-    get_predictions_from_openai_and_write_to_file(
-        f"{OUTPUT_DIRECTORY}/tufano_predictions_raw.txt",
-        f"{OUTPUT_DIRECTORY}/tufano_ground_truths_raw.txt",
-        code_reviews,
-        buggy_codes,
-        target_codes,
-        START_INDEX,
-        END_INDEX,
-    )
+    # get_predictions_from_openai_and_write_to_file(
+    #     f"{OUTPUT_DIRECTORY}/tufano_predictions_raw.txt",
+    #     f"{OUTPUT_DIRECTORY}/tufano_ground_truths_raw.txt",
+    #     code_reviews,
+    #     buggy_codes,
+    #     target_codes,
+    #     START_INDEX,
+    #     END_INDEX,
+    # )
 
     # transfer_content_to_another_file(
     #     keyword="response:",
@@ -45,3 +45,8 @@ if __name__ == "__main__":
     #     input_file="logs/LOGS_tufano_predictions_raw_1500_1718.txt",
     #     output_file="outputs/tufano_ground_truths_raw_1500_1718.txt",
     # )
+
+    # combine_output_files("ground_truths", "outputs", "tufano_ground_truths_raw.txt")
+    # combine_output_files("predictions", "outputs", "tufano_predictions_raw.txt")
+
+    get_bleu_and_codebleu("outputs/tufano_ground_truths_raw.txt", "outputs/tufano_predictions_raw.txt")
