@@ -88,10 +88,48 @@ def heuristic_adjust_spaces(text):
 
 
 def heuristic_remove_redundant_words(line):
-    redundant_words = ["Refactored code :", "Updated code :", "Fixed code :", "Corrected code :", "```"]
-    for reds in redundant_words:
-        line = line.replace(reds, "").replace(reds.lower(), "").replace(reds.title(), "")
+    redundant_words = [
+        "Here's the",
+        "Refactored code :",
+        "Updated code :",
+        "Fixed code :",
+        "Corrected code :",
+        "Code :",
+        "```",
+        "< START >",
+        "< END >",
+    ]
+    for redundant_word in redundant_words:
+        line = line.replace(redundant_word, "").replace(redundant_word.lower(), "").replace(redundant_word.title(), "")
     return line.strip()
+
+
+def heuristic_remove_starts_with_java(line):
+    if line.startswith("java"):
+        line = line[4:]
+    return line.strip()
+
+
+def heuristic_remove_code_explanation_at_the_end(line):
+    end_words = ["Explanation :", "Note :", "In the refactored code", "The refactored code"]
+    for end_word in end_words:
+        line = line.split(end_word)[0]
+
+    return line.strip()
+
+
+def apply_heuristics(line):
+    heuristics = [
+        heuristic_adjust_spaces,
+        heuristic_remove_redundant_words,
+        heuristic_remove_starts_with_java,
+        heuristic_remove_code_explanation_at_the_end,
+    ]
+
+    for heuristic in heuristics:
+        line = heuristic(line)
+
+    return line
 
 
 def modify_file_name(file_name, start_index, end_index):
@@ -352,7 +390,7 @@ def combine_output_files(keyword, directory_path, combined_file_name):
     # for file in file_list:
     #     print(os.path.join(directory_path, file))
 
-    combined_file = open(os.path.join(directory_path,combined_file_name), "w", encoding="UTF-8")
+    combined_file = open(os.path.join(directory_path, combined_file_name), "w", encoding="UTF-8")
     for file in file_list:
         input_file = open(os.path.join(directory_path, file), "r", encoding="UTF-8")
         input_lines = input_file.readlines()
