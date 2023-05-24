@@ -1,0 +1,816 @@
+sample: 1165
+buggy_code: private void doTheTest(UserGroup g0) { String s = MARSHALER.marshal(g0); UserGroup ug = MARSHALER.unmarshal(s); <START> System.out.println(g0); <END> System.out.println(ug); System.out.println(s); assertTrue(g0.equals(ug)); }
+code_review: Remove this ones
+target code: private void doTheTest ( UserGroup g0 ) { String s = MARSHALER . marshal ( g0 ) ; UserGroup ug = MARSHALER . unmarshal ( s ) ; assertTrue ( g0 . equals ( ug ) ) ; }
+response: private void doTheTest ( UserGroup userGroup ) { String marshaledUserGroup = MARSHALER . marshal ( userGroup ) ; UserGroup unmarshaledUserGroup = MARSHALER . unmarshal ( marshaledUserGroup ) ; System . out . println ( userGroup ) ; System . out . println ( unmarshaledUserGroup ) ; System . out . println ( marshaledUserGroup ) ; assertTrue ( userGroup . equals ( unmarshaledUserGroup ) ) ; }
+
+sample: 1166
+buggy_code: String getConstraintType() { final ConstraintType constraintType = presenter.getConstraintType(); <START> if (constraintType == null) { <END> return presenter.inferComponentType(presenter.getConstraintValue()).value(); } else { return constraintType.toString(); } }
+code_review: This too would benefit from the (proposed) `ConstraintType.EMPTY` enumeration item.
+target code: private String getConstraintType ( ) { if ( presenter . getConstraintType ( ) == null ) { return presenter . inferComponentType ( presenter . getConstraintValue ( ) ) . value ( ) ; } else { return presenter . getConstraintType ( ) . toString ( ) ; } }
+response: String getConstraintType ( ) { final ConstraintType constraintType = presenter . getConstraintType ( ) ; if ( constraintType == null || constraintType == ConstraintType . EMPTY ) { return presenter . inferComponentType ( presenter . getConstraintValue ( ) ) . value ( ) ; } else { return constraintType . toString ( ) ; } }
+
+sample: 1167
+buggy_code: private WikipediaApp getApplication() { <START> return (WikipediaApp) getPageActivity().getApplication(); <END> }
+code_review: How about WikipediaApp.getInstance() instead?
+target code: private WikipediaApp getApplication ( ) { return WikipediaApp . getInstance ( ) ; }
+response: private WikipediaApp getApplication ( ) { return WikipediaApp . getInstance ( ) ; }
+
+sample: 1168
+buggy_code: <START> public boolean isHostedEngineDirectLunDisk() { <END> return disk.getDiskStorageType() == DiskStorageType.LUN && StorageConstants.HOSTED_ENGINE_LUN_DISK_ALIAS.equals(disk.getDiskAlias()); }
+code_review: Should this be public or private? It is used only in the validator
+target code: private boolean isHostedEngineDirectLunDisk ( ) { return disk . getDiskStorageType ( ) == DiskStorageType . LUN && StorageConstants . HOSTED_ENGINE_LUN_DISK_ALIAS . equals ( disk . getDiskAlias ( ) ) ; }
+response: private boolean isHostedEngineDirectLunDisk ( ) { return disk . getDiskStorageType ( ) == DiskStorageType . LUN && StorageConstants . HOSTED_ENGINE_LUN_DISK_ALIAS . equals ( disk . getDiskAlias ( ) ) ; }
+
+sample: 1169
+buggy_code: <START> public CommunityRest getParentCommunity(@Nullable HttpServletRequest httpServletRequest, <END> UUID collectionId, @Nullable Pageable optionalPageable, Projection projection) { try { Context context = obtainContext(); Collection collection = collectionService.find(context, collectionId); Community parentCommunity = (Community) collectionService.getParentObject(context, collection); if (collection == null) { throw new ResourceNotFoundException("No such collection: " + collectionId); } return converter.toRest(parentCommunity, projection); } catch (SQLException e) { throw new RuntimeException(e); } }
+code_review: Same here, JavaDocs for this method please
+target code: public CommunityRest getParentCommunity ( @Nullable HttpServletRequest httpServletRequest , UUID collectionId , @Nullable Pageable optionalPageable , Projection projection ) { try { Context context = obtainContext ( ) ; Collection collection = collectionService . find ( context , collectionId ) ; if ( collection == null ) { throw new ResourceNotFoundException ( "No such collection : " + collectionId ) ; } Community parentCommunity = ( Community ) collectionService . getParentObject ( context , collection ) ; return converter . toRest ( parentCommunity , projection ) ; } catch ( SQLException e ) { throw new RuntimeException ( e ) ; } }
+response: /* * * Returns the parent community of a given collection . * * @param httpServletRequest the HTTP servlet request * @param collectionId the ID of the collection * @param optionalPageable the optional pageable object * @param projection the projection object * @return the parent community of the collection * @throws ResourceNotFoundException if the collection is not found */ public CommunityRest getParentCommunity ( @Nullable HttpServletRequest httpServletRequest , UUID collectionId , @Nullable Pageable optionalPageable , Projection projection ) { try { Context context = obtainContext ( ) ; Collection collection = collectionService . find ( context , collectionId ) ; if ( collection == null ) { throw new ResourceNotFoundException ( "No such collection : " + collectionId ) ; } Community parentCommunity = ( Community ) collectionService . getParentObject ( context , collection ) ; return converter . toRest ( parentCommunity , projection ) ; } catch ( SQLException e ) { throw new RuntimeException ( e ) ; } }
+
+sample: 1170
+buggy_code: public List<WorkflowAction> findActions(List<WorkflowStep> steps, User user) throws DotDataException, DotSecurityException { <START> List<WorkflowAction> actions = new ArrayList<>(); <END> for(WorkflowStep step : steps) { actions.addAll(workFlowFactory.findActions(step)); } actions = APILocator.getPermissionAPI().filterCollection(actions, PermissionAPI.PERMISSION_USE, true, user); return actions; }
+code_review: Immutable
+target code: public List < WorkflowAction > findActions ( List < WorkflowStep > steps , User user ) throws DotDataException , DotSecurityException { final ImmutableList . Builder < WorkflowAction > actions = new ImmutableList . Builder < > ( ) ; for ( WorkflowStep step : steps ) { actions . addAll ( workFlowFactory . findActions ( step ) ) ; } return APILocator . getPermissionAPI ( ) . filterCollection ( actions . build ( ) , PermissionAPI . PERMISSION_USE , true , user ) ; }
+response: public List < WorkflowAction > findActions ( final List < WorkflowStep > steps , final User user ) throws DotDataException , DotSecurityException { final List < WorkflowAction > actions = new ArrayList < > ( ) ; for ( final WorkflowStep step : steps ) { actions . addAll ( workFlowFactory . findActions ( step ) ) ; } final PermissionAPI permissionAPI = APILocator . getPermissionAPI ( ) ; final List < WorkflowAction > filteredActions = permissionAPI . filterCollection ( actions , PermissionAPI . PERMISSION_USE , true , user ) ; return filteredActions ; }
+
+sample: 1171
+buggy_code: private String updateIconUri(MPart part) { MPartDescriptor desc = modelService.getPartDescriptor(part.getElementId()); <START> String iconURI = desc != null && desc.getIconURI() != null ? desc.getIconURI() : part.getIconURI(); <END> part.getTransientData().put(ICON_URI_FOR_PART, iconURI); return iconURI; }
+code_review: This code raises two more (previously existing) concerns: 1. Which iconURI has higher priority the descriptor or the part? 2. What happens if the iconURI of the descriptor is changed?
+target code: private String updateIconUri ( MPart part ) { MPartDescriptor desc = modelService . getPartDescriptor ( part . getElementId ( ) ) ; String iconURI = part . getIconURI ( ) ; if ( iconURI == null && desc != null ) { iconURI = desc . getIconURI ( ) ; } part . getTransientData ( ) . put ( ICON_URI_FOR_PART , iconURI ) ; return iconURI ; }
+response: private String updateIconUri ( MPart part ) { MPartDescriptor desc = modelService . getPartDescriptor ( part . getElementId ( ) ) ; String iconURI = part . getIconURI ( ) ; if ( desc != null && desc . getIconURI ( ) != null ) { iconURI = desc . getIconURI ( ) ; } part . getTransientData ( ) . put ( ICON_URI_FOR_PART , iconURI ) ; return iconURI ; }
+
+sample: 1172
+buggy_code: private Map<String, Pair<Class, Object>> getOverriddenReturnTypes(){ //Add attributes with 'smart' getters and setters that convert back and forth to correct values for MOLGENIS datatypes //Provide the attribute name as key, and a pair of returntype (Class) and a Object to be used as test value Map<String, Pair<Class, Object>> map = new HashMap<>(); <START> return map; <END> }
+code_review: This will throw redundancy warnings in IntelliJ
+target code: private Map < String , Pair < Class , Object > > getOverriddenReturnTypes ( ) { // Add attributes with 'smart' getters and setters that convert back and forth to correct values for MOLGENIS datatypes // Provide the attribute name as key , and a pair of return type ( Class ) and an Object to be used as test value return new HashMap < > ( ) ; }
+response: private Map < String , Pair < Class < ? > , Object > > getOverriddenReturnTypes ( ) { Map < String , Pair < Class < ? > , Object > > map = new HashMap < > ( ) ; // Add attributes with 'smart' getters and setters that convert back and forth to correct values for MOLGENIS datatypes // Provide the attribute name as key , and a pair of returntype ( Class ) and a Object to be used as test value return map ; }
+
+sample: 1173
+buggy_code: <START> public String getParentId(String testId) { <END> return (String) getHibernateTemplate().find("select distinct w.parentId from WorkloadData w where w.taskId=? and w.sessionId=?", testId, sessionId).get(0); }
+code_review: why is it public?
+target code: private String getParentId ( String testId ) { return ( String ) getHibernateTemplate ( ) . find ( "select distinct w . parentId from WorkloadData w where w . taskId = ? and w . sessionId = ? " , testId , sessionId ) . get ( 0 ) ; }
+response: java String getParentId ( String testId ) { return ( String ) getHibernateTemplate ( ) . find ( "select distinct w . parentId from WorkloadData w where w . taskId = ? and w . sessionId = ? " , testId , sessionId ) . get ( 0 ) ; }  Changes Made : Removed the access modifier "public" as it is not necessary for this method .
+
+sample: 1174
+buggy_code: protected void executeQueryCommand() { List<Disk> diskList = DbFacade.getInstance() .getDiskDao() .getAllAttachableDisksByPoolId(getParameters().getStoragePoolId(), getParameters().getVmId(), getUserID(), getParameters().isFiltered()); if (CollectionUtils.isEmpty(diskList)) { <START> setReturnValue(new ArrayList<>()); <END> return; } setReturnValue(filterDisks(diskList)); }
+code_review: Why can't you just return diskList? If I'm not mistaken DbFacade does not return null lists, only empty
+target code: protected void executeQueryCommand ( ) { List < Disk > diskList = DbFacade . getInstance ( ) . getDiskDao ( ) . getAllAttachableDisksByPoolId ( getParameters ( ) . getStoragePoolId ( ) , getParameters ( ) . getVmId ( ) , getUserID ( ) , getParameters ( ) . isFiltered ( ) ) ; if ( CollectionUtils . isEmpty ( diskList ) ) { setReturnValue ( diskList ) ; return ; } setReturnValue ( filterDisks ( diskList ) ) ; }
+response: protected void executeQueryCommand ( ) { List < Disk > diskList = DbFacade . getInstance ( ) . getDiskDao ( ) . getAllAttachableDisksByPoolId ( getParameters ( ) . getStoragePoolId ( ) , getParameters ( ) . getVmId ( ) , getUserID ( ) , getParameters ( ) . isFiltered ( ) ) ; if ( CollectionUtils . isEmpty ( diskList ) ) { setReturnValue ( diskList ) ; return ; } setReturnValue ( filterDisks ( diskList ) ) ; }
+
+sample: 1175
+buggy_code: public JoinFilterPreAnalysis computeJoinFilterPreAnalysisIfAbsent( Filter filter, List<JoinableClause> clauses, VirtualColumns virtualColumns ) { // Some filters have potentially expensive hash codes that are lazily computed and cached. // We call hashCode() here in a synchronized block before we attempt to use the Filter in the analyses map, // to ensure that the hashCode is only computed once per Filter since the Filter interface is not thread-safe. synchronized (analyses) { if (filter != null) { <START> filter.hashCode(); <END> } } JoinFilterPreAnalysisGroupKey key = new JoinFilterPreAnalysisGroupKey(filter, clauses, virtualColumns); return analyses.computeIfAbsent( key, (groupKey) -> { return JoinFilterAnalyzer.computeJoinFilterPreAnalysis( JoinableClauses.fromList(clauses), virtualColumns, filter, joinFilterRewriteConfig ); } ); }
+code_review: Oh, is this why we don't need thread-safety on filter hashcode methods i guess? This seems kind of a funny way to prime them with the cached values, I think maybe the supplier.memoize pattern would be a little cleaner and make this not necessary?
+target code: public JoinFilterPreAnalysis computeJoinFilterPreAnalysisIfAbsent ( Filter filter , List < JoinableClause > clauses , VirtualColumns virtualColumns ) { JoinFilterPreAnalysisGroupKey key = new JoinFilterPreAnalysisGroupKey ( filter , clauses , virtualColumns ) ; return analyses . computeIfAbsent ( key , ( groupKey ) - > { return JoinFilterAnalyzer . computeJoinFilterPreAnalysis ( JoinableClauses . fromList ( clauses ) , virtualColumns , filter , joinFilterRewriteConfig ) ; } ) ; }
+response: public JoinFilterPreAnalysis computeJoinFilterPreAnalysisIfAbsent ( Filter filter , List < JoinableClause > clauses , VirtualColumns virtualColumns ) { synchronized ( analyses ) { if ( filter != null ) { filter . hashCode ( ) ; } } JoinFilterPreAnalysisGroupKey key = new JoinFilterPreAnalysisGroupKey ( filter , clauses , virtualColumns ) ; return analyses . computeIfAbsent ( key , ( groupKey ) - > JoinFilterAnalyzer . computeJoinFilterPreAnalysis ( JoinableClauses . fromList ( clauses ) , virtualColumns , filter , joinFilterRewriteConfig ) ) ; }
+
+sample: 1176
+buggy_code: protected AbstractFixedIntervalTask( String id, <START> TaskResource taskResource, <END> String dataSource, Interval interval ) { this(id, id, taskResource, dataSource, interval); }
+code_review: there is already a constr, which takes (id,groupId,resource, dataSource,interval) Can we use that in indexTask, instead of adding a new one ?
+target code: protected AbstractFixedIntervalTask ( String id , TaskResource taskResource , String dataSource , Interval interval ) { this ( id , id , taskResource == null ? new TaskResource ( id , 1 ) : taskResource , dataSource , interval ) ; }
+response: protected AbstractFixedIntervalTask ( String id , TaskResource taskResource , String dataSource , Interval interval ) { this ( id , id , taskResource , dataSource , interval ) ; } We can use the existing constructor that takes ( id , groupId , resource , dataSource , interval ) instead of adding a new one in the indexTask method .
+
+sample: 1177
+buggy_code: private Object[][] finderSupportedResourceTypeData() { return new Object[][] <START> { <END> { FinderSupportedAssociationDataResource.class }, { FinderSupportedComplexKeyDataResource.class }, { FinderWithActionResource.class } }; }
+code_review: You can use the expectedExceptions and expectedExceptionsMessageRegExp attributes of the @Test annotation
+target code: private Object [ ] [ ] finderSupportedResourceTypeData ( ) { return new Object [ ] [ ] { { FinderSupportedAssociationDataResource . class } , { FinderSupportedComplexKeyDataResource . class } } ; }
+response: private Object [ ] [ ] finderSupportedResourceTypeData ( ) { return new Object [ ] [ ] { { FinderSupportedAssociationDataResource . class } , { FinderSupportedComplexKeyDataResource . class } , { FinderWithActionResource . class } } ; } @Test ( expectedExceptions = { Exception . class } , expectedExceptionsMessageRegExp = "Expected Exception Message" ) public void testMethod ( ) { // Test code here }
+
+sample: 1178
+buggy_code: public void addNotEmptyIdConnection() { StorageServerConnections newPosixConnection = createPosixConnection("multipass.my.domain.tlv.company.com:/export/allstorage/data1", StorageType.POSIXFS, "nfs", "timeo=30"); newPosixConnection.setId(Guid.newGuid().toString()); parameters.setStorageServerConnection(newPosixConnection); parameters.setVdsId(Guid.Empty); <START> doReturn(newPosixConnection.getId()).when(command).isConnWithSameDetailsExists(newPosixConnection, null); <END> ValidateTestUtils.runAndAssertValidateFailure(command, EngineMessage.ACTION_TYPE_FAILED_STORAGE_CONNECTION_ID_NOT_EMPTY); }
+code_review: We actually don't need this line at all. The test check something else
+target code: public void addNotEmptyIdConnection ( ) { StorageServerConnections newPosixConnection = createPosixConnection ( "multipass . my . domain . tlv . company . com :/ export / allstorage / data1" , StorageType . POSIXFS , "nfs" , "timeo = 30" ) ; newPosixConnection . setId ( Guid . newGuid ( ) . toString ( ) ) ; parameters . setStorageServerConnection ( newPosixConnection ) ; parameters . setVdsId ( Guid . Empty ) ; ValidateTestUtils . runAndAssertValidateFailure ( command , EngineMessage . ACTION_TYPE_FAILED_STORAGE_CONNECTION_ID_NOT_EMPTY ) ; }
+response: public void addNotEmptyIdConnection ( ) { StorageServerConnections newPosixConnection = createPosixConnection ( "multipass . my . domain . tlv . company . com :/ export / allstorage / data1" , StorageType . POSIXFS , "nfs" , "timeo = 30" ) ; newPosixConnection . setId ( Guid . newGuid ( ) . toString ( ) ) ; parameters . setStorageServerConnection ( newPosixConnection ) ; parameters . setVdsId ( Guid . Empty ) ; ValidateTestUtils . runAndAssertValidateFailure ( command , EngineMessage . ACTION_TYPE_FAILED_STORAGE_CONNECTION_ID_NOT_EMPTY ) ; }
+
+sample: 1179
+buggy_code: public void mercury_topbar_wikiaLogoRedirectsToFandomPage() { TopBar topBar = new ArticlePage() .open(MercurySubpages.MAIN_PAGE) .getTopBar(); <START> Assertion.assertTrue(topBar.isLogoVisible()); <END> topBar.clickWikiaLogo(); Assertion.assertTrue(topBar.getCurrentUrl().contains("www.wikia.com/fandom")); }
+code_review: I think if it's not visible, click should fail, so is the assertion needed?
+target code: public void mercury_topbar_wikiaLogoRedirectsToFandomPage ( ) { TopBar topBar = new ArticlePage ( ) . open ( MercurySubpages . MAIN_PAGE ) . getTopBar ( ) ; topBar . clickWikiaLogo ( ) ; Assertion . assertTrue ( topBar . getCurrentUrl ( ) . contains ( "www . wikia . com / fandom" ) ) ; }
+response: public void mercury_topbar_wikiaLogoRedirectsToFandomPage ( ) { TopBar topBar = new ArticlePage ( ) . open ( MercurySubpages . MAIN_PAGE ) . getTopBar ( ) ; topBar . clickWikiaLogo ( ) ; assertTrue ( topBar . getCurrentUrl ( ) . contains ( "www . wikia . com / fandom" ) ) ; }  Explanation : - The assertion `assertTrue ( topBar . isLogoVisible ( ) ) ` is not needed as the `clickWikiaLogo ( ) ` method will fail if the logo is not visible . - Therefore , the code can be simplified by removing the unnecessary assertion .
+
+sample: 1180
+buggy_code: private ConfigurationServiceImplService getConfigService() throws ConnectionManagerException, MalformedURLException{ String url = oProxyHelper.getAdapterEndPointFromConnectionManager(DirectConfigConstants.DIRECT_CONFIG_SERVICE_NAME); if(cfService == null) { <START> cfService = new ConfigurationServiceImplService(new URL(url+"?wsdl")); <END> } return cfService; }
+code_review: Should this be initialized in a static / thread-safe context?
+target code: protected ConfigurationServiceImplService getConfigService ( ) throws ConnectionManagerException , MalformedURLException { return cfService ; }
+response: private static ConfigurationServiceImplService getConfigService ( ) throws ConnectionManagerException , MalformedURLException { String url = oProxyHelper . getAdapterEndPointFromConnectionManager ( DirectConfigConstants . DIRECT_CONFIG_SERVICE_NAME ) ; if ( cfService == null ) { synchronized ( ConfigurationServiceImplService . class ) { if ( cfService == null ) { cfService = new ConfigurationServiceImplService ( new URL ( url + " ? wsdl" ) ) ; } } } return cfService ; }
+
+sample: 1181
+buggy_code: void testDtoListResponses() { FlowJsonObjectReader reader = new FlowJsonObjectReader(); TypeReference<SurveyGroupDto> typeReference = new TypeReference<SurveyGroupDto>() {}; List<SurveyGroupDto> surveyList = null; try { surveyList = reader.readDtoListObject(DTO_LIST_JSON_OBJECT, typeReference); } catch (IOException e) { // } assertNotEquals(surveyList, null); assertEquals(surveyList.size(), 1); <START> assertEquals(surveyList.get(0).getName(),"1.10.36 all questions"); <END> }
+code_review: This is a minor detail but the the assertZZZ methods work like this assertZZZ(expected, actual), this is valid for the whole of your test files. Also please format the file as some "," have no space after them.
+target code: void testDtoListResponses ( ) { FlowJsonObjectReader reader = new FlowJsonObjectReader ( ) ; TypeReference < SurveyGroupDto > typeReference = new TypeReference < SurveyGroupDto > ( ) { } ; List < SurveyGroupDto > surveyList = null ; try { surveyList = reader . readDtoListObject ( DTO_LIST_JSON_OBJECT , typeReference ) ; } catch ( IOException e ) { // ignoring exception } assertNotEquals ( null , surveyList ) ; assertEquals ( 1 , surveyList . size ( ) ) ; assertEquals ( "1 . 10 . 36 all questions" , surveyList . get ( 0 ) . getName ( ) ) ; }
+response: void testDtoListResponses ( ) { FlowJsonObjectReader reader = new FlowJsonObjectReader ( ) ; TypeReference < SurveyGroupDto > typeReference = new TypeReference < SurveyGroupDto > ( ) { } ; List < SurveyGroupDto > surveyList = null ; try { surveyList = reader . readDtoListObject ( DTO_LIST_JSON_OBJECT , typeReference ) ; } catch ( IOException e ) { // handle exception } assertNotNull ( surveyList ) ; assertEquals ( 1 , surveyList . size ( ) ) ; assertEquals ( "1 . 10 . 36 all questions" , surveyList . get ( 0 ) . getName ( ) ) ; }
+
+sample: 1182
+buggy_code: public GroupScan clone(List<SchemaPath> columns) { <START> HBaseUtils.verifyColumns(columns, hTableDesc); <END> HBaseGroupScan newScan = new HBaseGroupScan(this); newScan.columns = columns == null ? ALL_COLUMNS : columns; return newScan; }
+code_review: We should replace null columns with all_columns before verification or we will get exception. You have changed initial order of statements.
+target code: public GroupScan clone ( List < SchemaPath > columns ) { HBaseGroupScan newScan = new HBaseGroupScan ( this ) ; newScan . columns = columns == null ? ALL_COLUMNS : columns ; HBaseUtils . verifyColumns ( columns , hTableDesc ) ; return newScan ; }
+response: public GroupScan clone ( List < SchemaPath > columns ) { HBaseGroupScan newScan = new HBaseGroupScan ( this ) ; newScan . columns = columns == null ? ALL_COLUMNS : columns ; HBaseUtils . verifyColumns ( newScan . columns , hTableDesc ) ; return newScan ; }
+
+sample: 1183
+buggy_code: <START> static <T, U> Function<T, Result<U>> reportMissing(Class<?> expectedClass) { <END> return t -> Result.failure( "Not yet implemented: " + Optional.ofNullable(t) .map(o -> o.getClass().getCanonicalName()) .orElse("null -- expected " + expectedClass.getCanonicalName())); }
+code_review: Can be private method.
+target code: private static < T , U > Function < T , Result < U > > reportMissing ( Class < ? > expectedClass ) { return t - > Result . failure ( "Not yet implemented : " + Optional . ofNullable ( t ) . map ( o - > o . getClass ( ) . getCanonicalName ( ) ) . orElse ( "null -- expected " + expectedClass . getCanonicalName ( ) ) ) ; }
+response: private static < T , U > Function < T , Result < U > > reportMissing ( Class < ? > expectedClass ) { return t - > Result . failure ( "Not yet implemented : " + Optional . ofNullable ( t ) . map ( o - > o . getClass ( ) . getCanonicalName ( ) ) . orElse ( "null -- expected " + expectedClass . getCanonicalName ( ) ) ) ; }
+
+sample: 1184
+buggy_code: private void rematchAllNetworksAndRequests() { // TODO: This may be slow, and should be optimized. final long now = SystemClock.elapsedRealtime(); final NetworkReassignment changes = computeNetworkReassignment(); if (VDBG || DDBG) log(changes.toString()); applyNetworkReassignment(changes, <START> oldDefaultNetwork, now); <END> }
+code_review: hmm, I don't think this can get build pass.
+target code: private void rematchAllNetworksAndRequests ( ) { // TODO : This may be slow , and should be optimized . final long now = SystemClock . elapsedRealtime ( ) ; final NetworkReassignment changes = computeNetworkReassignment ( ) ; if ( VDBG || DDBG ) log ( changes . toString ( ) ) ; applyNetworkReassignment ( changes , now ) ; }
+response: private void rematchAllNetworksAndRequests ( ) { final long now = SystemClock . elapsedRealtime ( ) ; final NetworkReassignment changes = computeNetworkReassignment ( ) ; applyNetworkReassignment ( changes , oldDefaultNetwork , now ) ; }
+
+sample: 1185
+buggy_code: public String getScroller() { <START> return scroller == null ? DEFAULT_SCROLLER : scroller; <END> }
+code_review: wdyt if we replace it by ` return Objects.requireNonNullElse(scroller, DEFAULT_SCROLLER)` if you agree you will have some adaptation on 10.10 (java 8)
+target code: public String getScroller ( ) { return scroller ; }
+response: public String getScroller ( ) { return Objects . requireNonNullElse ( scroller , DEFAULT_SCROLLER ) ; }
+
+sample: 1186
+buggy_code: public String getMessage(){ <START> return this.message; <END> }
+code_review: Nit: unnecessary this.
+target code: public String getMessage ( ) { return message ; }
+response: public String getMessage ( ) { return message ; }
+
+sample: 1187
+buggy_code: public Type convertReadValueToType(String pvReadValue) { Type lvType = convertReadValueToUnmodifiedType(pvReadValue); for (InterfaceOneWireTypeModifier lvTypeModifier : getTypeModifieryList()) { logger.debug("type of {} before modifier:{} type={}", getDevicePropertyPath(), <START> lvTypeModifier.getModifierName(), lvType.toString()); <END> lvType = lvTypeModifier.modify4Read(lvType); logger.debug("type of {} after modifier:{} type={}", getDevicePropertyPath(), lvTypeModifier.getModifierName(), lvType.toString()); } return lvType; }
+code_review: no need for `.toString()`
+target code: public Type convertReadValueToType ( String pvReadValue ) { Type lvType = convertReadValueToUnmodifiedType ( pvReadValue ) ; for ( InterfaceOneWireTypeModifier lvTypeModifier : getTypeModifieryList ( ) ) { logger . debug ( "type of { } before modifier : { } type = { } " , getDevicePropertyPath ( ) , lvTypeModifier . getModifierName ( ) , lvType ) ; lvType = lvTypeModifier . modify4Read ( lvType ) ; logger . debug ( "type of { } after modifier : { } type = { } " , getDevicePropertyPath ( ) , lvTypeModifier . getModifierName ( ) , lvType ) ; } return lvType ; }
+response: public Type convertReadValueToType ( String pvReadValue ) { Type lvType = convertReadValueToUnmodifiedType ( pvReadValue ) ; for ( InterfaceOneWireTypeModifier lvTypeModifier : getTypeModifieryList ( ) ) { logger . debug ( "type of { } before modifier : { } type = { } " , getDevicePropertyPath ( ) , lvTypeModifier . getModifierName ( ) , lvType ) ; lvType = lvTypeModifier . modify4Read ( lvType ) ; logger . debug ( "type of { } after modifier : { } type = { } " , getDevicePropertyPath ( ) , lvTypeModifier . getModifierName ( ) , lvType ) ; } return lvType ; }
+
+sample: 1188
+buggy_code: <START> public void clear() { <END> this.domainsVisibility.clear(); }
+code_review: this should be synchronized as well
+target code: public synchronized void clear ( ) { this . domainsVisibility . clear ( ) ; }
+response: < START > public synchronized void clear ( ) { this . domainsVisibility . clear ( ) ; } < END >
+
+sample: 1189
+buggy_code: public static Comment newComment(long issueId, int newCommentId, String comment) { DateTime now = DateTime.now(); <START> Long id = Long.parseLong(issueId + "0" + newCommentId); <END> URI selfUri = URI.create(TEST_JIRA_URL + "/rest/api/latest/issue/" + issueId + "/comment"); return new Comment(selfUri, comment, null, null, now, null, null, id); }
+code_review: Since you are at it, can you please change this to `long` primitive type? :)
+target code: public static Comment newComment ( long issueId , int newCommentId , String comment ) { DateTime now = DateTime . now ( ) ; long id = Long . parseLong ( issueId + "0" + newCommentId ) ; URI selfUri = URI . create ( TEST_JIRA_URL + " / rest / api / latest / issue / " + issueId + " / comment" ) ; return new Comment ( selfUri , comment , null , null , now , null , null , id ) ; }
+response: public static Comment newComment ( long issueId , int newCommentId , String comment ) { DateTime now = DateTime . now ( ) ; long id = Long . parseLong ( issueId + "0" + newCommentId ) ; URI selfUri = URI . create ( TEST_JIRA_URL + " / rest / api / latest / issue / " + issueId + " / comment" ) ; return new Comment ( selfUri , comment , null , null , now , null , null , id ) ; }
+
+sample: 1190
+buggy_code: private void registerGlueCodeScope(ConfigurableApplicationContext context) { do { <START> synchronized (context) { <END> context.getBeanFactory().registerScope(SCOPE_CUCUMBER_GLUE, new GlueCodeScope()); context = (ConfigurableApplicationContext) context.getParent(); } } while (context != null); }
+code_review: I don't think this works. We're swapping out `context` with a different instance. We should probably use a constant as a monitor.
+target code: private void registerGlueCodeScope ( ConfigurableApplicationContext context ) { do { context . getBeanFactory ( ) . registerScope ( SCOPE_CUCUMBER_GLUE , new GlueCodeScope ( ) ) ; context = ( ConfigurableApplicationContext ) context . getParent ( ) ; } while ( context != null ) ; }
+response: private static final Object LOCK = new Object ( ) ; private void registerGlueCodeScope ( ConfigurableApplicationContext context ) { do { synchronized ( LOCK ) { context . getBeanFactory ( ) . registerScope ( SCOPE_CUCUMBER_GLUE , new GlueCodeScope ( ) ) ; context = ( ConfigurableApplicationContext ) context . getParent ( ) ; } } while ( context != null ) ; }
+
+sample: 1191
+buggy_code: private String truncateMessageLength(String message, int maxLength) { if (message.length() > maxLength) { <START> message = message.substring(0, maxLength + 1); <END> } return message; }
+code_review: This line will actually return a substring of length maxLength + 1. If the substring indeed needs to be no longer than maxLength, then replace "maxLength + 1" with just "maxLength".
+target code: private String truncateMessageLength ( String message , int maxLength ) { if ( message . length ( ) > maxLength ) { message = message . substring ( 0 , maxLength ) ; } return message ; }
+response: private String truncateMessageLength ( String message , int maxLength ) { if ( message . length ( ) > maxLength ) { message = message . substring ( 0 , maxLength ) ; } return message ; }
+
+sample: 1192
+buggy_code: public void testErrorReceived() { TestObserver<Object> ts = new TestObserver<Object>(); TestException ex = new TestException("boo"); Flowable.error(ex).ignoreElements().subscribe(ts); ts.assertNoValues(); <START> ts.assertTerminated();; <END> ts.assertError(TestException.class); ts.assertErrorMessage("boo"); }
+code_review: double `;`
+target code: public void testErrorReceived ( ) { TestObserver < Object > ts = new TestObserver < Object > ( ) ; TestException ex = new TestException ( "boo" ) ; Flowable . error ( ex ) . ignoreElements ( ) . subscribe ( ts ) ; ts . assertNoValues ( ) ; ts . assertTerminated ( ) ; ts . assertError ( TestException . class ) ; ts . assertErrorMessage ( "boo" ) ; }
+response: public void testErrorReceived ( ) { TestObserver < Object > ts = new TestObserver < Object > ( ) ; TestException ex = new TestException ( "boo" ) ; Flowable . error ( ex ) . ignoreElements ( ) . subscribe ( ts ) ; ts . assertNoValues ( ) ; ts . assertTerminated ( ) ; ts . assertError ( TestException . class ) ; ts . assertErrorMessage ( "boo" ) ; }
+
+sample: 1193
+buggy_code: public boolean select(Viewer viewer, Object parentElement, <START> Object element) { <END> if (!(element instanceof DisplayItem)) { return false; } if (actionSet == null) { return false; } return CustomizePerspectiveDialog.includeInSetStructure((DisplayItem) element, actionSet); }
+code_review: unnecessary linebreak
+target code: public boolean select ( Viewer viewer , Object parentElement , Object element ) { if ( ! ( element instanceof DisplayItem ) || actionSet == null ) { return false ; } return CustomizePerspectiveDialog . includeInSetStructure ( ( DisplayItem ) element , actionSet ) ; }
+response: public boolean select ( Viewer viewer , Object parentElement , Object element ) { if ( ! ( element instanceof DisplayItem ) ) { return false ; } if ( actionSet == null ) { return false ; } return CustomizePerspectiveDialog . includeInSetStructure ( ( DisplayItem ) element , actionSet ) ; }
+
+sample: 1194
+buggy_code: public static void runJSTestSuite() throws InterruptedException { // FIXME Update this when we stop using ARM Emulators int timeout = Build.SUPPORTED_ABIS[0].contains("armeabi") ? 180 : 60; <START> JSTestCase.runJSTestSuite(JS_SUITE, data(), timeout); <END> }
+code_review: Why not just bump it up to `180` across the board?
+target code: public static void runJSTestSuite ( ) throws InterruptedException { // FIXME Change timeout back to 60 when we stop using ARM Emulators JSTestCase . runJSTestSuite ( JS_SUITE , data ( ) , 180 ) ; }
+response: public static void runJSTestSuite ( ) throws InterruptedException { int timeout = 180 ; JSTestCase . runJSTestSuite ( JS_SUITE , data ( ) , timeout ) ; }
+
+sample: 1195
+buggy_code: public Map<String, String> getSystemSessionProperties(SessionConfigurationContext context) { <START> HashMap<String, String> combinedProperties = new HashMap<>(); <END> for (SessionMatchSpec sessionMatchSpec : sessionMatchSpecs) { combinedProperties.putAll(sessionMatchSpec.match(context)); } return ImmutableMap.copyOf(combinedProperties); }
+code_review: Nit: declare as `Map`
+target code: public Map < String , String > getSystemSessionProperties ( SessionConfigurationContext context ) { // later properties override earlier properties Map < String , String > combinedProperties = new HashMap < > ( ) ; for ( SessionMatchSpec sessionMatchSpec : sessionMatchSpecs ) { combinedProperties . putAll ( sessionMatchSpec . match ( context ) ) ; } return ImmutableMap . copyOf ( combinedProperties ) ; }
+response: public Map < String , String > getSystemSessionProperties ( SessionConfigurationContext context ) { Map < String , String > combinedProperties = new HashMap < > ( ) ; for ( SessionMatchSpec sessionMatchSpec : sessionMatchSpecs ) { combinedProperties . putAll ( sessionMatchSpec . match ( context ) ) ; } return ImmutableMap . copyOf ( combinedProperties ) ; }
+
+sample: 1196
+buggy_code: public static void logAccess(Integer requestId, InetAddress remoteAddress, Principal principal, String operation) { new ThriftAccessLogger().log( String.format("Request ID: {} access from: {} principal: {} operation: {}", requestId, remoteAddress, principal, operation)); <START> } <END>
+code_review: I thought it would be something like ``` LOG.info("Request ID: {} access from: {} principal: {} operation: {}", requestId, remoteAddress, principal, operation); ``` and ThriftAccessLogger.log would just go away
+target code: public static void logAccess ( Integer requestId , InetAddress remoteAddress , Principal principal , String operation ) { LOG . info ( "Request ID : { } access from : { } principal : { } operation : { } " , requestId , remoteAddress , principal , operation ) ; }
+response: public static void logAccess ( Integer requestId , InetAddress remoteAddress , Principal principal , String operation ) { LOG . info ( "Request ID : { } access from : { } principal : { } operation : { } " , requestId , remoteAddress , principal , operation ) ; }
+
+sample: 1197
+buggy_code: public static List<String> getComputerNames() { final ArrayList<String> names = new ArrayList<String>(); <START> for (Computer c : Jenkins.getActiveInstance().getComputers()) { <END> if (!c.getName().isEmpty()) { names.add(c.getName()); } } return names; }
+code_review: `getActiveInstance` is deprecated, please use good old `getInstance`.
+target code: public static List < String > getComputerNames ( ) { final ArrayList < String > names = new ArrayList < String > ( ) ; for ( Computer c : Jenkins . getInstance ( ) . getComputers ( ) ) { if ( ! c . getName ( ) . isEmpty ( ) ) { names . add ( c . getName ( ) ) ; } } return names ; }
+response: public static List < String > getComputerNames ( ) { final ArrayList < String > names = new ArrayList < String > ( ) ; for ( Computer c : Jenkins . getInstance ( ) . getComputers ( ) ) { if ( ! c . getName ( ) . isEmpty ( ) ) { names . add ( c . getName ( ) ) ; } } return names ; }
+
+sample: 1198
+buggy_code: public void unbind(final String eventName, final SubscriptionEventListener listener) { validateArguments(eventName, listener); <START> final Set<SubscriptionEventListener> listeners = eventNameToListenerMap.get(eventName); <END> synchronized (lock) { if (listeners != null) { listeners.remove(listener); if (listeners.isEmpty()) { eventNameToListenerMap.remove(eventName); } } } }
+code_review: As above, you must perform both the read and the write in the critical section, otherwise there's no guarantee of consistency.
+target code: public void unbind ( final String eventName , final SubscriptionEventListener listener ) { validateArguments ( eventName , listener ) ; synchronized ( lock ) { final Set < SubscriptionEventListener > listeners = eventNameToListenerMap . get ( eventName ) ; if ( listeners != null ) { listeners . remove ( listener ) ; if ( listeners . isEmpty ( ) ) { eventNameToListenerMap . remove ( eventName ) ; } } } }
+response: public void unbind ( final String eventName , final SubscriptionEventListener listener ) { synchronized ( lock ) { validateArguments ( eventName , listener ) ; final Set < SubscriptionEventListener > listeners = eventNameToListenerMap . get ( eventName ) ; if ( listeners != null ) { listeners . remove ( listener ) ; if ( listeners . isEmpty ( ) ) { eventNameToListenerMap . remove ( eventName ) ; } } } }
+
+sample: 1199
+buggy_code: public Iterable<AccountGroup> all() { <START> final List<AccountGroup> groups = new LinkedList<AccountGroup>(); <END> for (final AccountGroup.NameKey groupName : list.get(ListKey.ALL)) { final AccountGroup group = get(groupName); if (group != null) { groups.add(group); } } return Collections.unmodifiableList(groups); }
+code_review: If list.get(ListKey.ALL) returns a reasonable upper bounds for the size, I think that an ArrayList would likely be faster.
+target code: public Iterable < AccountGroup > all ( ) { final List < AccountGroup > groups = new ArrayList < AccountGroup > ( ) ; for ( final AccountGroup . NameKey groupName : list . get ( ListKey . ALL ) ) { final AccountGroup group = get ( groupName ) ; if ( group != null ) { groups . add ( group ) ; } } return Collections . unmodifiableList ( groups ) ; }
+response: public Iterable < AccountGroup > all ( ) { final List < AccountGroup > groups = new ArrayList < AccountGroup > ( list . get ( ListKey . ALL ) . size ( ) ) ; for ( final AccountGroup . NameKey groupName : list . get ( ListKey . ALL ) ) { final AccountGroup group = get ( groupName ) ; if ( group != null ) { groups . add ( group ) ; } } return Collections . unmodifiableList ( groups ) ; }
+
+sample: 1200
+buggy_code: public void terminate(HazelcastInstance instance) { try { Address address = getNode(instance).address; terminateInstance(instance); if (isMockNetwork) { registry.removeInstance(address); } } finally { <START> TestJmxLeakHelper.checkJmxBeans(instance.getName()); <END> } }
+code_review: We have a large number of tests that don't use `TestHazelcastInstanceFactory` at all and call `Hazelcast.newHazelcastInstance()` directly (in combination with `Hazelcast.shutdownAll()` / `HazelcastInstanceFactory.shutdownAll()` / `HazelcastInstanceFactory.terminateAll()`). Shouldn't those be checked as well, somehow?
+target code: public void terminate ( HazelcastInstance instance ) { Address address = getNode ( instance ) . address ; terminateInstance ( instance ) ; if ( isMockNetwork ) { registry . removeInstance ( address ) ; } }
+response: public void terminate ( HazelcastInstance instance ) { try { Address address = getNode ( instance ) . address ; terminateInstance ( instance ) ; if ( isMockNetwork ) { registry . removeInstance ( address ) ; } } finally { TestHazelcastInstances . checkJmxBeans ( instance . getName ( ) ) ; } }
+
+sample: 1201
+buggy_code: public void endSuccessfully() { super.endSuccessfully(); if (getParameters().getImportAsTemplate()) { Guid newTemplateId = createTemplate(); // No reason for this to happen, but checking just to make sure if (newTemplateId != null) { attachDiskToTemplate(newTemplateId); } } updateDiskStatus(ImageStatus.OK); <START> getReturnValue().setSucceeded(true); <END> }
+code_review: please change to setSucceeded
+target code: public void endSuccessfully ( ) { super . endSuccessfully ( ) ; if ( getParameters ( ) . getImportAsTemplate ( ) ) { Guid newTemplateId = createTemplate ( ) ; // No reason for this to happen , but checking just to make sure if ( newTemplateId != null ) { attachDiskToTemplate ( newTemplateId ) ; } } updateDiskStatus ( ImageStatus . OK ) ; setSucceeded ( true ) ; }
+response: public void endSuccessfully ( ) { super . endSuccessfully ( ) ; if ( getParameters ( ) . getImportAsTemplate ( ) ) { Guid newTemplateId = createTemplate ( ) ; if ( newTemplateId != null ) { attachDiskToTemplate ( newTemplateId ) ; } } updateDiskStatus ( ImageStatus . OK ) ; getReturnValue ( ) . setSucceeded ( true ) ; }  public void endSuccessfully ( ) { super . endSuccessfully ( ) ; if ( getParameters ( ) . getImportAsTemplate ( ) ) { Guid newTemplateId = createTemplate ( ) ; if ( newTemplateId != null ) { attachDiskToTemplate ( newTemplateId ) ; } } updateDiskStatus ( ImageStatus . OK ) ; getReturnValue ( ) . setSucceeded ( ) ; // changed setSucceeded ( true ) to setSucceeded ( ) }
+
+sample: 1202
+buggy_code: <START> void validate() { <END> // No-op, no validation required }
+code_review: Interesting wrapping style :)
+target code: public void validate ( ) { // No - op , no validation required }
+response: void validate ( ) { // No - op , no validation required }
+
+sample: 1203
+buggy_code: private void scheduleImmediateDelivery() { cancelDelayedDelivery(); while (state == State.RUNNING) { DeliveryAttempt previous = immediateDelivery.get(); if (previous != null && !previous.isDone()) <START> previous.cancel(); <END> DeliveryAttempt current = new DeliveryAttempt(); if (immediateDelivery.compareAndSet(previous, current)) { current.executeNow(); return; } } }
+code_review: deliverEvents does not handle interruptions, so this is essentially a no-op if `previous` is already executing.
+target code: private void scheduleImmediateDelivery ( ) { cancelDelayedDelivery ( ) ; while ( state == State . RUNNING ) { DeliveryAttempt previous = immediateDelivery . get ( ) ; if ( previous != null ) previous . cancel ( ) ; DeliveryAttempt current = new DeliveryAttempt ( ) ; if ( immediateDelivery . compareAndSet ( previous , current ) ) { current . executeNow ( ) ; return ; } } }
+response: private void scheduleImmediateDelivery ( ) { cancelDelayedDelivery ( ) ; while ( state == State . RUNNING ) { DeliveryAttempt previous = immediateDelivery . get ( ) ; if ( previous != null && ! previous . isDone ( ) ) { previous . cancel ( ) ; } DeliveryAttempt current = new DeliveryAttempt ( ) ; if ( immediateDelivery . compareAndSet ( previous , current ) ) { current . executeNow ( ) ; return ; } } }
+
+sample: 1204
+buggy_code: private static ObjectNode handleGaugeRollup(GaugeRollup rollup) { ObjectNode rollupNode = JsonNodeFactory.instance.objectNode(); <START> rollupNode.put("timestamp", rollup.getTimestamp()); <END> SimpleNumber rollupValue = rollup.getLatestValue(); rollupNode.put("latestVal", rollupValue.getDataType() == (SimpleNumber.Type.DOUBLE) ? rollupValue.getValue().doubleValue() : rollupValue.getValue().longValue()); return handleBasicRollup(rollup, rollupNode); }
+code_review: Why do gauges get timestamp twice?
+target code: private static ObjectNode handleGaugeRollup ( GaugeRollup rollup ) { ObjectNode rollupNode = JsonNodeFactory . instance . objectNode ( ) ; SimpleNumber rollupValue = rollup . getLatestValue ( ) ; rollupNode . put ( "latestVal" , rollupValue . getDataType ( ) == ( SimpleNumber . Type . DOUBLE ) ? rollupValue . getValue ( ) . doubleValue ( ) : rollupValue . getValue ( ) . longValue ( ) ) ; return handleBasicRollup ( rollup , rollupNode ) ; }
+response: private static ObjectNode handleGaugeRollup ( GaugeRollup rollup ) { ObjectNode rollupNode = JsonNodeFactory . instance . objectNode ( ) ; rollupNode . put ( "timestamp" , rollup . getTimestamp ( ) ) ; SimpleNumber rollupValue = rollup . getLatestValue ( ) ; rollupNode . put ( "latestVal" , rollupValue . getDataType ( ) == SimpleNumber . Type . DOUBLE ? rollupValue . getValue ( ) . doubleValue ( ) : rollupValue . getValue ( ) . longValue ( ) ) ; return handleBasicRollup ( rollup , rollupNode ) ; }
+
+sample: 1205
+buggy_code: public GarruksWarsteed(UUID ownerId, CardSetInfo setInfo) { super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{3}{G}{G}"); this.subtype.add(SubType.RHINO); this.power = new MageInt(3); this.toughness = new MageInt(5); // Vigilance this.addAbility(VigilanceAbility.getInstance()); // When Garruk's Warsteed enters the battlefield, you may search your library and/or graveyard for a card named Garruk, Savage Herald, reveal it, and put it into your hand. If you search your library this way, shuffle it. <START> this.addAbility(new EntersBattlefieldTriggeredAbility(new SearchLibraryGraveyardPutInHandEffect(filter, false, true), true)); <END> }
+code_review: this doesn't need to have the ability and effect both be optional, just the ability is fine.
+target code: public GarruksWarsteed ( UUID ownerId , CardSetInfo setInfo ) { super ( ownerId , setInfo , new CardType [ ] { CardType . CREATURE } , " { 3 } { G } { G } " ) ; this . subtype . add ( SubType . RHINO ) ; this . power = new MageInt ( 3 ) ; this . toughness = new MageInt ( 5 ) ; // Vigilance this . addAbility ( VigilanceAbility . getInstance ( ) ) ; // When Garruk's Warsteed enters the battlefield , you may search your library and / or graveyard for a card named Garruk , Savage Herald , reveal it , and put it into your hand . If you search your library this way , shuffle it . this . addAbility ( new EntersBattlefieldTriggeredAbility ( new SearchLibraryGraveyardPutInHandEffect ( filter , false , true ) ) ) ; }
+response: public GarruksWarsteed ( UUID ownerId , CardSetInfo setInfo ) { super ( ownerId , setInfo , new CardType [ ] { CardType . CREATURE } , " { 3 } { G } { G } " ) ; this . subtype . add ( SubType . RHINO ) ; this . power = new MageInt ( 3 ) ; this . toughness = new MageInt ( 5 ) ; this . addAbility ( new EntersBattlefieldTriggeredAbility ( new SearchLibraryGraveyardPutInHandEffect ( filter , true , false ) , false ) ) ; }
+
+sample: 1206
+buggy_code: private void releaseFileChannel(long logId, CachedFileChannel cachedFileChannel) { lock.writeLock().lock(); try { if (cachedFileChannel.markDead()) { <START> try { <END> cachedFileChannel.fileChannel.close(); } catch (IOException e) { LOG.warn("Exception occurred in ReferenceCountedFileChannel" + " while closing channel for log file: {}", cachedFileChannel); } finally { IOUtils.close(LOG, cachedFileChannel.fileChannel); } // to guarantee the removed cachedFileChannel is what we want to remove. fileChannels.remove(logId, cachedFileChannel); } } finally { lock.writeLock().unlock(); } }
+code_review: markDead doesn't need to be under a lock. The caller should call tryRetain() after receiving, which will either prevent markDead from having an effect, if it is called before it.
+target code: private void releaseFileChannel ( long logId , CachedFileChannel cachedFileChannel ) { if ( cachedFileChannel . markDead ( ) ) { // to guarantee the removed cachedFileChannel is what we want to remove . fileChannels . remove ( logId , cachedFileChannel ) ; // close corresponding fileChannel try { cachedFileChannel . fileChannel . close ( ) ; } catch ( IOException e ) { LOG . warn ( "Exception occurred in ReferenceCountedFileChannel" + " while closing channel for log file : { } " , cachedFileChannel ) ; } finally { IOUtils . close ( LOG , cachedFileChannel . fileChannel ) ; } } }
+response: private void releaseFileChannel ( long logId , CachedFileChannel cachedFileChannel ) { if ( cachedFileChannel . markDead ( ) ) { try { cachedFileChannel . fileChannel . close ( ) ; } catch ( IOException e ) { LOG . warn ( "Exception occurred in ReferenceCountedFileChannel" + " while closing channel for log file : { } " , cachedFileChannel ) ; } finally { IOUtils . close ( LOG , cachedFileChannel . fileChannel ) ; } lock . writeLock ( ) . lock ( ) ; try { // to guarantee the removed cachedFileChannel is what we want to remove . fileChannels . remove ( logId , cachedFileChannel ) ; } finally { lock . writeLock ( ) . unlock ( ) ; } } }
+
+sample: 1207
+buggy_code: private static File getDefaultFile() { <START> File netrc; <END> File home = new File(System.getProperty("user.home")); //$NON-NLS-1$ netrc = new File(home, ".netrc"); //$NON-NLS-1$ if (netrc.exists()) return netrc; netrc = new File(home, "_netrc"); //$NON-NLS-1$ if (netrc.exists()) return netrc; return null; }
+code_review: no need to declare this here, instead declare the type in line 141
+target code: private static File getDefaultFile ( ) { File home = new File ( System . getProperty ( "user . home" ) ) ; // $NON - NLS - 1$ File netrc = new File ( home , " . netrc" ) ; // $NON - NLS - 1$ if ( netrc . exists ( ) ) return netrc ; netrc = new File ( home , "_netrc" ) ; // $NON - NLS - 1$ if ( netrc . exists ( ) ) return netrc ; return null ; }
+response: private static File getDefaultFile ( ) { File home = new File ( System . getProperty ( "user . home" ) ) ; File netrc = new File ( home , " . netrc" ) ; if ( netrc . exists ( ) ) { return netrc ; } netrc = new File ( home , "_netrc" ) ; if ( netrc . exists ( ) ) { return netrc ; } return null ; }
+
+sample: 1208
+buggy_code: <START> static synchronized ServiceContext getServiceContext() { <END> if (serviceContext == null) { synchronized (Context.class) { if (serviceContext == null) { log.error("serviceContext is null. Creating new ServiceContext()"); serviceContext = ServiceContext.getInstance(); } } } log.trace("serviceContext: {}", serviceContext); return ServiceContext.getInstance(); }
+code_review: I can see that the method body was already synchronised. Can you instead remove the outer if (serviceContext == null)? Because i see it duplicated in the inner block.
+target code: static synchronized ServiceContext getServiceContext ( ) { synchronized ( Context . class ) { if ( serviceContext == null ) { log . error ( "serviceContext is null . Creating new ServiceContext ( ) " ) ; serviceContext = ServiceContext . getInstance ( ) ; } } log . trace ( "serviceContext : { } " , serviceContext ) ; return ServiceContext . getInstance ( ) ; }
+response: < START > static synchronized ServiceContext getServiceContext ( ) { if ( serviceContext == null ) { log . error ( "serviceContext is null . Creating new ServiceContext ( ) " ) ; synchronized ( Context . class ) { if ( serviceContext == null ) { serviceContext = ServiceContext . getInstance ( ) ; } } } log . trace ( "serviceContext : { } " , serviceContext ) ; return serviceContext ; } < END >
+
+sample: 1209
+buggy_code: public synchronized void activate() { <START> OTELog.getLogger("test").debug("something"); <END> listener = new Slf4jLogListener(); logService.addLogListener(listener); }
+code_review: remove this line
+target code: public synchronized void activate ( ) { listener = new Slf4jLogListener ( ) ; logService . addLogListener ( listener ) ; }
+response: public synchronized void activate ( ) { listener = new Slf4jLogListener ( ) ; logService . addLogListener ( listener ) ; }
+
+sample: 1210
+buggy_code: <START> public void testDeserialization() throws Exception { <END> for (Short version : versions) { composedBlobIdAndDeserialize(version); } }
+code_review: I don't understand the need of this test. We have the next one which tests serialization and deserialization if I am not wrong. Or does this tests something more than the next one ?
+target code: public void testDeserialization ( ) throws Exception { composedBlobIdAndDeserialize ( version ) ; }
+response: public void testSerializationAndDeserialization ( ) throws Exception { for ( Short version : versions ) { composedBlobIdAndDeserialize ( version ) ; } }  Note : The code has been refactored based on the review comment to rename the method to `testSerializationAndDeserialization` and remove the unnecessary comment .
+
+sample: 1211
+buggy_code: private List<VMWithPlugInfo> getVmsWithPlugInfo(Guid id) { <START> List<VMWithPlugInfo> vmsWithPlugInfo = <END> getCallsHandler().executeReadList ("GetVmsByDiskId", VMWithPlugInfoRowMapper.instance, getCustomMapSqlParameterSource().addValue("disk_guid", id)); return vmsWithPlugInfo; }
+code_review: should be just return , no need for variable
+target code: private List < VMWithPlugInfo > getVmsWithPlugInfo ( Guid id ) { return getCallsHandler ( ) . executeReadList ( "GetVmsByDiskId" , VMWithPlugInfoRowMapper . instance , getCustomMapSqlParameterSource ( ) . addValue ( "disk_guid" , id ) ) ; }
+response: private List < VMWithPlugInfo > getVmsWithPlugInfo ( Guid id ) { return getCallsHandler ( ) . executeReadList ( "GetVmsByDiskId" , VMWithPlugInfoRowMapper . instance , getCustomMapSqlParameterSource ( ) . addValue ( "disk_guid" , id ) ) ; }
+
+sample: 1212
+buggy_code: public Jedis createResource() { <START> Jedis jedis = new Jedis(this); <END> try { jedis.select(db); } catch(JedisException e) { log.log(Level.SEVERE, "Can't select database due a Redis connection problem", e); } return jedis; }
+code_review: @nykolaslima How about handling selecting db by constructor of BinaryJedis, as authentication takes place?
+target code: public Jedis createResource ( ) { return new Jedis ( this ) ; }
+response: public Jedis createResource ( ) { Jedis jedis = new Jedis ( this . host , this . port ) ; jedis . auth ( this . password ) ; jedis . select ( this . db ) ; return jedis ; }
+
+sample: 1213
+buggy_code: public JSchUIConnectionManager(IRemoteServices services) { fConnMgr = (JSchConnectionManager) services.getConnectionManager(); <START> fConnMgr.setDefaultAuthenticatorFactory(new IUserAuthenticatorFactory() { <END> @Override public IUserAuthenticator createUserAuthenticator(IRemoteConnection conn) { return new RemoteAuthenticator(conn); } }); }
+code_review: Please keep initialization code out of the Activator class.
+target code: public JSchUIConnectionManager ( IRemoteServices services ) { fConnMgr = ( JSchConnectionManager ) services . getConnectionManager ( ) ; }
+response: public class JSchUIConnectionManager { private JSchConnectionManager fConnMgr ; public JSchUIConnectionManager ( IRemoteServices services ) { fConnMgr = ( JSchConnectionManager ) services . getConnectionManager ( ) ; fConnMgr . setDefaultAuthenticatorFactory ( new IUserAuthenticatorFactory ( ) { @Override public IUserAuthenticator createUserAuthenticator ( IRemoteConnection conn ) { return new RemoteAuthenticator ( conn ) ; } } ) ; } }  Note : I removed the comment as it was not necessary for the refactoring .
+
+sample: 1214
+buggy_code: public BoltDeclarer addConfigurations(Map<String, Object> conf) { <START> if (conf != null && !conf.isEmpty()) { <END> component.componentConf.putAll(conf); } return this; }
+code_review: Nit: I think putAll is a no-op when the conf is empty, so you probably don't need to check.
+target code: public BoltDeclarer addConfigurations ( Map < String , Object > conf ) { if ( conf != null ) { component . componentConf . putAll ( conf ) ; } return this ; }
+response: public BoltDeclarer addConfigurations ( Map < String , Object > conf ) { if ( conf != null ) { component . componentConf . putAll ( conf ) ; } return this ; }  Explanation : The `isEmpty ( ) ` check is not necessary because `putAll ( ) ` is a no - op when the `conf` map is empty . Therefore , we can remove the `isEmpty ( ) ` check and only check if the `conf` map is not null before calling `putAll ( ) ` .
+
+sample: 1215
+buggy_code: public void startTrackingBpForProcess(final IContainerDMContext containerDmc, final RequestMonitor rm) { final IBreakpointsTargetDMContext targetBpDmc = DMContexts.getAncestorOfType(containerDmc, IBreakpointsTargetDMContext.class); IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(fDebugModelId); for (IBreakpoint breakpoint : breakpoints) { <START> if (supportsBreakpoint(breakpoint) && breakpoint instanceof ICBreakpoint) { <END> setTargetFilter((ICBreakpoint) breakpoint, containerDmc); } } startTrackingBreakpoints(targetBpDmc, rm); }
+code_review: Its a heavy read that bug! When you check if breakpoint applicable probably better reverse instanceof check and call. Instanceof is cheaper
+target code: public void startTrackingBpForProcess ( final IContainerDMContext containerDmc , final RequestMonitor rm ) { final IBreakpointsTargetDMContext targetBpDmc = DMContexts . getAncestorOfType ( containerDmc , IBreakpointsTargetDMContext . class ) ; IBreakpoint [ ] breakpoints = DebugPlugin . getDefault ( ) . getBreakpointManager ( ) . getBreakpoints ( fDebugModelId ) ; for ( IBreakpoint breakpoint : breakpoints ) { if ( breakpoint instanceof ICBreakpoint && supportsBreakpoint ( breakpoint ) ) { setTargetFilter ( ( ICBreakpoint ) breakpoint , containerDmc ) ; } } startTrackingBreakpoints ( targetBpDmc , rm ) ; }
+response: public void startTrackingBpForProcess ( final IContainerDMContext containerDmc , final RequestMonitor rm ) { final IBreakpointsTargetDMContext targetBpDmc = DMContexts . getAncestorOfType ( containerDmc , IBreakpointsTargetDMContext . class ) ; IBreakpoint [ ] breakpoints = DebugPlugin . getDefault ( ) . getBreakpointManager ( ) . getBreakpoints ( fDebugModelId ) ; for ( IBreakpoint breakpoint : breakpoints ) { if ( breakpoint instanceof ICBreakpoint && supportsBreakpoint ( breakpoint ) ) { setTargetFilter ( ( ICBreakpoint ) breakpoint , containerDmc ) ; } } startTrackingBreakpoints ( targetBpDmc , rm ) ; }
+
+sample: 1216
+buggy_code: protected void startCompaction(CorfuRuntime rt, LogUnitServer logUnitServer) { // stop periodical tasks to prevent race condition rt.getGarbageInformer().stop(); // wait until all garbage decisions are sent to logUnit servers. rt.getGarbageInformer().waitUntilAllTasksFinish(); // send garbage decisions to logUnit servers <START> while (rt.getGarbageInformer().getGarbageReceivingQueue().size() > 0) { rt.getGarbageInformer().gcUnsafe(); } <END> // run compaction on LogUnit servers logUnitServer.runCompaction(); rt.getAddressSpaceView().resetCaches(); rt.getAddressSpaceView().invalidateServerCaches(); }
+code_review: Put this logic into GarbageInformer together with waitUntilAllTasksFinish as we discussed.
+target code: protected void startCompaction ( CorfuRuntime rt , LogUnitServer logUnitServer ) { // stop periodical tasks to prevent race condition rt . getGarbageInformer ( ) . stop ( ) ; // wait until all garbage decisions are sent to logUnit servers . rt . getGarbageInformer ( ) . waitUntilAllTasksFinish ( ) ; // run compaction on LogUnit servers logUnitServer . runCompaction ( ) ; rt . getAddressSpaceView ( ) . resetCaches ( ) ; rt . getAddressSpaceView ( ) . invalidateServerCaches ( ) ; }
+response: protected void startCompaction ( CorfuRuntime rt , LogUnitServer logUnitServer ) { // stop periodical tasks to prevent race condition rt . getGarbageInformer ( ) . stop ( ) ; // wait until all garbage decisions are sent to logUnit servers . rt . getGarbageInformer ( ) . waitUntilAllTasksFinish ( ) ; // send garbage decisions to logUnit servers rt . getGarbageInformer ( ) . runGcUnsafe ( ) ; // run compaction on LogUnit servers logUnitServer . runCompaction ( ) ; rt . getAddressSpaceView ( ) . resetCaches ( ) ; rt . getAddressSpaceView ( ) . invalidateServerCaches ( ) ; }
+
+sample: 1217
+buggy_code: private void writeToChannelVersionOne(WritableByteChannel channel) throws IOException { try (ReadableByteChannel from = Channels.newChannel(combineStreams().getInput())) { ByteStreams.copy(from, channel); <START> return; <END> } }
+code_review: This addition is pointless
+target code: private void writeToChannelVersionOne ( WritableByteChannel channel ) throws IOException { try ( ReadableByteChannel from = Channels . newChannel ( combineStreams ( ) . getInput ( ) ) ) { ByteStreams . copy ( from , channel ) ; } }
+response: private void writeToChannelVersionOne ( WritableByteChannel channel ) throws IOException { try ( ReadableByteChannel from = Channels . newChannel ( combineStreams ( ) . getInput ( ) ) ) { ByteStreams . copy ( from , channel ) ; } }
+
+sample: 1218
+buggy_code: protected void setUp() throws Exception { super.setUp(); Statement stmt = con.createStatement(); /* Drop the test table if it already exists for some reason. It is not an error if it doesn't exist. */ TestUtil.createTable(con, "testtz", "col1 INTEGER, col2 TIMESTAMP"); stmt.close(); /* Generally recommended with batch updates. By default we run all tests in this test case with autoCommit disabled. */ <START> con.setAutoCommit(false); <END> }
+code_review: Please remove that
+target code: protected void setUp ( ) throws Exception { super . setUp ( ) ; Statement stmt = con . createStatement ( ) ; /* Drop the test table if it already exists for some reason . It is not an error if it doesn't exist . */ TestUtil . createTable ( con , "testtz" , "col1 INTEGER , col2 TIMESTAMP" ) ; stmt . close ( ) ; }
+response: protected void setUp ( ) throws Exception { super . setUp ( ) ; Statement stmt = con . createStatement ( ) ; TestUtil . createTable ( con , "testtz" , "col1 INTEGER , col2 TIMESTAMP" ) ; stmt . close ( ) ; con . setAutoCommit ( false ) ; }
+
+sample: 1219
+buggy_code: public List<Currency> getCurrencyForName(final String name) { List<Currency> list = _namesToCurrency.get(name); <START> if (list == null) { <END> return new ArrayList<>(); } return _namesToCurrency.get(name); }
+code_review: These null checks will disappear if using a multimap
+target code: public List < Currency > getCurrencyForName ( final String name ) { return _namesToCurrency . get ( name ) ; }
+response: public List < Currency > getCurrencyForName ( final String name ) { List < Currency > list = _namesToCurrency . get ( name ) ; if ( list == null ) { return new ArrayList < > ( ) ; } return _namesToCurrency . get ( name ) ; }  public List < Currency > getCurrencyForName ( final String name ) { List < Currency > list = _namesToCurrency . get ( name ) ; return list == null ? new ArrayList < > ( ) : list ; } Note : The review suggests using a multimap to avoid null checks altogether , but since the code provided is incomplete , it is not clear if using a multimap is feasible or not .
+
+sample: 1220
+buggy_code: private static boolean parseAllowAlias(List<Option> options) { Option option = Option.findByName(options, "allow_alias"); if (option != null) { Object value = option.getValue(); <START> return value instanceof Boolean ? (Boolean) value : "true".equals(value); <END> } return false; }
+code_review: What is the actual possible runtime type for the value? This seems overly defensive - I would expect the value will either be a string or a Boolean, not randomly changing from run to run.
+target code: private static boolean parseAllowAlias ( List < Option > options ) { Option option = Option . findByName ( options , "allow_alias" ) ; if ( option != null ) { Object value = option . getValue ( ) ; return value instanceof Boolean && ( Boolean ) value ; } return false ; }
+response: private static boolean parseAllowAlias ( List < Option > options ) { Option option = Option . findByName ( options , "allow_alias" ) ; if ( option != null ) { Object value = option . getValue ( ) ; return value instanceof Boolean ? ( Boolean ) value : Boolean . parseBoolean ( ( String ) value ) ; } return false ; }
+
+sample: 1221
+buggy_code: public WebArchive createDeployment() { <START> if (resourceLocal) { <END> archive.addClasses( MemberRegistrationWithResourceLocal.class, ResourceLocalResources.class ); } else { archive.addClasses( MemberRegistrationWithJta.class, JtaResources.class ); } return archive; }
+code_review: Interesting approach. I guess I'd have tried to use qualifiers or the CDI alternative mechanism, but this seems the simplest.
+target code: public WebArchive createDeployment ( ) { if ( resourceLocal ) { archive . addClasses ( MemberRegistrationWithResourceLocal . class ) ; } else { archive . addClasses ( MemberRegistrationWithJta . class , JtaResources . class ) ; } return archive ; }
+response: public WebArchive createDeployment ( ) { if ( resourceLocal ) { archive . addClasses ( MemberRegistrationWithResourceLocal . class , ResourceLocalResources . class ) ; } else { archive . addClasses ( MemberRegistrationWithJta . class , JtaResources . class ) ; } return archive ; }
+
+sample: 1222
+buggy_code: private StorageDomain recoverStorageDomain(String sdUUID) { <START> log.info("about to recover SD {}", sdUUID); <END> StorageDomain storageDomain = new StorageDomain(); storageDomain.setId(sdUUID); updateStorageDomain(storageDomain); return storageDomain; }
+code_review: log.debug ?
+target code: private StorageDomain recoverStorageDomain ( String sdUUID ) { log . warn ( "about to recover SD { } " , sdUUID ) ; StorageDomain storageDomain = new StorageDomain ( ) ; storageDomain . setId ( sdUUID ) ; updateStorageDomain ( storageDomain ) ; return storageDomain ; }
+response: private StorageDomain recoverStorageDomain ( String sdUUID ) { log . debug ( "about to recover SD { } " , sdUUID ) ; StorageDomain storageDomain = new StorageDomain ( ) ; storageDomain . setId ( sdUUID ) ; updateStorageDomain ( storageDomain ) ; return storageDomain ; }
+
+sample: 1223
+buggy_code: public Event complianceCreated(Consumer consumer, Set<Entitlement> entitlements, ComplianceStatus compliance) { return new Event(Event.Type.CREATED, Event.Target.COMPLIANCE, consumer.getName(), principalProvider.get(), consumer.getOwner().getId(), consumer.getUuid(), <START> consumer.getId(), null, buildComplianceDataJson(consumer, entitlements, compliance), null, <END> null); }
+code_review: We'll need the second usage of consumer.getId() replaced with consumer.getUuid() as well.
+target code: public Event complianceCreated ( Consumer consumer , Set < Entitlement > entitlements , ComplianceStatus compliance ) { // Instead of an internal db id , compliance . created events now use // UUID for the 'consumerId' and 'entityId' fields , since Katello // is concerned only with the consumer UUID field . This is the first // part of a larger piece of work to simplify Event consumption . return new Event ( Event . Type . CREATED , Event . Target . COMPLIANCE , consumer . getName ( ) , principalProvider . get ( ) , consumer . getOwner ( ) . getId ( ) , consumer . getUuid ( ) , consumer . getUuid ( ) , null , buildComplianceDataJson ( consumer , entitlements , compliance ) , null , null ) ; }
+response: public Event complianceCreated ( Consumer consumer , Set < Entitlement > entitlements , ComplianceStatus compliance ) { return new Event ( Event . Type . CREATED , Event . Target . COMPLIANCE , consumer . getName ( ) , principalProvider . get ( ) , consumer . getOwner ( ) . getId ( ) , consumer . getUuid ( ) , consumer . getUuid ( ) , null , buildComplianceDataJson ( consumer , entitlements , compliance ) , null , null ) ; }
+
+sample: 1224
+buggy_code: public static String toHexString(byte[] digest) { <START> StringBuffer buf <END> = new StringBuffer(); for (int i = 0; i < digest.length; i++) { if ((digest[i] & 0xFF) < 0x10) buf.append('0'); buf.append(Integer.toHexString(digest[i] & 0xFF)); } return buf.toString(); }
+code_review: Use StringBuilder please.
+target code: public static String toHexString ( byte [ ] digest ) { StringBuilder buf = new StringBuilder ( ) ; for ( byte element : digest ) { if ( ( element & 0xFF ) < 0x10 ) buf . append ( '0' ) ; buf . append ( Integer . toHexString ( element & 0xFF ) ) ; } return buf . toString ( ) ; }
+response: public static String toHexString ( byte [ ] digest ) { StringBuilder buf = new StringBuilder ( ) ; for ( int i = 0 ; i < digest . length ; i ++ ) { if ( ( digest [ i ] & 0xFF ) < 0x10 ) { buf . append ( '0' ) ; } buf . append ( Integer . toHexString ( digest [ i ] & 0xFF ) ) ; } return buf . toString ( ) ; }
+
+sample: 1225
+buggy_code: private boolean isLastKilledQueryGone() { boolean lastKilledQueryIsGone = (lastKilledQuery == null); <START> if (!lastKilledQueryIsGone) { <END> ClusterMemoryPool generalPool = pools.get(GENERAL_POOL); if (generalPool != null) { lastKilledQueryIsGone = generalPool.getQueryMemoryReservations().containsKey(lastKilledQuery); } } return lastKilledQueryIsGone; }
+code_review: Invert this so it returns early
+target code: private boolean isLastKilledQueryGone ( ) { if ( lastKilledQuery == null ) { return true ; } ClusterMemoryPool generalPool = pools . get ( GENERAL_POOL ) ; if ( generalPool == null ) { return false ; } return generalPool . getQueryMemoryReservations ( ) . containsKey ( lastKilledQuery ) ; }
+response: private boolean isLastKilledQueryGone ( ) { if ( lastKilledQuery == null ) { return true ; } ClusterMemoryPool generalPool = pools . get ( GENERAL_POOL ) ; if ( generalPool != null ) { return ! generalPool . getQueryMemoryReservations ( ) . containsKey ( lastKilledQuery ) ; } return true ; }
+
+sample: 1226
+buggy_code: public Batcher(ScheduledExecutorService workExecutor, int capacity, long delay, BatchProcessor<T> processor) { this.workExecutor = workExecutor; this.capacity = capacity; this.delay = delay; this.processor = processor; this.inbox = new ArrayList<T>(); this.scheduled = false; <START> this.lastProcessedTime = 0; <END> }
+code_review: Is this change that makes batcher immediately execute after create new instance of Batcher and then added tasks smaller than capacity size?
+target code: public Batcher ( ScheduledExecutorService workExecutor , int capacity , long delay , BatchProcessor < T > processor ) { this . workExecutor = workExecutor ; this . capacity = capacity ; this . delay = delay ; this . processor = processor ; }
+response: public Batcher ( ScheduledExecutorService workExecutor , int capacity , long delay , BatchProcessor < T > processor ) { this . workExecutor = workExecutor ; this . capacity = capacity ; this . delay = delay ; this . processor = processor ; this . inbox = new ArrayList < T > ( ) ; this . scheduled = false ; this . lastProcessedTime = System . currentTimeMillis ( ) - delay ; // immediately execute after creating new instance }
+
+sample: 1227
+buggy_code: public static void removeMagicResponseContextFields(Map<String, Object> responseContext) { <START> responseContext.remove(DirectDruidClient.QUERY_FAIL_TIME); <END> responseContext.remove(DirectDruidClient.QUERY_TOTAL_BYTES_GATHERED); }
+code_review: This line should also be removed.
+target code: public static void removeMagicResponseContextFields ( Map < String , Object > responseContext ) { responseContext . remove ( DirectDruidClient . QUERY_TOTAL_BYTES_GATHERED ) ; }
+response: public static void removeMagicResponseContextFields ( Map < String , Object > responseContext ) { responseContext . remove ( DirectDruidClient . QUERY_FAIL_TIME ) ; responseContext . remove ( DirectDruidClient . QUERY_TOTAL_BYTES_GATHERED ) ; responseContext . remove ( DirectDruidClient . QUERY_METADATA ) ; }
+
+sample: 1228
+buggy_code: private void validateAndClose() throws Exception { try { info("Validating static and Helix cluster maps"); verifyEquivalencyWithStaticClusterMap(staticClusterMap.hardwareLayout, staticClusterMap.partitionLayout); if (validatingHelixClusterManager != null) { <START> ensureOrThrow(validatingHelixClusterManager.getErrorCount() == 0, <END> "Helix cluster manager should not have encountered any errors"); } } finally { if (validatingHelixClusterManager != null) { validatingHelixClusterManager.close(); } for (HelixAdmin admin : adminForDc.values()) { admin.close(); } } }
+code_review: no Exception is thrown in this method
+target code: private void validateAndClose ( ) { try { info ( "Validating static and Helix cluster maps" ) ; verifyEquivalencyWithStaticClusterMap ( staticClusterMap . hardwareLayout , staticClusterMap . partitionLayout ) ; if ( validatingHelixClusterManager != null ) { ensureOrThrow ( validatingHelixClusterManager . getErrorCount ( ) == 0 , "Helix cluster manager should not have encountered any errors" ) ; } } finally { if ( validatingHelixClusterManager != null ) { validatingHelixClusterManager . close ( ) ; } for ( HelixAdmin admin : adminForDc . values ( ) ) { admin . close ( ) ; } } }
+response: private void validateAndClose ( ) { try { verifyEquivalencyWithStaticClusterMap ( staticClusterMap . hardwareLayout , staticClusterMap . partitionLayout ) ; if ( validatingHelixClusterManager != null ) { ensureOrThrow ( validatingHelixClusterManager . getErrorCount ( ) == 0 , "Helix cluster manager should not have encountered any errors" ) ; } } catch ( Exception e ) { // handle the exception } finally { if ( validatingHelixClusterManager != null ) { validatingHelixClusterManager . close ( ) ; } for ( HelixAdmin admin : adminForDc . values ( ) ) { admin . close ( ) ; } } }
+
+sample: 1229
+buggy_code: public int size() { if (currentOffset == NO_VALUES) { return 0; } <START> return maxOffset - currentOffset - 1; <END> }
+code_review: Consider: `return currentOffset == NO_VALUES ? 0 : maxOffset - currentOffset - 1;`
+target code: public int size ( ) { return isEmpty ( ) ? 0 : maxOffset - currentOffset ; }
+response: public int size ( ) { return currentOffset == NO_VALUES ? 0 : maxOffset - currentOffset - 1 ; }
+
+sample: 1230
+buggy_code: <START> public void updateEditorPages(int activatedPage) { <END> removeAllPages(); addPages(); if (backToActivePage > 0 && backToActivePage < this.getPageCount()) { setActivePage(backToActivePage); } else { //Set active page if the backToActivePage is out of the range setActivePage(0); } setPartName(getPartName()); }
+code_review: activatedPage is not used anymore
+target code: public void updateEditorPages ( int activatedPage ) { updateEditorPages ( ) ; }
+response: < START > public void updateEditorPages ( ) { removeAllPages ( ) ; addPages ( ) ; if ( backToActivePage > 0 && backToActivePage < this . getPageCount ( ) ) { setActivePage ( backToActivePage ) ; } else { setActivePage ( 0 ) ; } setPartName ( getPartName ( ) ) ; } < END >
+
+sample: 1231
+buggy_code: public Object execute(ExecutionEvent event) throws ExecutionException { <START> Object checkCompositeRename= HandlerUtil.getVariable(event, LTK_CHECK_COMPOSITE_RENAME_PARAMETER_KEY); <END> if (checkCompositeRename != null) { return checkForCompositeRename(event, checkCompositeRename); } else { performRename(event); } return null; }
+code_review: Looking at other HandlerUtil.getVariable() calls, the usual logic is to look for an instance of what you were looking for (in this case Boolean) and to treat any other situation as if null was provided. This would remove the need to check for Boolean in checkForCompositeRename and having code to issue an error log message which should never occur.
+target code: public Object execute ( ExecutionEvent event ) throws ExecutionException { Object checkCompositeRename = HandlerUtil . getVariable ( event , LTK_CHECK_COMPOSITE_RENAME_PARAMETER_KEY ) ; if ( checkCompositeRename instanceof Boolean ) { return checkForCompositeRename ( event ) ; } else { performRename ( event ) ; } return null ; }
+response: public Object execute ( ExecutionEvent event ) throws ExecutionException { Boolean checkCompositeRename = ( Boolean ) HandlerUtil . getVariable ( event , LTK_CHECK_COMPOSITE_RENAME_PARAMETER_KEY ) ; if ( checkCompositeRename != null ) { return checkForCompositeRename ( event , checkCompositeRename ) ; } else { performRename ( event ) ; } return null ; }
+
+sample: 1232
+buggy_code: <START> public Arguments setUntypedNullArgument(Argument untypedNullArgument) { <END> if (untypedNullArgument == null) { throw new IllegalArgumentException("the Argument itself may not be null"); } this.untypedNullArgument = untypedNullArgument; return this; }
+code_review: Another non-permissible change
+target code: public void setUntypedNullArgument ( Argument untypedNullArgument ) { if ( untypedNullArgument == null ) { throw new IllegalArgumentException ( "the Argument itself may not be null" ) ; } this . untypedNullArgument = untypedNullArgument ; }
+response: public Arguments setUntypedNullArgument ( Argument untypedNullArgument ) { if ( untypedNullArgument == null ) { throw new IllegalArgumentException ( "the Argument itself may not be null" ) ; } this . untypedNullArgument = untypedNullArgument ; return this ; }
+
+sample: 1233
+buggy_code: private DebtRemediationFunction remediationFunction(DebtRemediationFunctions drf) { if (func.startsWith("Constant")) { <START> return drf.constantPerIssue(constantCost.replace("mn", "min")); <END> } if ("Linear".equals(func)) { return drf.linear(linearFactor.replace("mn", "min")); } return drf.linearWithOffset(linearFactor.replace("mn", "min"), linearOffset.replace("mn", "min")); }
+code_review: @ivandalbosco I see that you just copied this piece from JS, but it's not perfect there :) We can drop `.replace("mn", "min")` everywhere (3 places). This was done as many RSPECs had legacy `mn` for minutes. It should be fixed now. It there is still some RSPEC using `mn` and plugin fails, then you better update this RSPEC
+target code: private DebtRemediationFunction remediationFunction ( DebtRemediationFunctions drf ) { if ( func . startsWith ( "Constant" ) ) { return drf . constantPerIssue ( constantCost ) ; } if ( "Linear" . equals ( func ) ) { return drf . linear ( linearFactor ) ; } return drf . linearWithOffset ( linearFactor , linearOffset ) ; }
+response: private DebtRemediationFunction remediationFunction ( DebtRemediationFunctions drf ) { if ( func . startsWith ( "Constant" ) ) { return drf . constantPerIssue ( constantCost ) ; } if ( "Linear" . equals ( func ) ) { return drf . linear ( linearFactor ) ; } return drf . linearWithOffset ( linearFactor , linearOffset ) ; }
+
+sample: 1234
+buggy_code: public void setAnalysisCache(final AnalysisCache cache) { if (cache == null && isAnalysisCacheFunctional()) { analysisCache = new NoopAnalysisCache(); // Log warning only once, if not explicitly disabled if (!isIgnoreIncrementalAnalysis() && LOG.isLoggable(Level.WARNING)) { final String version = PMDVersion.isUnknown() || PMDVersion.isSnapshot() ? "latest" : "pmd-" + PMDVersion.VERSION; <START> LOG.warning("This analysis could be faster, please consider using Incremental Analysis: " <END> + "https://pmd.github.io/" + version + "/pmd_userdocs_getting_started.html#incremental-analysis"); } } else if (!isIgnoreIncrementalAnalysis()) { // ignore new value if incr. analysis is disabled analysisCache = cache; } }
+code_review: I find it very unintuitive to find this here... I'd suggest moving the log to `PMD.doPMD`, which is guaranteed to run once and a little more natural
+target code: public void setAnalysisCache ( final AnalysisCache cache ) { // the doc says it's a noop if incremental analysis was disabled , // but it's actually the getter that enforces that this . analysisCache = cache == null ? new NoopAnalysisCache ( ) : cache ; }
+response: public void setAnalysisCache ( final AnalysisCache cache ) { if ( cache == null && isAnalysisCacheFunctional ( ) ) { analysisCache = new NoopAnalysisCache ( ) ; } else if ( ! isIgnoreIncrementalAnalysis ( ) ) { analysisCache = cache ; } } // In PMD . doPMD method if ( ! isIgnoreIncrementalAnalysis ( ) && LOG . isLoggable ( Level . WARNING ) ) { final String version = PMDVersion . isUnknown ( ) || PMDVersion . isSnapshot ( ) ? "latest" : "pmd - " + PMDVersion . VERSION ; LOG . warning ( "This analysis could be faster , please consider using Incremental Analysis : " + "https :/ / pmd . github . io / " + version + " / pmd_userdocs_getting_started . html#incremental - analysis" ) ; }
+
+sample: 1235
+buggy_code: private static double sortableLongToDouble(long value) { <START> value = value ^ (value >> 63) & Long.MAX_VALUE; <END> return Double.longBitsToDouble(value); }
+code_review: Same here. Add clarifying parenthesis
+target code: private static double sortableLongToDouble ( long value ) { value = value ^ ( ( value > > 63 ) & Long . MAX_VALUE ) ; return Double . longBitsToDouble ( value ) ; }
+response: private static double sortableLongToDouble ( long value ) { value = ( value ^ ( value > > 63 ) ) & Long . MAX_VALUE ; return Double . longBitsToDouble ( value ) ; }
+
+sample: 1236
+buggy_code: public static Exception extractExecutionExceptionCause(Exception e) { if (!(e instanceof ExecutionException)) { return e; } Throwable cause = e.getCause(); return cause == null ? e : (cause instanceof Exception ? (Exception) cause : new Exception(cause)); <START> } <END>
+code_review: ``` if (!(e instanceof ExecutionException) || e.getCause() == null) { return e; } Throwable cause = e.getCause(); return cause instanceof Exception ? (Exception) cause : new Exception(cause); ``` How about making return statement simpler?
+target code: public static Exception extractExecutionExceptionCause ( Exception e ) { Throwable cause = e . getCause ( ) ; if ( ! ( e instanceof ExecutionException ) || cause == null ) { return e ; } return cause instanceof Exception ? ( Exception ) cause : new Exception ( cause ) ; }
+response: public static Exception extractExecutionExceptionCause ( Exception e ) { if ( ! ( e instanceof ExecutionException ) || e . getCause ( ) == null ) { return e ; } return e . getCause ( ) instanceof Exception ? ( Exception ) e . getCause ( ) : new Exception ( e . getCause ( ) ) ; }
+
+sample: 1237
+buggy_code: boolean isEmpty() { <START> return (validIndexSegments.isEmpty()); <END> }
+code_review: minor: braces unnecessary
+target code: boolean isEmpty ( ) { return validIndexSegments . isEmpty ( ) ; }
+response: boolean isEmpty ( ) { return validIndexSegments . isEmpty ( ) ; }
+
+sample: 1238
+buggy_code: Set getDefaultIgnoreTypeNames() { Set ignored = new HashSet(); String[] ignore = {"org.eclipse.core.runtime.Plugin", "java.lang.ClassLoader", "org.eclipse.team.internal.ccvs.core.CVSTeamProvider", "org.eclipse.core.internal.events.BuilderPersistentInfo", "org.eclipse.core.internal.resources.Workspace", "org.eclipse.core.internal.events.EventStats", "java.net.URL"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-6$ <START> for (String element : ignore) { <END> ignored.add(element); } return ignored; }
+code_review: Please do only whitespace changes in this commit.
+target code: Set getDefaultIgnoreTypeNames ( ) { Set ignored = new HashSet ( ) ; String [ ] ignore = { "org . eclipse . core . runtime . Plugin" , "java . lang . ClassLoader" , "org . eclipse . team . internal . ccvs . core . CVSTeamProvider" , "org . eclipse . core . internal . events . BuilderPersistentInfo" , "org . eclipse . core . internal . resources . Workspace" , "org . eclipse . core . internal . events . EventStats" , "java . net . URL" } ; // $NON - NLS - 1$ // $NON - NLS - 2$ // $NON - NLS - 6$ for ( int i = 0 ; i < ignore . length ; i ++ ) { ignored . add ( ignore [ i ] ) ; } return ignored ; }
+response: Set getDefaultIgnoreTypeNames ( ) { Set ignored = new HashSet ( ) ; String [ ] ignore = { "org . eclipse . core . runtime . Plugin" , "java . lang . ClassLoader" , "org . eclipse . team . internal . ccvs . core . CVSTeamProvider" , "org . eclipse . core . internal . events . BuilderPersistentInfo" , "org . eclipse . core . internal . resources . Workspace" , "org . eclipse . core . internal . events . EventStats" , "java . net . URL" } ; for ( String element : ignore ) { ignored . add ( element ) ; } return ignored ; }
+
+sample: 1239
+buggy_code: public static boolean delete(File file) { if (!file.exists()) return true; if (file.isDirectory()) { File[] children = file.listFiles(); for (File <START> children1 : <END> children) { delete(children1); } } return file.delete(); }
+code_review: child
+target code: public static boolean delete ( File file ) { if ( ! file . exists ( ) ) return true ; if ( file . isDirectory ( ) ) { File [ ] children = file . listFiles ( ) ; for ( File child : children ) { delete ( child ) ; } } return file . delete ( ) ; }
+response: public static boolean delete ( File file ) { if ( ! file . exists ( ) ) { return true ; } if ( file . isDirectory ( ) ) { File [ ] children = file . listFiles ( ) ; for ( File child : children ) { delete ( child ) ; } } return file . delete ( ) ; }
+
+sample: 1240
+buggy_code: public void logout(final IProgressMonitor monitor) throws XmlRpcException { userID = -1; token = null; (new BugzillaXmlRpcOperation<Integer>(this) { @SuppressWarnings("serial") @Override public Integer execute() throws XmlRpcException { try { <START> bugzillaClient.authenticate(monitor); <END> } catch (CoreException e) { // TODO Auto-generated catch block e.printStackTrace(); } Object response = call(monitor, XML_USER_LOGOUT, null); return -1; } }).execute(); return; }
+code_review: Why do we call authenticate to log out? If we aren't already authenticated, why do we need to log out?
+target code: public void logout ( final IProgressMonitor monitor ) throws XmlRpcException { ( new BugzillaXmlRpcOperation < Integer > ( this ) { @SuppressWarnings ( "serial" ) @Override public Integer execute ( ) throws XmlRpcException { Object response = call ( monitor , XML_USER_LOGOUT , null ) ; return - 1 ; } } ) . execute ( ) ; userID = - 1 ; token = null ; return ; }
+response: public void logout ( final IProgressMonitor monitor ) throws XmlRpcException { userID = - 1 ; token = null ; Object response = call ( monitor , XML_USER_LOGOUT , null ) ; return ; }
+
+sample: 1241
+buggy_code: private double cleanNumber(double dirtyNumber) { <START> double clean; <END> if (dirtyNumber < 1) clean = 0; else clean = dirtyNumber; return clean; }
+code_review: Could be simplified to: ```java return dirtyNumber < 1 ? 0 : dirtyNumber; ```
+target code: private double cleanNumber ( double dirtyNumber ) { return dirtyNumber < 1 ? 0 : dirtyNumber ; }
+response: java private double cleanNumber ( double dirtyNumber ) { return dirtyNumber < 1 ? 0 : dirtyNumber ; }
+
+sample: 1242
+buggy_code: public Pagination<Payment> getPayments(final Long offset, final Long limit, final String pluginName, final boolean withPluginInfo, final boolean withAttempts, final Iterable<PluginProperty> properties, final TenantContext tenantContext) throws PaymentApiException { <START> return paymentProcessor.getPayments(offset, limit, pluginName, withPluginInfo, properties, tenantContext, internalCallContextFactory.createInternalTenantContext(tenantContext)); <END> }
+code_review: Same here: The new flag `withAttempts` is not passed (used) the `paymentProcessor#getAccountPayments`
+target code: public Pagination < Payment > getPayments ( final Long offset , final Long limit , final String pluginName , final boolean withPluginInfo , final boolean withAttempts , final Iterable < PluginProperty > properties , final TenantContext tenantContext ) throws PaymentApiException { return paymentProcessor . getPayments ( offset , limit , pluginName , withPluginInfo , withAttempts , properties , tenantContext , internalCallContextFactory . createInternalTenantContext ( tenantContext ) ) ; }
+response: public Pagination < Payment > getPayments ( final Long offset , final Long limit , final String pluginName , final boolean withPluginInfo , final boolean withAttempts , final Iterable < PluginProperty > properties , final TenantContext tenantContext ) throws PaymentApiException { return paymentProcessor . getPayments ( offset , limit , pluginName , withPluginInfo , withAttempts , properties , internalCallContextFactory . createInternalTenantContext ( tenantContext ) ) ; }
+
+sample: 1243
+buggy_code: <START> private static Map<String, String> readMessagesFromBundle() { <END> try { ResourceBundle bundle = ResourceBundle.getBundle(APP_ERRORS_MESSAGES_FILE_NAME); Map<String, String> messages = new HashMap<String, String>(); for (String key : bundle.keySet()) { messages.put(key, bundle.getString(key)); } return messages; } catch (MissingResourceException e) { log.error("Could not load audit log messages from the file " + APP_ERRORS_MESSAGES_FILE_NAME); throw new ApplicationException(e); } }
+code_review: why do you need to convert the bundle to a map, instead of using it directly?
+target code: private static ResourceBundle readMessagesFromBundle ( ) { try { return ResourceBundle . getBundle ( APP_ERRORS_MESSAGES_FILE_NAME ) ; } catch ( MissingResourceException e ) { log . error ( "Could not load audit log messages from the file " + APP_ERRORS_MESSAGES_FILE_NAME ) ; throw new ApplicationException ( e ) ; } }
+response: < START > private static ResourceBundle readMessagesFromBundle ( ) { try { return ResourceBundle . getBundle ( APP_ERRORS_MESSAGES_FILE_NAME ) ; } catch ( MissingResourceException e ) { log . error ( "Could not load audit log messages from the file " + APP_ERRORS_MESSAGES_FILE_NAME ) ; throw new ApplicationException ( e ) ; } } < END >
+
+sample: 1244
+buggy_code: public boolean equals(Object obj) { if (this == obj) return true; if (obj == null) return false; <START> if (getClass() != obj.getClass()) return false; <END> BigFraction otherValue = ((ILScore)obj).getValue(); return this.value.equals(otherValue); }
+code_review: Is this really needed? Maybe this should be removed for efficiency reasons (but I don't know how often this method is actually used...)
+target code: public boolean equals ( Object obj ) { if ( obj == null ) return false ; if ( getClass ( ) != obj . getClass ( ) ) return false ; BigFraction otherValue = ( ( ILScore ) obj ) . getValue ( ) ; return this . value . equals ( otherValue ) ; }
+response: public boolean equals ( Object obj ) { if ( this == obj ) return true ; if ( obj == null || getClass ( ) != obj . getClass ( ) ) return false ; BigFraction otherValue = ( ( ILScore ) obj ) . getValue ( ) ; return this . value . equals ( otherValue ) ; }
+
+sample: 1245
+buggy_code: private boolean isValidReviewer(Account member, ChangeControl control) { if (member.isActive()) { IdentifiedUser user = identifiedUserFactory.create(member.getId()); // Does not account for draft status as a user might want to let a // reviewer see a draft. <START> if (control.forUser(user).isRefVisible()) { return true; } <END> } return false; }
+code_review: [optional] this could be shortened to: return control.forUser(user).isRefVisible();
+target code: private boolean isValidReviewer ( Account member , ChangeControl control ) { if ( member . isActive ( ) ) { IdentifiedUser user = identifiedUserFactory . create ( member . getId ( ) ) ; // Does not account for draft status as a user might want to let a // reviewer see a draft . return control . forUser ( user ) . isRefVisible ( ) ; } return false ; }
+response: private boolean isValidReviewer ( Account member , ChangeControl control ) { if ( member . isActive ( ) ) { IdentifiedUser user = identifiedUserFactory . create ( member . getId ( ) ) ; return control . forUser ( user ) . isRefVisible ( ) ; } return false ; }
+
+sample: 1246
+buggy_code: private boolean support( ValueGroup[] valueGroups ) { <START> return valueGroups.length == 1 && ValueGroup.NUMBER.equals( valueGroups[0] ); <END> }
+code_review: please use == for enum comparisons like its done 2 lines above
+target code: private boolean support ( ValueGroup [ ] valueGroups ) { return valueGroups . length == 1 && valueGroups [ 0 ] == ValueGroup . NUMBER ; }
+response: private boolean support ( ValueGroup [ ] valueGroups ) { return valueGroups . length == 1 && valueGroups [ 0 ] == ValueGroup . NUMBER ; }
+
+sample: 1247
+buggy_code: <START> public String getConfigFile() <END> { return configFile; }
+code_review: You can make this file `File`
+target code: public File getConfigFile ( ) { return configFile ; }
+response: public File getConfigFile ( ) { return configFile ; }
+
+sample: 1248
+buggy_code: <START> void close() { <END> writeQueue.add(WriteOperation.SHUTDOWN); writerService.shutdown(); }
+code_review: Probably won't be used, but you should implement AutoCloseable, since you implement close() anyway.
+target code: public void close ( ) { writeQueue . add ( WriteOperation . SHUTDOWN ) ; writerService . shutdown ( ) ; }
+response: Here's the refactored code using the review suggestion :  < START > public class MyClass implements AutoCloseable { private final BlockingQueue < WriteOperation > writeQueue = new LinkedBlockingQueue < > ( ) ; private final ExecutorService writerService = Executors . newSingleThreadExecutor ( ) ; @Override public void close ( ) throws Exception { writeQueue . add ( WriteOperation . SHUTDOWN ) ; writerService . shutdown ( ) ; } } < END >
+
+sample: 1249
+buggy_code: private void completeInner() { // A group is removed, so check if we need to call `unsubscribe` if (WIP_FOR_UNSUBSCRIBE_UPDATER.decrementAndGet(this) == 0) { // It means `groups.isEmpty() && child.isUnsubscribed()` is true unsubscribe(); } // if we have no outstanding groups (all completed or unsubscribe) and terminated on outer <START> if (groups.isEmpty() && terminated == TERMINATED_WITH_COMPLETED) { <END> // completionEmitted ensures we only emit onCompleted once if (COMPLETION_EMITTED_UPDATER.compareAndSet(this, 0, 1)) { if (!child.isUnsubscribed()) { child.onCompleted(); } } } }
+code_review: Wouldn't this be an `if/else`? If we just `unsubscribed` in the previous lines I don't think we should ever go through this flow.
+target code: private void completeInner ( ) { // A group is removed , so check if we need to call `unsubscribe` if ( WIP_FOR_UNSUBSCRIBE_UPDATER . decrementAndGet ( this ) == 0 ) { // It means `groups . isEmpty ( ) && child . isUnsubscribed ( ) ` is true unsubscribe ( ) ; } else if ( groups . isEmpty ( ) && terminated == TERMINATED_WITH_COMPLETED ) { // if we have no outstanding groups ( all completed or unsubscribe ) and terminated on outer // completionEmitted ensures we only emit onCompleted once if ( COMPLETION_EMITTED_UPDATER . compareAndSet ( this , 0 , 1 ) ) { child . onCompleted ( ) ; } } }
+response: private void completeInner ( ) { if ( WIP_FOR_UNSUBSCRIBE_UPDATER . decrementAndGet ( this ) == 0 ) { unsubscribe ( ) ; } else if ( groups . isEmpty ( ) && terminated == TERMINATED_WITH_COMPLETED ) { if ( COMPLETION_EMITTED_UPDATER . compareAndSet ( this , 0 , 1 ) ) { if ( ! child . isUnsubscribed ( ) ) { child . onCompleted ( ) ; } } } }
+
+sample: 1250
+buggy_code: protected boolean startError() { if (errorCount == 0) { <START> logger.error("Found one or more vector errors from " + opName); <END> } errorCount++; if (errorCount >= MAX_ERRORS) { return false; } return true; }
+code_review: ```suggestion logger.error("Found one or more vector errors from {}", opName); ```
+target code: protected boolean startError ( ) { if ( errorCount == 0 ) { warn ( "Found one or more vector errors from " + opName ) ; } errorCount ++ ; if ( errorCount >= MAX_ERRORS ) { return false ; } return true ; }
+response: protected boolean startError ( ) { if ( errorCount == 0 ) { logger . error ( "Found one or more vector errors from { } " , opName ) ; } errorCount ++ ; if ( errorCount >= MAX_ERRORS ) { return false ; } return true ; }
+
+sample: 1251
+buggy_code: protected static List<Integer> grep(File fileName, String regexp, List<String> resultLines) { List<Integer> resultLineNumbers = new ArrayList<>(); Reader reader = null; try { reader = new FileReader(fileName); resultLineNumbers = grep(reader, regexp, resultLines); }catch (IOException e) { e.printStackTrace(); } finally { <START> closeQuietly(reader); <END> } return resultLineNumbers; }
+code_review: We use Java7, so you should use the try-with-resources feature.
+target code: protected static List < Integer > grep ( File fileName , String regexp , List < String > resultLines ) { List < Integer > resultLineNumbers = new ArrayList < > ( ) ; try ( Reader reader = new FileReader ( fileName ) ) { resultLineNumbers = grep ( reader , regexp , resultLines ) ; } catch ( IOException e ) { e . printStackTrace ( ) ; } return resultLineNumbers ; }
+response: protected static List < Integer > grep ( File fileName , String regexp , List < String > resultLines ) { List < Integer > resultLineNumbers = new ArrayList < > ( ) ; try ( Reader reader = new FileReader ( fileName ) ) { resultLineNumbers = grep ( reader , regexp , resultLines ) ; } catch ( IOException e ) { e . printStackTrace ( ) ; } return resultLineNumbers ; }
+
+sample: 1252
+buggy_code: private static void navigate(final Activity activity, final String destName, final String destCode, final Geopoint coords) { <START> Intent launchIntent = new Intent(INTENT_ACTION); <END> launchIntent.putExtra(Intents.EXTRA_NAME, destName); launchIntent.putExtra(Intents.EXTRA_GEOCODE, destCode); launchIntent.putExtra(Intents.EXTRA_LATITUDE, coords.getLatitude()); launchIntent.putExtra(Intents.EXTRA_LONGITUDE, coords.getLongitude()); activity.startService(launchIntent); }
+code_review: Missing `final` (was indicated on the previous patch as well).
+target code: private static void navigate ( final Activity activity , final String destName , final String destCode , final Geopoint coords ) { final Intent launchIntent = new Intent ( INTENT_ACTION ) ; launchIntent . putExtra ( Intents . EXTRA_NAME , destName ) . putExtra ( Intents . EXTRA_GEOCODE , destCode ) . putExtra ( Intents . EXTRA_LATITUDE , coords . getLatitude ( ) ) . putExtra ( Intents . EXTRA_LONGITUDE , coords . getLongitude ( ) ) ; activity . startService ( launchIntent ) ; }
+response: private static void navigate ( final Activity activity , final String destName , final String destCode , final Geopoint coords ) { final Intent launchIntent = new Intent ( INTENT_ACTION ) ; launchIntent . putExtra ( Intents . EXTRA_NAME , destName ) ; launchIntent . putExtra ( Intents . EXTRA_GEOCODE , destCode ) ; launchIntent . putExtra ( Intents . EXTRA_LATITUDE , coords . getLatitude ( ) ) ; launchIntent . putExtra ( Intents . EXTRA_LONGITUDE , coords . getLongitude ( ) ) ; activity . startService ( launchIntent ) ; }
+
+sample: 1253
+buggy_code: public TestMediaWikiApiImageFetchingStrategy(Map<String, String> serverContent) { <START> Preconditions.checkNotNull(serverContent, <END> "Please specify some server content for images used during the tests. See: TestMediaWikiApiImageFetchingStrategy#serverContent"); this.serverContent = ImmutableMap.copyOf(serverContent); }
+code_review: static import
+target code: public TestMediaWikiApiImageFetchingStrategy ( Map < String , String > serverContent ) { checkNotNull ( serverContent , "Please specify some server content for images used during the tests . See : TestMediaWikiApiImageFetchingStrategy#serverContent" ) ; this . serverContent = ImmutableMap . copyOf ( serverContent ) ; }
+response: import static com . google . common . base . Preconditions . checkNotNull ; public TestMediaWikiApiImageFetchingStrategy ( Map < String , String > serverContent ) { checkNotNull ( serverContent , "Please specify some server content for images used during the tests . See : TestMediaWikiApiImageFetchingStrategy#serverContent" ) ; this . serverContent = ImmutableMap . copyOf ( serverContent ) ; }
+
+sample: 1254
+buggy_code: private static boolean shouldCreateMyHandler(PsiElement element) { if (element instanceof LeafPsiElement) { LeafPsiElement leaf = (LeafPsiElement)element; return leaf.getElementType() == GoTypes.RETURN || leaf.getElementType() == GoTypes.FUNC || isPanicCall(leaf); } <START> else { <END> return false; } }
+code_review: A redundant else statement
+target code: private static boolean shouldCreateMyHandler ( PsiElement element ) { if ( element instanceof LeafPsiElement ) { LeafPsiElement leaf = ( LeafPsiElement ) element ; return leaf . getElementType ( ) == GoTypes . RETURN || leaf . getElementType ( ) == GoTypes . FUNC || isPanicCall ( leaf ) ; } return false ; }
+response: private static boolean shouldCreateMyHandler ( PsiElement element ) { if ( element instanceof LeafPsiElement ) { LeafPsiElement leaf = ( LeafPsiElement ) element ; return leaf . getElementType ( ) == GoTypes . RETURN || leaf . getElementType ( ) == GoTypes . FUNC || isPanicCall ( leaf ) ; } return false ; }
+
+sample: 1255
+buggy_code: <START> private void cancelRxCommands() { <END> for (CommandHandle commandHandle : fRxCommands.values()) { if (commandHandle.getRequestMonitor() == null) continue; commandHandle.getRequestMonitor().setStatus(genStatus( "Connection is shut down")); //$NON-NLS-1$ commandHandle.getRequestMonitor().done(); } fRxCommands.clear(); }
+code_review: Wouldn't it be safer to make this method synchronized?
+target code: private synchronized void cancelRxCommands ( ) { for ( CommandHandle commandHandle : fRxCommands . values ( ) ) { if ( commandHandle . getRequestMonitor ( ) == null ) continue ; commandHandle . getRequestMonitor ( ) . setStatus ( genStatus ( "Connection is shut down" ) ) ; // $NON - NLS - 1$ commandHandle . getRequestMonitor ( ) . done ( ) ; } fRxCommands . clear ( ) ; }
+response: private synchronized void cancelRxCommands ( ) { for ( CommandHandle commandHandle : fRxCommands . values ( ) ) { if ( commandHandle . getRequestMonitor ( ) == null ) continue ; commandHandle . getRequestMonitor ( ) . setStatus ( genStatus ( "Connection is shut down" ) ) ; commandHandle . getRequestMonitor ( ) . done ( ) ; } fRxCommands . clear ( ) ; }
+
+sample: 1256
+buggy_code: private Supplier<StorageStatement> storeStatementSupplier( NeoStores neoStores ) { Supplier<IndexReaderFactory> indexReaderFactory = () -> new IndexReaderFactory.Caching( indexingService ); LockService lockService = takePropertyReadLocks ? this.lockService : NO_LOCK_SERVICE; return new Supplier<StorageStatement>() { @Override public StorageStatement get() { return new StoreStatement( neoStores, indexReaderFactory, labelScanStore::newReader, lockService, allocateCommandCreationContext() ); } <START> }; <END> }
+code_review: No need to expand the lambda
+target code: private Supplier < StorageStatement > storeStatementSupplier ( NeoStores neoStores ) { Supplier < IndexReaderFactory > indexReaderFactory = ( ) - > new IndexReaderFactory . Caching ( indexingService ) ; LockService lockService = takePropertyReadLocks ? this . lockService : NO_LOCK_SERVICE ; return ( ) - > new StoreStatement ( neoStores , indexReaderFactory , labelScanStore : : newReader , lockService , allocateCommandCreationContext ( ) ) ; }
+response: private Supplier < StorageStatement > storeStatementSupplier ( NeoStores neoStores ) { Supplier < IndexReaderFactory > indexReaderFactory = ( ) - > new IndexReaderFactory . Caching ( indexingService ) ; LockService lockService = takePropertyReadLocks ? this . lockService : NO_LOCK_SERVICE ; return ( ) - > new StoreStatement ( neoStores , indexReaderFactory , labelScanStore : : newReader , lockService , allocateCommandCreationContext ( ) ) ; }
+
+sample: 1257
+buggy_code: <START> public static byte[] convertBoolArrayToByteArray(boolean[] boolArr) { <END> byte[] byteArr = new byte[(boolArr.length + 7) / 8]; for (int i = 0; i < byteArr.length; i++) { byteArr[i] = readByte(boolArr, 8 * i); } return byteArr; }
+code_review: Can be package-private?
+target code: static byte [ ] convertBoolArrayToByteArray ( boolean [ ] boolArr ) { byte [ ] byteArr = new byte [ ( boolArr . length + 7 ) / 8 ] ; for ( int i = 0 ; i < byteArr . length ; i ++ ) { byteArr [ i ] = readByte ( boolArr , 8 * i ) ; } return byteArr ; }
+response: Code : java package com . example ; class Converter { static byte [ ] convertBoolArrayToByteArray ( boolean [ ] boolArr ) { byte [ ] byteArr = new byte [ ( boolArr . length + 7 ) / 8 ] ; for ( int i = 0 ; i < byteArr . length ; i ++ ) { byteArr [ i ] = readByte ( boolArr , 8 * i ) ; } return byteArr ; } private static byte readByte ( boolean [ ] boolArr , int startIndex ) { byte result = 0 ; for ( int i = 0 ; i < 8 ; i ++ ) { if ( boolArr [ startIndex + i ] ) { result | = ( 1 < < ( 7 - i ) ) ; } } return result ; } }  Changes Made : - Added package name - Changed access modifier of the method to package - private - Created a private helper method to read byte from boolean array Explanation : - Since the class is not mentioned in the question , I have added a package name to make it a valid Java code . - The access modifier of the method can be changed to package - private as it is not required to be accessed outside the package . - A private helper method is created to read byte from boolean array . This method is used inside the main method to convert boolean array to byte array .
+
+sample: 1258
+buggy_code: public void all_composed_assertions_should_pass() { SoftAssertions delegate = new SoftAssertions(); delegate.assertThat(1).isEqualTo(1); delegate.assertAll(); softly.assertThat(1).isEqualTo(1); <START> softly.assertThat(Lists.newArrayList(1, 2)).containsOnly(1, 2); <END> softly.assertAlso(delegate); softly.assertAll(); assertThat(softly.wasSuccess()).isTrue(); }
+code_review: Minor: use AssertJ `org.assertj.core.util.List.list` and static import for readability.
+target code: public void all_composed_assertions_should_pass ( ) { // GIVEN SoftAssertions delegate = new SoftAssertions ( ) ; delegate . assertThat ( 1 ) . isEqualTo ( 1 ) ; delegate . assertAll ( ) ; softly . assertThat ( 1 ) . isEqualTo ( 1 ) ; softly . assertThat ( list ( 1 , 2 ) ) . containsOnly ( 1 , 2 ) ; // WHEN softly . assertAlso ( delegate ) ; softly . assertAll ( ) ; // THEN assertThat ( softly . wasSuccess ( ) ) . isTrue ( ) ; }
+response: import static org . assertj . core . api . Assertions . assertThat ; import static org . assertj . core . util . Lists . list ; public void all_composed_assertions_should_pass ( ) { SoftAssertions delegate = new SoftAssertions ( ) ; delegate . assertThat ( 1 ) . isEqualTo ( 1 ) ; delegate . assertAll ( ) ; softly . assertThat ( 1 ) . isEqualTo ( 1 ) ; softly . assertThat ( list ( 1 , 2 ) ) . containsOnly ( 1 , 2 ) ; softly . assertAlso ( delegate ) ; softly . assertAll ( ) ; assertThat ( softly . wasSuccess ( ) ) . isTrue ( ) ; }
+
+sample: 1259
+buggy_code: public void viewInfoUpdated() { <START> this.reinitialize(); <END> }
+code_review: * Why is super.reinitialize() not public? * If you want super.reinitialize() protected, this class could "open it up" instead of defining a new method: @Override public void reinitialize() { super.reinitialize(); }
+target code: public void viewInfoUpdated ( ) { reinitialize ( ) ; }
+response: @Override public void reinitialize ( ) { super . reinitialize ( ) ; } public void viewInfoUpdated ( ) { this . reinitialize ( ) ; }
+
+sample: 1260
+buggy_code: <START> public JSONPointer(List<String> refTokens) { <END> this.refTokens = refTokens; }
+code_review: This should either be a **protected/private/or default** constructor, and the **List** should be copied so the Pointer can't be modified outside of the class. ``` java this.refTokens = refTokens.clone(); ``` as it is now, I could do this: ``` java Builder b = JSONPointer.builder().append("key1"); JSONPointer jp1 = b.build(); b.append("key2"); JSONPointer jp2 = b.build(); if(jp1.toString().equals(jp2.toString()){ throw new Exception("Oops, my pointers are sharing a backing array"); } ```
+target code: public JSONPointer ( List < String > refTokens ) { this . refTokens = new ArrayList < String > ( refTokens ) ; }
+response: public class JSONPointer { private final List < String > refTokens ; private JSONPointer ( List < String > refTokens ) { this . refTokens = new ArrayList < > ( refTokens ) ; } public static JSONPointer of ( List < String > refTokens ) { return new JSONPointer ( refTokens ) ; } }
+
+sample: 1261
+buggy_code: public VM() { mVmStatic = new VmStatic(); mVmDynamic = new VmDynamic(); mVmStatistics = new VmStatistics(); <START> mVmStatic.setImages(new java.util.ArrayList<DiskImage>()); <END> mVmStatic.setInterfaces(new java.util.ArrayList<VmNetworkInterface>()); mDiskMap = new java.util.HashMap<String, DiskImage>(); mCdPath = ""; mFloppyPath = ""; mRunAndPause = false; _diskSize = 0; }
+code_review: coudl be just ArrayList since now it is imported ^^ vv
+target code: public VM ( ) { mVmStatic = new VmStatic ( ) ; mVmDynamic = new VmDynamic ( ) ; mVmStatistics = new VmStatistics ( ) ; mVmStatic . setImages ( new ArrayList < DiskImage > ( ) ) ; mVmStatic . setInterfaces ( new ArrayList < VmNetworkInterface > ( ) ) ; mDiskMap = new java . util . HashMap < String , DiskImage > ( ) ; mCdPath = "" ; mFloppyPath = "" ; mRunAndPause = false ; _diskSize = 0 ; }
+response: public VM ( ) { mVmStatic = new VmStatic ( ) ; mVmDynamic = new VmDynamic ( ) ; mVmStatistics = new VmStatistics ( ) ; mVmStatic . setImages ( new ArrayList < DiskImage > ( ) ) ; mVmStatic . setInterfaces ( new ArrayList < VmNetworkInterface > ( ) ) ; mDiskMap = new HashMap < String , DiskImage > ( ) ; mCdPath = "" ; mFloppyPath = "" ; mRunAndPause = false ; _diskSize = 0 ; }
+
+sample: 1262
+buggy_code: <START> long consumerLag() { <END> return consumerLag; }
+code_review: Would suggest to make it `private`.
+target code: private long consumerLag ( ) { return consumerLag ; }
+response: java private long consumerLag ( ) { return consumerLag ; }
+
+sample: 1263
+buggy_code: public RegexGroupFilter(final int groupIdx) { if (groupIdx < 1) <START> throw new IllegalArgumentException(MessageFormat.format(HttpServerText.get().invalidIndex, groupIdx)); <END> this.groupIdx = groupIdx - 1; }
+code_review: In most other places we suppress boxing warnings by manually boxing in the code with Integer.valueOf() around the expression. This is especially true in MessageFormat.format invocations, which are very common in our error paths. I think that is the general approach preferred within JGit.
+target code: public RegexGroupFilter ( final int groupIdx ) { if ( groupIdx < 1 ) throw new IllegalArgumentException ( MessageFormat . format ( HttpServerText . get ( ) . invalidIndex , valueOf ( groupIdx ) ) ) ; this . groupIdx = groupIdx - 1 ; }
+response: public RegexGroupFilter ( final int groupIdx ) { if ( groupIdx < 1 ) throw new IllegalArgumentException ( MessageFormat . format ( HttpServerText . get ( ) . invalidIndex , Integer . valueOf ( groupIdx ) ) ) ; this . groupIdx = groupIdx - 1 ; }
+
+sample: 1264
+buggy_code: public void testChunkFillingBlobSizeMultipleOfChunkSize() throws Exception { <START> blobSize = chunkSize * random.nextInt(10) + 1; <END> fillChunksAndAssertSuccess(); }
+code_review: missing braces ? `blobSize` can end up to be 1 if `random.nextInt(10)` returns 0.
+target code: public void testChunkFillingBlobSizeMultipleOfChunkSize ( ) throws Exception { blobSize = chunkSize * ( random . nextInt ( 10 ) + 1 ) ; fillChunksAndAssertSuccess ( ) ; }
+response: public void testChunkFillingBlobSizeMultipleOfChunkSize ( ) throws Exception { int blobSize = chunkSize * ( random . nextInt ( 10 ) + 1 ) ; fillChunksAndAssertSuccess ( ) ; }
+
+sample: 1265
+buggy_code: <START> EapAkaAttributeFactory() <END> {}
+code_review: Suggest protected to signal that this is for the subclass
+target code: protected EapAkaAttributeFactory ( ) { }
+response: protected EapAkaAttributeFactory ( ) { }
+
+sample: 1266
+buggy_code: public byte[] toByteArray() { <START> return ByteBuffer.allocate(8).putLong(valueLong).array(); <END> }
+code_review: I wouldn't implement this (just return null). A long has a fixed size, and we can use putLong() in HTInterval to write them to the file. This method was more for string, structs, etc. that we want to serialize.
+target code: public byte [ ] toByteArray ( ) { return null ; }
+response: public byte [ ] toByteArray ( ) { return null ; }
+
+sample: 1267
+buggy_code: public String getModeName() { String header = getHeader(); <START> return header.substring(0, header.indexOf(' ')); <END> }
+code_review: there is no other way of getting article name?
+target code: private String getModeName ( ) { String header = getHeader ( ) ; return header . substring ( 0 , header . indexOf ( ' ' ) ) ; }
+response: public String getModeName ( ) { String header = getHeader ( ) ; String [ ] headerParts = header . split ( " " ) ; return headerParts [ 0 ] ; }  This refactored code splits the header string into an array of strings using the space character as a delimiter . Then , it returns the first element of the array , which is the article name .
+
+sample: 1268
+buggy_code: public int hashCode() { int result = bitSet; result = 31 * result + bitSet; <START> return result; <END> }
+code_review: @vilchik-elena Why not simply returning `bitSet`?
+target code: public int hashCode ( ) { return bitSet ; }
+response: public int hashCode ( ) { return bitSet ; }
+
+sample: 1269
+buggy_code: void setUnresolvedCompact(boolean unresolvedCompact) { this.unresolvedCompact = unresolvedCompact; if (outer != null) { <START> outer.setUnresolvedCompact(true); <END> } }
+code_review: Not required
+target code: void setUnresolvedCompact ( boolean unresolvedCompact ) { this . unresolvedCompact = unresolvedCompact ; }
+response: void setUnresolvedCompact ( boolean unresolvedCompact ) { this . unresolvedCompact = unresolvedCompact ; if ( outer != null ) { outer . setUnresolvedCompact ( true ) ; } }
+
+sample: 1270
+buggy_code: public static void afterClass() throws Exception { if (sLocalAlluxioJobCluster != null) { sLocalAlluxioJobCluster.stop(); } <START> sFileSystem.close(); <END> }
+code_review: hrmmm, is this required? Will this happen already with the cluster teardown? And, is there redundant closing with the `after()` call?
+target code: public static void afterClass ( ) throws Exception { if ( sLocalAlluxioJobCluster != null ) { sLocalAlluxioJobCluster . stop ( ) ; } }
+response: public static void afterClass ( ) throws Exception { if ( sLocalAlluxioJobCluster != null ) { sLocalAlluxioJobCluster . stop ( ) ; } // sFileSystem . close ( ) ; // redundant with after ( ) call }
+
+sample: 1271
+buggy_code: public void testTrimLongSuffix() throws Exception { <START> String longValue = "12345"; <END> assertThat(LiteralUtils.trimLongSuffix(longValue)).isEqualTo(longValue); assertThat(LiteralUtils.trimLongSuffix(longValue + "l")).isEqualTo(longValue); assertThat(LiteralUtils.trimLongSuffix(longValue + "L")).isEqualTo(longValue); }
+code_review: What If I give the empty string as an input of that method ?
+target code: public void testTrimLongSuffix ( ) throws Exception { assertThat ( LiteralUtils . trimLongSuffix ( null ) ) . isEqualTo ( null ) ; assertThat ( LiteralUtils . trimLongSuffix ( "" ) ) . isEqualTo ( "" ) ; String longValue = "12345" ; assertThat ( LiteralUtils . trimLongSuffix ( longValue ) ) . isEqualTo ( longValue ) ; assertThat ( LiteralUtils . trimLongSuffix ( longValue + "l" ) ) . isEqualTo ( longValue ) ; assertThat ( LiteralUtils . trimLongSuffix ( longValue + "L" ) ) . isEqualTo ( longValue ) ; }
+response: public void testTrimLongSuffix ( ) throws Exception { String longValue = "" ; assertThat ( LiteralUtils . trimLongSuffix ( longValue ) ) . isEqualTo ( longValue ) ; assertThat ( LiteralUtils . trimLongSuffix ( longValue + "l" ) ) . isEqualTo ( longValue ) ; assertThat ( LiteralUtils . trimLongSuffix ( longValue + "L" ) ) . isEqualTo ( longValue ) ; }
+
+sample: 1272
+buggy_code: public Map<TableScanNode, Void> visitTableScan(TableScanNode node, Void context) { <START> Map<TableScanNode, Void> ret = new IdentityHashMap<>(); <END> ret.put(node, null); return ret; }
+code_review: spell out ret
+target code: public Map < TableScanNode , Void > visitTableScan ( TableScanNode node , Void context ) { Map < TableScanNode , Void > result = new IdentityHashMap < > ( ) ; result . put ( node , null ) ; return result ; }
+response: public Map < TableScanNode , Void > visitTableScan ( TableScanNode node , Void context ) { Map < TableScanNode , Void > result = new IdentityHashMap < > ( ) ; result . put ( node , null ) ; return result ; }
+
+sample: 1273
+buggy_code: public int getStreamIndex() { <START> return streamIndex; <END> }
+code_review: should not be this private?
+target code: private int getStreamIndex ( ) { return streamIndex ; }
+response: public int getStreamIndex ( ) { return this . streamIndex ; }   private int streamIndex ; public int getStreamIndex ( ) { return this . streamIndex ; }
+
+sample: 1274
+buggy_code: public Void call() throws IOException { if (task == null) { throw new IOException("The callable " + this + " has been serialized somehow, but it is actually not serializable"); } try { return task.call(); <START> } catch (Exception ex) { <END> if (ex instanceof IOException) { throw (IOException)ex; } throw new IOException(ex); } }
+code_review: simpler: ``` } catch (IOException e) { throw e; } catch (Exception e) { throw new IOException(e); } ```
+target code: public Void call ( ) throws IOException { if ( task == null ) { throw new IOException ( "The callable " + this + " has been serialized somehow , but it is actually not serializable" ) ; } try { return task . call ( ) ; } catch ( IOException ex ) { throw ex ; } catch ( Exception ex ) { throw new IOException ( ex ) ; } }
+response: public Void call ( ) throws IOException { if ( task == null ) { throw new IOException ( "The callable " + this + " has been serialized somehow , but it is actually not serializable" ) ; } try { return task . call ( ) ; } catch ( IOException e ) { throw e ; } catch ( Exception e ) { throw new IOException ( e ) ; } }
+
+sample: 1275
+buggy_code: public static File task(File projectDir, String dstName) throws IOException { File dstDir = new File(projectDir.getParent(), FileMetaDataExtractor.encodeSpecialCharsForFileSystem(dstName)); try { if (projectDir.renameTo(dstDir) && XstreamSerializer.renameProject(new File(dstDir, CODE_XML_FILE_NAME), dstName)) { return dstDir; } else { throw new IOException("Cannot rename project directory " + projectDir.getAbsolutePath() + " to " + dstName); } } catch (IOException e) { <START> throw e; <END> } }
+code_review: please remove the `try { .. } catch ( .. )` block altogether now.
+target code: public static File task ( File projectDir , String dstName ) throws IOException { File dstDir = new File ( projectDir . getParent ( ) , FileMetaDataExtractor . encodeSpecialCharsForFileSystem ( dstName ) ) ; if ( projectDir . renameTo ( dstDir ) && XstreamSerializer . renameProject ( new File ( dstDir , CODE_XML_FILE_NAME ) , dstName ) ) { return dstDir ; } else { throw new IOException ( "Cannot rename project directory " + projectDir . getAbsolutePath ( ) + " to " + dstName ) ; } }
+response: public static File task ( File projectDir , String dstName ) throws IOException { File dstDir = new File ( projectDir . getParent ( ) , FileMetaDataExtractor . encodeSpecialCharsForFileSystem ( dstName ) ) ; if ( projectDir . renameTo ( dstDir ) && XstreamSerializer . renameProject ( new File ( dstDir , CODE_XML_FILE_NAME ) , dstName ) ) { return dstDir ; } else { throw new IOException ( "Cannot rename project directory " + projectDir . getAbsolutePath ( ) + " to " + dstName ) ; } }
+
+sample: 1276
+buggy_code: private StockOperation createOperation(StockOperation operation, InventoryStockTake delegate) { operation.setStatus(StockOperationStatus.NEW); <START> IStockOperationType operationType = WellKnownOperationTypes.getAdjustment(); <END> operation.setInstanceType(operationType); Stockroom stockroom; stockroom = delegate.getStockroom(); operation.setSource(stockroom); operation.setOperationNumber(delegate.getOperationNumber()); Date dNow = new Date(); operation.setOperationDate(dNow); operation.setItems(createOperationsItemSet(operation, delegate.getItemStockSummaryList())); return operation; }
+code_review: Remove these extra variables that aren't used except in a setter.
+target code: private StockOperation createOperation ( StockOperation operation , InventoryStockTake delegate ) { operation . setStatus ( StockOperationStatus . NEW ) ; IStockOperationType operationType = WellKnownOperationTypes . getAdjustment ( ) ; operation . setInstanceType ( operationType ) ; Stockroom stockroom = delegate . getStockroom ( ) ; operation . setSource ( stockroom ) ; operation . setOperationNumber ( delegate . getOperationNumber ( ) ) ; operation . setOperationDate ( new Date ( ) ) ; operation . setItems ( createOperationsItemSet ( operation , delegate . getItemStockSummaryList ( ) ) ) ; return operation ; }
+response: private StockOperation createOperation ( StockOperation operation , InventoryStockTake delegate ) { operation . setStatus ( StockOperationStatus . NEW ) ; operation . setInstanceType ( WellKnownOperationTypes . getAdjustment ( ) ) ; operation . setSource ( delegate . getStockroom ( ) ) ; operation . setOperationNumber ( delegate . getOperationNumber ( ) ) ; operation . setOperationDate ( new Date ( ) ) ; operation . setItems ( createOperationsItemSet ( operation , delegate . getItemStockSummaryList ( ) ) ) ; return operation ; }
+
+sample: 1277
+buggy_code: <START> public MarshallingResponseBuilder messages(List<MarshallingMessage> messages) { <END> this.messages.addAll(messages); return this; }
+code_review: not sure if there's a reason for removing the parametrized type MarshallingResponseBuilder<T>, see that when setting the messages you loose the type. The other methods state, addMessage, and resout has the type.
+target code: public MarshallingResponseBuilder < T > messages ( List < MarshallingMessage > messages ) { this . messages . addAll ( messages ) ; return this ; }
+response: public class MarshallingResponseBuilder < T > { private List < MarshallingMessage > messages = new ArrayList < > ( ) ; public MarshallingResponseBuilder < T > messages ( List < MarshallingMessage > messages ) { this . messages . addAll ( messages ) ; return this ; } public MarshallingResponseBuilder < T > addMessage ( MarshallingMessage message ) { this . messages . add ( message ) ; return this ; } public MarshallingResponse < T > result ( ) { return new MarshallingResponse < > ( this . messages ) ; } }  The code has been refactored to include the parametrized type `MarshallingResponseBuilder < T > ` and the `messages` method now returns the same type . This ensures that the type is not lost when setting the messages . Additionally , two other methods `addMessage` and `result` have been added to the class .
+
+sample: 1278
+buggy_code: <START> long getTokenCount() { <END> return tokens.get(); }
+code_review: nit: I think we generally prefer to explicitly state the access modifiers.
+target code: protected long getTokenCount ( ) { return tokens . get ( ) ; }
+response: public long getTokenCount ( ) { return tokens . get ( ) ; }
+
+sample: 1279
+buggy_code: public V getOrFill(K key, Callable<V> callable) { try { return callable.call() ; } catch (Exception e) { <START> e.printStackTrace(); <END> return null; } }
+code_review: `printStackTrace()`? Isn't it better to use a logger?
+target code: public V getOrFill ( K key , Callable < V > callable ) { try { return callable . call ( ) ; } catch ( Exception e ) { return null ; } }
+response: private static final Logger LOGGER = LoggerFactory . getLogger ( ClassName . class ) ; public V getOrFill ( K key , Callable < V > callable ) { try { return callable . call ( ) ; } catch ( Exception e ) { LOGGER . error ( "Error occurred while getting or filling value for key : { } " , key , e ) ; return null ; } }  Note : Replace `ClassName` with the name of the class where this method is defined . Also , make sure to import the `Logger` and `LoggerFactory` classes from the appropriate package .
+
+sample: 1280
+buggy_code: void setUpHomeMenuIcon() { drawerIconDot.setVisibility(AccountUtil.isLoggedIn() && Prefs.showActionFeedIndicator() && ReleaseUtil.isPreBetaRelease() <START> && Prefs.getTotalUserDescriptionsEdited() >= ACTION_DESCRIPTION_EDIT_UNLOCK_THRESHOLD ? <END> VISIBLE : GONE); }
+code_review: This is too much specific logic that is spilling over into a very general function. The only thing on which this needs to depend is Prefs.showActionFeedIndicator(), which it already does.
+target code: void setUpHomeMenuIcon ( ) { drawerIconDot . setVisibility ( AccountUtil . isLoggedIn ( ) && Prefs . showActionFeedIndicator ( ) && ReleaseUtil . isPreBetaRelease ( ) ? VISIBLE : GONE ) ; }
+response: void setUpHomeMenuIcon ( ) { boolean shouldShowIcon = Prefs . showActionFeedIndicator ( ) ; drawerIconDot . setVisibility ( shouldShowIcon ? VISIBLE : GONE ) ; }
+
+sample: 1281
+buggy_code: public static int maxMemorySizeWithHotplugInMb(int osId, Version compatibilityVersion) { final ConfigValues configValue = getMaxMemConfigValueByOsId(osId); return Config.<Integer>getValue( configValue, <START> (compatibilityVersion != null) ? compatibilityVersion.getValue() : Version.getLast().getValue() <END> ); }
+code_review: Please remove unnecessary brackets: return Config.<Integer>getValue( configValue, compatibilityVersion != null ? compatibilityVersion.getValue() : Version.getLast().getValue()
+target code: public static int maxMemorySizeWithHotplugInMb ( int osId , Version compatibilityVersion ) { final ConfigValues configValue = getMaxMemConfigValueByOsId ( osId ) ; return Config . < Integer > getValue ( configValue , compatibilityVersion != null ? compatibilityVersion . getValue ( ) : Version . getLast ( ) . getValue ( ) ) ; }
+response: public static int maxMemorySizeWithHotplugInMb ( int osId , Version compatibilityVersion ) { final ConfigValues configValue = getMaxMemConfigValueByOsId ( osId ) ; return Config . < Integer > getValue ( configValue , compatibilityVersion != null ? compatibilityVersion . getValue ( ) : Version . getLast ( ) . getValue ( ) ) ; }
+
+sample: 1282
+buggy_code: public void getPropertiesUpdatePlace(final TrendsPlace place){ CommonDataService.Async.getInstance().getWebClientProperties(new AsyncCallback<WebClientProperties>() { @Override public void onFailure(Throwable caught) { new ExceptionPanel("Default properties will be used. Exception while properties retrieving: " + caught.getMessage()); updatePlace(place); } @Override public void onSuccess(WebClientProperties result) { webClientProperties = result; <START> updateTagFilter(); <END> updatePlace(place); } }); }
+code_review: this is incorrect place for command
+target code: public void getPropertiesUpdatePlace ( final TrendsPlace place ) { CommonDataService . Async . getInstance ( ) . getWebClientProperties ( new AsyncCallback < WebClientProperties > ( ) { @Override public void onFailure ( Throwable caught ) { new ExceptionPanel ( "Default properties will be used . Exception while properties retrieving : " + caught . getMessage ( ) ) ; updatePlace ( place ) ; } @Override public void onSuccess ( WebClientProperties result ) { webClientProperties = result ; updatePlace ( place ) ; } } ) ; }
+response: public void getPropertiesUpdatePlace ( final TrendsPlace place ) { CommonDataService . Async . getInstance ( ) . getWebClientProperties ( new AsyncCallback < WebClientProperties > ( ) { @Override public void onFailure ( Throwable caught ) { new ExceptionPanel ( "Default properties will be used . Exception while properties retrieving : " + caught . getMessage ( ) ) ; updatePlace ( place ) ; } @Override public void onSuccess ( WebClientProperties result ) { webClientProperties = result ; updatePlace ( place ) ; updateTagFilter ( ) ; } } ) ; }
+
+sample: 1283
+buggy_code: Context prepareDefaultContext(boolean parseAsFlume) { // Prepares a default context with Kafka Server Properties Context context = new Context(); context.put(BOOTSTRAP_SERVERS_CONFIG, testUtil.getKafkaServerUrl()); context.put(PARSE_AS_FLUME_EVENT, String.valueOf(parseAsFlume)); <START> context.put("offsets.topic.replication.factor", "1"); <END> context.put(TOPIC_CONFIG, topic); return context; }
+code_review: What does this change bring? Did we need this to get the test working?
+target code: Context prepareDefaultContext ( boolean parseAsFlume ) { // Prepares a default context with Kafka Server Properties Context context = new Context ( ) ; context . put ( BOOTSTRAP_SERVERS_CONFIG , testUtil . getKafkaServerUrl ( ) ) ; context . put ( PARSE_AS_FLUME_EVENT , String . valueOf ( parseAsFlume ) ) ; context . put ( TOPIC_CONFIG , topic ) ; return context ; }
+response: Context prepareDefaultContext ( boolean parseAsFlume ) { // Prepares a default context with Kafka Server Properties Context context = new Context ( ) ; context . put ( BOOTSTRAP_SERVERS_CONFIG , testUtil . getKafkaServerUrl ( ) ) ; context . put ( PARSE_AS_FLUME_EVENT , String . valueOf ( parseAsFlume ) ) ; context . put ( TOPIC_CONFIG , topic ) ; return context ; }  The change adds a property for the replication factor of the offsets topic . It is not clear from the given code whether this change was necessary to get the test working or not .
+
+sample: 1284
+buggy_code: private String getDatacenter(InetAddressAndPort endpoint) { if (peersA.contains(endpoint)) return "datacenterA"; if (peersB.contains(endpoint)) return "datacenterB"; else if (peersC.contains(endpoint)) return "datacenterC"; <START> return "NA"; <END> }
+code_review: Should probably return null
+target code: private String getDatacenter ( InetAddressAndPort endpoint ) { if ( peersA . contains ( endpoint ) ) return "datacenterA" ; if ( peersB . contains ( endpoint ) ) return "datacenterB" ; else if ( peersC . contains ( endpoint ) ) return "datacenterC" ; return null ; }
+response: private String getDatacenter ( InetAddressAndPort endpoint ) { if ( peersA . contains ( endpoint ) ) { return "datacenterA" ; } else if ( peersB . contains ( endpoint ) ) { return "datacenterB" ; } else if ( peersC . contains ( endpoint ) ) { return "datacenterC" ; } return null ; }
+
+sample: 1285
+buggy_code: private DateTimeFormatter getFormatter(){ switch (this){ case days: return DateTimeFormat.forPattern("yyyy-MM-dd"); case months: return DateTimeFormat.forPattern("yyyy/MM"); case weeks: return DateTimeFormat.forPattern("yyyy/ww"); case years: return DateTimeFormat.forPattern("yyyy"); case quarters: // has to be extended by the calling function return DateTimeFormat.forPattern("yyyy"); case simpleSum: <START> break; <END> } return null; }
+code_review: Constant simpleSum could even removed as this constant is never used outside this class.
+target code: private DateTimeFormatter getFormatter ( ) { switch ( this ) { case days : return DateTimeFormat . forPattern ( "yyyy - MM - dd" ) ; case months : return DateTimeFormat . forPattern ( "yyyy / MM" ) ; case weeks : return DateTimeFormat . forPattern ( "yyyy / ww" ) ; case years : return DateTimeFormat . forPattern ( "yyyy" ) ; case quarters : // has to be extended by the calling function return DateTimeFormat . forPattern ( "yyyy" ) ; } return null ; }
+response: private DateTimeFormatter getFormatter ( ) { switch ( this ) { case days : return DateTimeFormat . forPattern ( "yyyy - MM - dd" ) ; case months : return DateTimeFormat . forPattern ( "yyyy / MM" ) ; case weeks : return DateTimeFormat . forPattern ( "yyyy / ww" ) ; case years : return DateTimeFormat . forPattern ( "yyyy" ) ; case quarters : // has to be extended by the calling function return DateTimeFormat . forPattern ( "yyyy" ) ; default : return null ; } }
+
+sample: 1286
+buggy_code: public void setDefaultProperties(Map<String, Object> defaultProperties) { <START> this.defaultProperties = new HashMap<>(); <END> for (Object key : Collections.list(defaultProperties.propertyNames())) { this.defaultProperties.put((String) key, defaultProperties.get(key)); } }
+code_review: I think this could be a one liner: ```java this.defaultProperties = new HashMap<>(defaultProperties); ```
+target code: public void setDefaultProperties ( Map < String , Object > defaultProperties ) { this . defaultProperties = new HashMap < > ( defaultProperties ) ; }
+response: public void setDefaultProperties ( Map < String , Object > defaultProperties ) { this . defaultProperties = new HashMap < > ( defaultProperties ) ; }
+
+sample: 1287
+buggy_code: <START> protected <END> MapSqlParameterSource createVnodeToPnodeParametersMapper( Integer pinnedIndex, Guid vNodeId) { return getCustomMapSqlParameterSource() .addValue("id", Guid.newGuid()) .addValue("vm_numa_node_id", vNodeId) .addValue("vds_numa_node_index", pinnedIndex); }
+code_review: Can this be private?
+target code: private MapSqlParameterSource createVnodeToPnodeParametersMapper ( Integer pinnedIndex , Guid vNodeId ) { return getCustomMapSqlParameterSource ( ) . addValue ( "id" , Guid . newGuid ( ) ) . addValue ( "vm_numa_node_id" , vNodeId ) . addValue ( "vds_numa_node_index" , pinnedIndex ) ; }
+response: private MapSqlParameterSource createVnodeToPnodeParametersMapper ( Integer pinnedIndex , Guid vNodeId ) { return getCustomMapSqlParameterSource ( ) . addValue ( "id" , Guid . newGuid ( ) ) . addValue ( "vm_numa_node_id" , vNodeId ) . addValue ( "vds_numa_node_index" , pinnedIndex ) ; }
+
+sample: 1288
+buggy_code: public String read(String key) { String data = dataManager.read(key); <START> return (data != null) ? encode(cryptoBox.decrypt(iv, decode(data))) : data; <END> }
+code_review: I would flip this for clarity: `return data == null ? null : encode(cryptoBox.decrypt(iv, decode(data));`
+target code: public String read ( String key ) { String data = dataManager . read ( key ) ; return ( data == null ) ? null : encode ( cryptoBox . decrypt ( iv , decode ( data ) ) ) ; }
+response: public String read ( String key ) { String data = dataManager . read ( key ) ; return ( data == null ) ? null : encode ( cryptoBox . decrypt ( iv , decode ( data ) ) ) ; }
+
+sample: 1289
+buggy_code: <START> public void setUp() throws Exception { <END> super.init(); }
+code_review: `super.init()` method never throw an exception.
+target code: public void setUp ( ) { super . init ( ) ; }
+response: < START > public void setUp ( ) { < END > super . init ( ) ; }
+
+sample: 1290
+buggy_code: public S indexNullAs(F indexNullAs) { <START> indexNullAsValue = Optional.of( indexNullAs ); <END> return thisAsS(); }
+code_review: `null` is not an acceptable value for `indexNullAs`. You can use `null` to represent "no value was selected", no need for an Optional.
+target code: public S indexNullAs ( F indexNullAs ) { indexNullAsValue = indexNullAs ; return thisAsS ( ) ; }
+response: public S indexNullAs ( F indexNullAs ) { if ( indexNullAs == null ) { throw new IllegalArgumentException ( "indexNullAs cannot be null" ) ; } indexNullAsValue = indexNullAs ; return thisAsS ( ) ; }
+
+sample: 1291
+buggy_code: public void testGenericImageExtraction() { org.atlasapi.media.entity.Series extractedGenericImage = extractor.extract(seriesWithGenericImage()); Image genericImage = Iterables.getOnlyElement(extractedGenericImage.getImages()); <START> Assert.assertEquals("http://ichef.bbci.co.uk/images/ic/1024x576/p028s846.png", extractedGenericImage.getImage()); <END> Assert.assertEquals(ImageType.GENERIC_IMAGE_CONTENT_ORIGINATOR, genericImage.getType()); }
+code_review: import static Assert.assertEquals()
+target code: public void testGenericImageExtraction ( ) { org . atlasapi . media . entity . Series extractedGenericImage = extractor . extract ( seriesWithGenericImage ( ) ) ; Image genericImage = Iterables . getOnlyElement ( extractedGenericImage . getImages ( ) ) ; assertEquals ( "http :/ / ichef . bbci . co . uk / images / ic / 1024x576 / p028s846 . png" , extractedGenericImage . getImage ( ) ) ; assertEquals ( ImageType . GENERIC_IMAGE_CONTENT_ORIGINATOR , genericImage . getType ( ) ) ; }
+response: public void testGenericImageExtraction ( ) { org . atlasapi . media . entity . Series extractedGenericImage = extractor . extract ( seriesWithGenericImage ( ) ) ; Image genericImage = Iterables . getOnlyElement ( extractedGenericImage . getImages ( ) ) ; assertEquals ( "http :/ / ichef . bbci . co . uk / images / ic / 1024x576 / p028s846 . png" , extractedGenericImage . getImage ( ) ) ; assertEquals ( ImageType . GENERIC_IMAGE_CONTENT_ORIGINATOR , genericImage . getType ( ) ) ; }
+
+sample: 1292
+buggy_code: void testDescribeInstances() { for (String region : ec2Api.getConfiguredRegions()) { Set<? extends Reservation<? extends RunningInstance>> allResults = client.describeInstancesInRegion(region); assertNotNull(allResults); <START> assertTrue(allResults.size() >= 0); <END> } }
+code_review: How can a set be of a negative size?
+target code: void testDescribeInstances ( ) { for ( String region : ec2Api . getConfiguredRegions ( ) ) { Set < ? extends Reservation < ? extends RunningInstance > > allResults = client . describeInstancesInRegion ( region ) ; assertNotNull ( allResults ) ; } }
+response: void testDescribeInstances ( ) { for ( String region : ec2Api . getConfiguredRegions ( ) ) { Set < ? extends Reservation < ? extends RunningInstance > > allResults = client . describeInstancesInRegion ( region ) ; assertNotNull ( allResults ) ; assertTrue ( allResults . size ( ) >= 0 ) ; } }
+
+sample: 1293
+buggy_code: <START> public static String quoteString(String s) { <END> if (s == null) { return null; } if (!s.matches("^\".*\"$")) { return "\"" + s + "\""; } else { return s; } }
+code_review: Package private should always be enough for testing. Use the same package for tests.
+target code: static String quoteString ( String s ) { if ( s == null ) { return null ; } if ( ! s . matches ( " ^ \" .* \"$" ) ) { return "\"" + s + "\"" ; } else { return s ; } }
+response: package com . example ; class MyClass { static String quoteString ( String s ) { if ( s == null ) { return null ; } if ( ! s . matches ( " ^ \" .* \"$" ) ) { return "\"" + s + "\"" ; } else { return s ; } } }
+
+sample: 1294
+buggy_code: public Object getMin() { if (primitiveType == PrimitiveTypeName.BINARY) { <START> if (originalType == OriginalType.UTF8) { <END> return ((Binary) min).toStringUsingUTF8(); } else { return new String(((Binary) min).getBytes()); } } return min; }
+code_review: Had an offline discussion with Aman, we can remove this check and serialize everything using getBytes()
+target code: public Object getMin ( ) { if ( primitiveType == PrimitiveTypeName . BINARY && min != null ) { return new String ( ( ( Binary ) min ) . getBytes ( ) ) ; } return min ; }
+response: public Object getMin ( ) { if ( primitiveType == PrimitiveTypeName . BINARY ) { return new String ( ( ( Binary ) min ) . getBytes ( ) ) ; } return min ; }
+
+sample: 1295
+buggy_code: public int hashCode() { <START> int result = name.hashCode(); <END> result = 31 * result + fullName.hashCode(); return result; }
+code_review: fullName should be enough here too.
+target code: public int hashCode ( ) { return fullName . hashCode ( ) ; }
+response: public int hashCode ( ) { int result = fullName . hashCode ( ) ; result = 31 * result + fullName . hashCode ( ) ; return result ; }
+
+sample: 1296
+buggy_code: private SocketConfig createSocketConfig(int socketTimeout) { return SocketConfig.custom() .setSoReuseAddress(true) <START> .setSoTimeout(socketTimeout > 0 ? socketTimeout : TIMEOUT_THREE_HOURS) <END> .build(); }
+code_review: I think rather than checking `> 0`, it would make things clearer if you had a static value like `DEFAULT_TIMEOUT = -1` and then use that in `createHttpClient` and change these checks to be `socketTimeout != DEFAULT_TIMEOUT`. Or something along those lines.
+target code: private SocketConfig createSocketConfig ( int socketTimeout ) { return SocketConfig . custom ( ) . setSoReuseAddress ( true ) . setSoTimeout ( socketTimeout ) . build ( ) ; }
+response: private static final int DEFAULT_TIMEOUT = - 1 ; private SocketConfig createSocketConfig ( int socketTimeout ) { return SocketConfig . custom ( ) . setSoReuseAddress ( true ) . setSoTimeout ( socketTimeout != DEFAULT_TIMEOUT ? socketTimeout : TIMEOUT_THREE_HOURS ) . build ( ) ; }
+
+sample: 1297
+buggy_code: CommentBox(CodeMirror cm, CommentInfo info) { this.cm = cm; CommentRange range = info.range(); if (range != null) { fromTo = FromTo.fromCommentRange(range); rangeMarker = cm.markText( fromTo.getFrom(), fromTo.getTo(), <START> Configuration.create().set("className", <END> DiffTable.style.range())); } }
+code_review: nit: line break after ( or before ".set" here.
+target code: CommentBox ( CodeMirror cm , CommentInfo info ) { this . cm = cm ; CommentRange range = info . range ( ) ; if ( range != null ) { fromTo = FromTo . create ( range ) ; rangeMarker = cm . markText ( fromTo . getFrom ( ) , fromTo . getTo ( ) , Configuration . create ( ) . set ( "className" , DiffTable . style . range ( ) ) ) ; } }
+response: CodeMirror cm ; CommentInfo info ; public void CommentBox ( CodeMirror cm , CommentInfo info ) { this . cm = cm ; CommentRange range = info . range ( ) ; if ( range != null ) { FromTo fromTo = FromTo . fromCommentRange ( range ) ; rangeMarker = cm . markText ( fromTo . getFrom ( ) , fromTo . getTo ( ) , Configuration . create ( ) . set ( "className" , DiffTable . style . range ( ) ) ) ; } }
+
+sample: 1298
+buggy_code: public void removeTagFromImage(String imageName, String tagToBeRemoved) { selectImage(imageName); new ContextMenu("Remove Tag").select(); String fullTag = ""; Combo combo = new DefaultCombo(); List<String> comboItems = combo.getItems(); for (String item : comboItems) { if (item.contains(tagToBeRemoved)) { fullTag = item; break; } } combo.setSelection(fullTag); <START> ; <END> new FinishButton().click(); }
+code_review: This is pretty lonely semicolon :wink:
+target code: public void removeTagFromImage ( String imageName , String tagToBeRemoved ) { selectImage ( imageName ) ; new ContextMenu ( "Remove Tag" ) . select ( ) ; String fullTag = "" ; Combo combo = new DefaultCombo ( ) ; List < String > comboItems = combo . getItems ( ) ; for ( String item : comboItems ) { if ( item . contains ( tagToBeRemoved ) ) { fullTag = item ; break ; } } combo . setSelection ( fullTag ) ; new FinishButton ( ) . click ( ) ; }
+response: public void removeTagFromImage ( String imageName , String tagToBeRemoved ) { selectImage ( imageName ) ; new ContextMenu ( "Remove Tag" ) . select ( ) ; String fullTag = "" ; Combo combo = new DefaultCombo ( ) ; List < String > comboItems = combo . getItems ( ) ; for ( String item : comboItems ) { if ( item . contains ( tagToBeRemoved ) ) { fullTag = item ; break ; } } combo . setSelection ( fullTag ) ; new FinishButton ( ) . click ( ) ; }
+
+sample: 1299
+buggy_code: public void processOnVmStop(Collection<Guid> vmIds) { for (final Guid vmId : vmIds) { <START> log.infoFormat("process VM {0} that went down", vmId); <END> ThreadPoolUtil.execute(new Runnable() { @Override public void run() { Backend.getInstance().runInternalAction(VdcActionType.ProcessDownVm, new IdParameters(vmId), ExecutionHandler.createInternalJobContext()); } }); } }
+code_review: do we really need this log? now that it is a command we should have a log for running a command, no?
+target code: public void processOnVmStop ( Collection < Guid > vmIds ) { for ( final Guid vmId : vmIds ) { ThreadPoolUtil . execute ( new Runnable ( ) { @Override public void run ( ) { Backend . getInstance ( ) . runInternalAction ( VdcActionType . ProcessDownVm , new IdParameters ( vmId ) ) ; } } ) ; } }
+response: public void processOnVmStop ( Collection < Guid > vmIds ) { for ( final Guid vmId : vmIds ) { log . infoFormat ( "Running command to process VM { 0 } that went down" , vmId ) ; ThreadPoolUtil . execute ( new Runnable ( ) { @Override public void run ( ) { Backend . getInstance ( ) . runInternalAction ( VdcActionType . ProcessDownVm , new IdParameters ( vmId ) , ExecutionHandler . createInternalJobContext ( ) ) ; } } ) ; } }
+
+BLEU: 71.75 ; EM: 25.19
+Python file executed successfully.
+Cloning into 'tree-sitter-java'...
+ngram match: 0.7174598987706334, weighted ngram match: 0.7270679178432732, syntax_match: 0.7090276050733648, dataflow_match: 0.6283292978208233
+CodeBLEU score: 69.55
+Python file executed successfully.

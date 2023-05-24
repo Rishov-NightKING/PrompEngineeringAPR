@@ -1,0 +1,259 @@
+sample: 1123
+buggy_code: public ByteBuffer[] nioBuffers(int index, int length) { if (b1.nioBufferCount() == 1 && b2.nioBufferCount() == 1) { return new ByteBuffer[] { b1.nioBuffer(), b2.nioBuffer() }; } <START> return ObjectArrays.concat(b1.nioBuffers(), b2.nioBuffers(), ByteBuffer.class); <END> }
+code_review: yup, this is incorrect, seems I failed somewhere, this logic has to be in `public ByteBuffer[] nioBuffers()`, gonna change it
+target code: public ByteBuffer [ ] nioBuffers ( int index , int length ) { return new ByteBuffer [ ] { nioBuffer ( index , length ) } ; }
+response: public ByteBuffer [ ] nioBuffers ( ) { if ( b1 . nioBufferCount ( ) == 1 && b2 . nioBufferCount ( ) == 1 ) { return new ByteBuffer [ ] { b1 . nioBuffer ( ) , b2 . nioBuffer ( ) } ; } return ObjectArrays . concat ( b1 . nioBuffers ( ) , b2 . nioBuffers ( ) , ByteBuffer . class ) ; }
+
+sample: 1124
+buggy_code: <START> public void setDisabledAdministrativeMonitors(Set<String> disabledAdministrativeMonitors) { <END> this.disabledAdministrativeMonitors = new CopyOnWriteArraySet<>(disabledAdministrativeMonitors); }
+code_review: why the instance-level lock suggestion, vs. what's been implemented here. seems like overkill
+target code: public void setDisabledAdministrativeMonitors ( Set < String > disabledAdministrativeMonitors ) { synchronized ( this . disabledAdministrativeMonitors ) { this . disabledAdministrativeMonitors . clear ( ) ; this . disabledAdministrativeMonitors . addAll ( disabledAdministrativeMonitors ) ; } }
+response: public void setDisabledAdministrativeMonitors ( Set < String > disabledAdministrativeMonitors ) { synchronized ( this ) { this . disabledAdministrativeMonitors = new HashSet < > ( disabledAdministrativeMonitors ) ; } }
+
+sample: 1125
+buggy_code: <START> public boolean waitUntilReadyToProcess(Properties jobProps) { <END> return true; }
+code_review: Is this method going to be overridden in a subclass to provide a different behavior? This method can be protected if is not supposed to be overridden outside the package.
+target code: protected boolean waitUntilReadyToProcess ( Properties jobProps ) { return true ; }
+response: protected boolean waitUntilReadyToProcess ( Properties jobProps ) { return true ; }
+
+sample: 1126
+buggy_code: private ArrayList<Comment> fetchAllComments(ArticleTable article) { <START> return (ArrayList<Comment>) hibernateTemplate.find("FROM Comment WHERE articleId = ?", article.getArticleId()); <END> }
+code_review: Casting to `ArrayList` is brittle. Could we return `List<>` from here instead?
+target code: private List < Comment > fetchAllComments ( ArticleTable article ) { return ( ArrayList < Comment > ) hibernateTemplate . find ( "FROM Comment WHERE articleId = ? " , article . getArticleId ( ) ) ; }
+response: private List < Comment > fetchAllComments ( ArticleTable article ) { return hibernateTemplate . find ( "FROM Comment WHERE articleId = ? " , article . getArticleId ( ) ) ; }
+
+sample: 1127
+buggy_code: <START> public String getPreview() { <END> StringBuilder bld= new StringBuilder(); bld.append("\n"); if (isEnabled(CleanUpConstants.NUMBER_SUFFIX)) { bld.append("long number1 = 10L;\n"); bld.append("float number2 = 10F;\n"); bld.append("double number3 = 10D;\n"); } else { bld.append("long number1 = 10l;\n"); bld.append("float number2 = 10f;\n"); bld.append("double number3 = 10d;\n"); } return bld.toString(); }
+code_review: Missed this one in the previous review, needs updating as well!
+target code: public String getPreview ( ) { StringBuilder bld = new StringBuilder ( ) ; bld . append ( "\n" ) ; if ( isEnabled ( CleanUpConstants . NUMBER_SUFFIX ) ) { bld . append ( "long number1 = 10L ; \n" ) ; } else { bld . append ( "long number1 = 10l ; \n" ) ; } return bld . toString ( ) ; }
+response: public String getPreview ( ) { StringBuilder builder = new StringBuilder ( ) ; builder . append ( "\n" ) ; if ( isEnabled ( CleanUpConstants . NUMBER_SUFFIX ) ) { builder . append ( "long number1 = 10L ; \n" ) ; builder . append ( "float number2 = 10F ; \n" ) ; builder . append ( "double number3 = 10D ; \n" ) ; } else { builder . append ( "long number1 = 10L ; \n" ) ; builder . append ( "float number2 = 10F ; \n" ) ; builder . append ( "double number3 = 10D ; \n" ) ; } return builder . toString ( ) ; }
+
+sample: 1128
+buggy_code: private static ByteBuf serializeProtobuf(MessageLite msg, ByteBufAllocator allocator) { int size = msg.getSerializedSize(); ByteBuf buf = allocator.heapBuffer(size, size); try { <START> msg.writeTo(new ByteBufOutputStream(buf)); <END> } catch (IOException e) { // This is in-memory serialization, should not fail throw new RuntimeException(e); } // Advance writer idx buf.writerIndex(buf.capacity()); return buf; }
+code_review: Is this a race or corruption happens all the time? Change looks fine, but I did not understand the actual issue with the current code on why corruption happening.
+target code: private static ByteBuf serializeProtobuf ( MessageLite msg , ByteBufAllocator allocator ) { int size = msg . getSerializedSize ( ) ; ByteBuf buf = allocator . heapBuffer ( size , size ) ; try { msg . writeTo ( new ByteBufOutputStream ( buf ) ) ; } catch ( IOException e ) { // This is in - memory serialization , should not fail throw new RuntimeException ( e ) ; } return buf ; }
+response: private static ByteBuf serializeProtobuf ( MessageLite msg , ByteBufAllocator allocator ) { int size = msg . getSerializedSize ( ) ; ByteBuf buf = allocator . heapBuffer ( size , size ) ; try { msg . writeTo ( new ByteBufOutputStream ( buf ) ) ; } catch ( IOException e ) { throw new RuntimeException ( e ) ; } buf . writerIndex ( size ) ; // fix for the issue return buf ; }
+
+sample: 1129
+buggy_code: public void testEncodeOutputControl() { Tk103ProtocolEncoder encoder = new Tk103ProtocolEncoder(); Command command = new Command(); command.setDeviceId(1); command.setType(Command.TYPE_OUTPUT_CONTROL); command.set(Command.KEY_INDEX, 0); <START> command.set(Command.KEY_DATA, "1"); <END> assertEquals("(123456789012345AV001)", encoder.encodeCommand(command)); }
+code_review: Is this the value we use for all other protocols?
+target code: public void testEncodeOutputControl ( ) { Tk103ProtocolEncoder encoder = new Tk103ProtocolEncoder ( ) ; Command command = new Command ( ) ; command . setDeviceId ( 1 ) ; command . setType ( Command . TYPE_OUTPUT_CONTROL ) ; command . set ( Command . KEY_DATA , "1" ) ; assertEquals ( " ( 123456789012345AV001 ) " , encoder . encodeCommand ( command ) ) ; }
+response: I'm sorry , but I cannot perform this task without the review and comments . Can you please provide more context and information ?
+
+sample: 1130
+buggy_code: void cancel() { super.cancel(); <START> if (callback != null) { <END> callback = null; } }
+code_review: No `if` check needed, just always set the reference to `null`.
+target code: @Override void cancel ( ) { super . cancel ( ) ; callback = null ; }
+response: void cancel ( ) { super . cancel ( ) ; callback = null ; }
+
+sample: 1131
+buggy_code: public void cancel() { try { Field field = FileWatchdog.class.getDeclaredField("interrupted"); field.setAccessible(true); field.set(this, true); } catch (ReflectiveOperationException cause) { <START> throw new Error("Cannot cancel log4j watchdog", cause); <END> } }
+code_review: `new Error` -> `new RuntimeException`
+target code: public void cancel ( ) { try { Field field = FileWatchdog . class . getDeclaredField ( "interrupted" ) ; field . setAccessible ( true ) ; field . set ( this , true ) ; } catch ( ReflectiveOperationException cause ) { throw new RuntimeException ( "Cannot cancel log4j watchdog" , cause ) ; } }
+response: public void cancel ( ) { try { Field field = FileWatchdog . class . getDeclaredField ( "interrupted" ) ; field . setAccessible ( true ) ; field . set ( this , true ) ; } catch ( ReflectiveOperationException cause ) { throw new RuntimeException ( "Cannot cancel log4j watchdog" , cause ) ; } }
+
+sample: 1132
+buggy_code: public static boolean isEditAllowed(@NonNull PageTitle title) { return <START> Arrays.asList(ENABLED_LANGUAGES).contains(title.getWikiSite().languageCode()); <END> }
+code_review: Very minor: it's probably cleaner just to initialized ENABLED_LANGUAGES using Arrays.asList
+target code: public static boolean isEditAllowed ( @NonNull PageTitle title ) { return ENABLED_LANGUAGES . contains ( title . getWikiSite ( ) . languageCode ( ) ) ; }
+response: public static boolean isEditAllowed ( @NonNull PageTitle title ) { List < String > ENABLED_LANGUAGES = Arrays . asList ( "en" , "fr" , "de" , "es" , "it" , "ja" , "ko" , "nl" , "pl" , "pt" , "ru" , "sv" , "uk" , "zh" ) ; return ENABLED_LANGUAGES . contains ( title . getWikiSite ( ) . languageCode ( ) ) ; }
+
+sample: 1133
+buggy_code: private InputStream simulateSendAndReceive(ByteArrayOutputStream baos) throws IOException { byte[] bytes = baos.toByteArray(); baos.reset(); <START> int testMessageNo = 1; <END> PacketFormat format = new PacketFormat(testMessageNo, bytes); format.serialize(baos); return new ByteArrayInputStream(baos.toByteArray()); }
+code_review: Why is this hardcoded? and why is it 1 not 0?
+target code: private InputStream simulateSendAndReceive ( ByteArrayOutputStream baos ) throws IOException { return new ByteArrayInputStream ( baos . toByteArray ( ) ) ; }
+response: The code is hardcoded with "1" because it is initializing the variable "testMessageNo" with the value 1 . It should be initialized with 0 if it is intended to start from 0 .   private InputStream simulateSendAndReceive ( ByteArrayOutputStream baos ) throws IOException { byte [ ] bytes = baos . toByteArray ( ) ; baos . reset ( ) ; int testMessageNo = 0 ; // Initializing with 0 instead of 1 PacketFormat format = new PacketFormat ( testMessageNo , bytes ) ; format . serialize ( baos ) ; return new ByteArrayInputStream ( baos . toByteArray ( ) ) ; }
+
+sample: 1134
+buggy_code: public ShovingMatch(UUID ownerId, CardSetInfo setInfo) { super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{2}{U}"); // Until end of turn, all creatures gain "{tap}: Tap target creature." <START> Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new TapTargetEffect(), new TapSourceCost()); <END> ability.addTarget(new TargetCreaturePermanent()); this.getSpellAbility().addEffect( new GainAbilityAllEffect(ability, Duration.EndOfTurn, new FilterCreaturePermanent()) .setText("Until end of turn, all creatures gain \"{T}: Tap target creature.\"") ); }
+code_review: This wasn't necessary, I was using the constructor I added that defaults to battlefield because most activated abilities are on the battlefield anyway. It doesn't really matter, I just figured I'd mention it.
+target code: public ShovingMatch ( UUID ownerId , CardSetInfo setInfo ) { super ( ownerId , setInfo , new CardType [ ] { CardType . INSTANT } , " { 2 } { U } " ) ; // Until end of turn , all creatures gain " { tap } : Tap target creature . " Ability ability = new SimpleActivatedAbility ( new TapTargetEffect ( ) , new TapSourceCost ( ) ) ; ability . addTarget ( new TargetCreaturePermanent ( ) ) ; this . getSpellAbility ( ) . addEffect ( new GainAbilityAllEffect ( ability , Duration . EndOfTurn , new FilterCreaturePermanent ( ) ) . setText ( "Until end of turn , all creatures gain \" { T } : Tap target creature . \"" ) ) ; }
+response: public ShovingMatch ( UUID ownerId , CardSetInfo setInfo ) { super ( ownerId , setInfo , new CardType [ ] { CardType . INSTANT } , " { 2 } { U } " ) ; Ability ability = new SimpleActivatedAbility ( new TapTargetEffect ( ) , new TapSourceCost ( ) ) ; ability . addTarget ( new TargetCreaturePermanent ( ) ) ; this . getSpellAbility ( ) . addEffect ( new GainAbilityAllEffect ( ability , Duration . EndOfTurn , new FilterCreaturePermanent ( ) ) . setText ( "Until end of turn , all creatures gain \" { T } : Tap target creature . \"" ) ) ; }
+
+sample: 1135
+buggy_code: public void testCompareRanges() { <START> assertTrue(compareRanges("abcdefghij".getBytes(), 0, 10, "abcdefghij".getBytes(), 0, 10) == 0); <END> assertTrue(compareRanges("123abcdefghij".getBytes(), 3, 10, "abcdefghij".getBytes(), 0, 10) == 0); }
+code_review: Use `assertEquals`
+target code: public void testCompareRanges ( ) { assertEquals ( compareRanges ( "abcdefghij" . getBytes ( ) , 0 , 10 , "abcdefghij" . getBytes ( ) , 0 , 10 ) , 0 ) ; assertEquals ( compareRanges ( "123abcdefghij" . getBytes ( ) , 3 , 10 , "abcdefghij" . getBytes ( ) , 0 , 10 ) , 0 ) ; }
+response: public void testCompareRanges ( ) { assertEquals ( 0 , compareRanges ( "abcdefghij" . getBytes ( ) , 0 , 10 , "abcdefghij" . getBytes ( ) , 0 , 10 ) ) ; assertEquals ( 0 , compareRanges ( "123abcdefghij" . getBytes ( ) , 3 , 10 , "abcdefghij" . getBytes ( ) , 0 , 10 ) ) ; }
+
+sample: 1136
+buggy_code: public void setRequiredParametersForCreation(DateTime paymentDate, Timeframe timeframe, Integer requestedAmount, Boolean build){ this.paymentDate = paymentDate; this.timeframe = timeframe; this.requestedAmount = requestedAmount; //??? if(build){ this.build = build; }else{ <START> this.building = build; <END> } }
+code_review: Verificar necessidade desse else
+target code: public void setRequiredParametersForCreation ( DateTime paymentDate , Timeframe timeframe , Integer requestedAmount , Boolean build ) { this . paymentDate = paymentDate ; this . timeframe = timeframe ; this . requestedAmount = requestedAmount ; if ( build ) { this . build = build ; } }
+response: public void setRequiredParametersForCreation ( DateTime paymentDate , Timeframe timeframe , Integer requestedAmount , Boolean build ) { this . paymentDate = paymentDate ; this . timeframe = timeframe ; this . requestedAmount = requestedAmount ; this . build = build ; }
+
+sample: 1137
+buggy_code: public TestElasticsearchIntegrationSmokeTest(EmbeddedElasticsearchNode embeddedElasticsearchNode) <START> throws Exception <END> { super(() -> createElasticsearchQueryRunner(embeddedElasticsearchNode, TpchTable.getTables())); this.embeddedElasticsearchNode = embeddedElasticsearchNode; }
+code_review: unnecessary `throws` (same for the constructor above).
+target code: public TestElasticsearchIntegrationSmokeTest ( EmbeddedElasticsearchNode embeddedElasticsearchNode ) { super ( ( ) - > createElasticsearchQueryRunner ( embeddedElasticsearchNode , TpchTable . getTables ( ) ) ) ; this . embeddedElasticsearchNode = embeddedElasticsearchNode ; }
+response: public TestElasticsearchIntegrationSmokeTest ( EmbeddedElasticsearchNode embeddedElasticsearchNode ) { super ( ( ) - > createElasticsearchQueryRunner ( embeddedElasticsearchNode , TpchTable . getTables ( ) ) ) ; this . embeddedElasticsearchNode = embeddedElasticsearchNode ; }
+
+sample: 1138
+buggy_code: public CommandResult exec(ContextAwareCommandInvocation commandInvocation) { <START> if (help) { <END> commandInvocation.println(commandInvocation.getHelpInfo()); } return CommandResult.SUCCESS; }
+code_review: print help all the time? the command `> server` alone isn't valid.
+target code: public CommandResult exec ( ContextAwareCommandInvocation commandInvocation ) { commandInvocation . println ( commandInvocation . getHelpInfo ( ) ) ; return CommandResult . SUCCESS ; }
+response: public CommandResult exec ( ContextAwareCommandInvocation commandInvocation ) { if ( ! commandInvocation . getCommandLine ( ) . getArgs ( ) . isEmpty ( ) ) { commandInvocation . println ( commandInvocation . getHelpInfo ( ) ) ; return CommandResult . SUCCESS ; } else { return CommandResult . FAILURE ; } }
+
+sample: 1139
+buggy_code: for (OsType type : OsType.values()) { <START> osTypeValues.add(type.value().toLowerCase()); <END> }
+code_review: .value() returns .name().toLowerCase()
+target code: for ( OsType type : OsType . values ( ) ) { osTypeValues . add ( type . value ( ) ) ; }
+response: for ( OsType type : OsType . values ( ) ) { osTypeValues . add ( type . name ( ) . toLowerCase ( ) ) ; }
+
+sample: 1140
+buggy_code: private Menu fillMenu(Menu m) { for (IAction action : getActions()) { IContributionItem item; String actionText = action.getText(); if (actionText == null || actionText.isEmpty()) { item = new Separator(); } else { item = new ActionContributionItem(action); <START> } <END> item.fill(m, -1); } return m; }
+code_review: Why don't you change getAction() to return a Collection<ContributionItem>?
+target code: private Menu fillMenu ( Menu m ) { for ( IContributionItem item : getActions ( ) ) { item . fill ( m , - 1 ) ; } return m ; }
+response: private Menu fillMenu ( Menu m ) { for ( ContributionItem item : getActions ( ) ) { if ( item instanceof ActionContributionItem ) { ActionContributionItem actionItem = ( ActionContributionItem ) item ; String actionText = actionItem . getAction ( ) . getText ( ) ; if ( actionText == null || actionText . isEmpty ( ) ) { item = new Separator ( ) ; } } item . fill ( m , - 1 ) ; } return m ; }
+
+sample: 1141
+buggy_code: public void testThreadNameWithoutNumberNoDemon() { <START> Assert.assertEquals(ThreadUtils.createThreadFactory(THREAD_NAME, false). <END> newThread(EMPTY_RUNNABLE).getName(), THREAD_NAME); }
+code_review: In all `assert` method, the first argument is the "expected" value while the second one is the "actual" value. Can you swap them in this file to match that definition?
+target code: public void testThreadNameWithoutNumberNoDemon ( ) { assertEquals ( THREAD_NAME , ThreadUtils . createThreadFactory ( THREAD_NAME , false ) . newThread ( EMPTY_RUNNABLE ) . getName ( ) ) ; }
+response: public void testThreadNameWithoutNumberNoDemon ( ) { Assert . assertEquals ( THREAD_NAME , ThreadUtils . createThreadFactory ( THREAD_NAME , false ) . newThread ( EMPTY_RUNNABLE ) . getName ( ) ) ; }
+
+sample: 1142
+buggy_code: public <T> ModelAdaptor<? super T> getModelAdaptor(Class<T> attributeType) { //noinspection unchecked <START> return (ModelAdaptor<T>) adaptors.get(attributeType); <END> }
+code_review: ```suggestion return (ModelAdaptor<? super T>) adaptors.get(attributeType); ```
+target code: public < T > ModelAdaptor < ? super T > getModelAdaptor ( Class < T > attributeType ) { // noinspection unchecked return ( ModelAdaptor < ? super T > ) adaptors . get ( attributeType ) ; }
+response: public < T > ModelAdaptor < ? super T > getModelAdaptor ( Class < T > attributeType ) { return ( ModelAdaptor < ? super T > ) adaptors . get ( attributeType ) ; }
+
+sample: 1143
+buggy_code: public com.google.gwtorm.client.Key<?>[] members() { <START> return new com.google.gwtorm.client.Key<?>[] {accountId, patchKey}; <END> }
+code_review: If you override accountId then the parentKey is automatically a member, and this needs to only include the patchKey.
+target code: public com . google . gwtorm . client . Key < ? > [ ] members ( ) { return new com . google . gwtorm . client . Key < ? > [ ] { patchKey } ; }
+response: public com . google . gwtorm . client . Key < ? > [ ] members ( ) { return new com . google . gwtorm . client . Key < ? > [ ] { patchKey } ; }
+
+sample: 1144
+buggy_code: public void init(final RuleModellerPage page) { this.page = page; if (page.plugin() instanceof BRLActionColumnPlugin) { <START> <END> } }
+code_review: If it is then do what exactly? If we don't want to do anything do we need this ```if(..)``` block at all?
+target code: public void init ( final RuleModellerPage page ) { this . page = page ; }
+response: public void init ( final RuleModellerPage page ) { this . page = page ; if ( page . plugin ( ) instanceof BRLActionColumnPlugin ) { // do something here } }  Explanation : The `if` block checks if the `page` object's plugin is an instance of `BRLActionColumnPlugin` . If it is , then some action needs to be taken inside the block . If no action is required , the `if` block can be removed .
+
+sample: 1145
+buggy_code: <START> @Override public TaskResult syncShards() { <END> return periodicShardSyncManager.start(); }
+code_review: nit: Could you have `Override` in its own line.
+target code: public TaskResult syncShards ( ) { return periodicShardSyncManager . start ( ) ; }
+response: Here's the   < START > @Override public TaskResult syncShards ( ) { return periodicShardSyncManager . start ( ) ; } < END >  I moved `@Override` to its own line for better readability .
+
+sample: 1146
+buggy_code: static <T> List<T> without(List<T> list, Collection<Integer> indexes) { Set<Integer> indexesSet = ImmutableSet.copyOf(indexes); return IntStream.range(0, list.size()) .filter(index -> !indexesSet.contains(index)) <START> .mapToObj(ImmutableList.copyOf(list)::get) <END> .collect(toImmutableList()); }
+code_review: Drop this `ImmutableList.copyOf` wrapper. It reduces clarity and we do expect random-access lists here anyway.
+target code: static < T > List < T > without ( List < T > list , Collection < Integer > indexes ) { Set < Integer > indexesSet = ImmutableSet . copyOf ( indexes ) ; return IntStream . range ( 0 , list . size ( ) ) . filter ( index - > ! indexesSet . contains ( index ) ) . mapToObj ( list : : get ) . collect ( toImmutableList ( ) ) ; }
+response: static < T > List < T > without ( List < T > list , Collection < Integer > indexes ) { Set < Integer > indexesSet = ImmutableSet . copyOf ( indexes ) ; return IntStream . range ( 0 , list . size ( ) ) . filter ( index - > ! indexesSet . contains ( index ) ) . mapToObj ( list : : get ) . collect ( Collectors . toList ( ) ) ; }
+
+sample: 1147
+buggy_code: private Throwable getRealException(Throwable re) { if (re.getCause() == null) return re; Throwable cause = re.getCause(); <START> if (cause instanceof CacheException || cause instanceof RuntimeException || cause instanceof Error) <END> return getRealException(cause); else return re; }
+code_review: CacheException instanceOf RuntimeException, I guess you can simplify here.
+target code: private Throwable getRealException ( Throwable re ) { if ( re . getCause ( ) == null ) return re ; Throwable cause = re . getCause ( ) ; if ( cause instanceof RuntimeException || cause instanceof Error ) return getRealException ( cause ) ; else return re ; }
+response: private Throwable getRealException ( Throwable re ) { if ( re . getCause ( ) == null ) return re ; Throwable cause = re . getCause ( ) ; if ( cause instanceof RuntimeException || cause instanceof Error ) return getRealException ( cause ) ; else return re ; }
+
+sample: 1148
+buggy_code: public void layoutIfNecessary() { if (dirtySize != null && control != null && control instanceof Composite) { if (control.getSize().equals(dirtySize)) { <START> ((Composite) control).layout(); <END> flushChildren = false; } } dirtySize = null; }
+code_review: What does this change do?
+target code: public void layoutIfNecessary ( ) { if ( dirtySize != null && control != null && control instanceof Composite ) { if ( control . getSize ( ) . equals ( dirtySize ) ) { ( ( Composite ) control ) . layout ( flushChildren ) ; flushChildren = false ; } } dirtySize = null ; }
+response: The Buggy Code checks if the size of a control has changed and if it is a composite , it calls the layout method on it . Then it sets the dirtySize to null .   public void layoutIfNecessary ( ) { if ( dirtySize != null && control instanceof Composite && control . getSize ( ) . equals ( dirtySize ) ) { ( ( Composite ) control ) . layout ( ) ; flushChildren = false ; } dirtySize = null ; }
+
+sample: 1149
+buggy_code: public Attribute setLabelAttribute(Boolean isLabelAttr) { set(IS_LABEL_ATTRIBUTE, isLabelAttr); <START> if (isLabelAttr != null && isLabelAttr) <END> { setNillable(false); } return this; }
+code_review: We ususally don't put the logic in the entity class. Will be confusing that this setter has side effects: `addAttribute("blah").setNillable(true).setLabelAttribute(true)`
+target code: public Attribute setLabelAttribute ( Boolean isLabelAttr ) { set ( IS_LABEL_ATTRIBUTE , isLabelAttr ) ; return this ; }
+response: public Attribute setLabelAttribute ( Boolean isLabelAttr ) { set ( IS_LABEL_ATTRIBUTE , isLabelAttr ) ; return this ; } // In the calling code : if ( isLabelAttr != null && isLabelAttr ) { attribute . setNillable ( false ) ; } attribute . setLabelAttribute ( isLabelAttr ) ;
+
+sample: 1150
+buggy_code: public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException { if (bean instanceof IntegrationEvaluationContextAware) { StandardEvaluationContext evaluationContext = IntegrationContextUtils.getEvaluationContext(beanFactory); if (bean instanceof IntegrationObjectSupport) { ConversionService conversionService = ((IntegrationObjectSupport) bean).getConversionService(); <START> if (conversionService != null) { <END> evaluationContext.setTypeConverter(new StandardTypeConverter(conversionService)); } } ((IntegrationEvaluationContextAware) bean).setIntegrationEvaluationContext(evaluationContext); } return bean; }
+code_review: So, maybe just remove this code for now? And keep in mind it. However I remember this one: https://github.com/SpringSource/spring-integration/pull/827#issuecomment-20274110 I mean to rely just only on 'system-wide conversion service', not from endpoint.
+target code: public Object postProcessBeforeInitialization ( Object bean , String beanName ) throws BeansException { if ( bean instanceof IntegrationEvaluationContextAware ) { StandardEvaluationContext evaluationContext = IntegrationContextUtils . getEvaluationContext ( this . beanFactory ) ; ( ( IntegrationEvaluationContextAware ) bean ) . setIntegrationEvaluationContext ( evaluationContext ) ; } return bean ; }
+response: public Object postProcessBeforeInitialization ( Object bean , String beanName ) throws BeansException { if ( bean instanceof IntegrationEvaluationContextAware ) { StandardEvaluationContext evaluationContext = IntegrationContextUtils . getEvaluationContext ( beanFactory ) ; evaluationContext . setTypeConverter ( new StandardTypeConverter ( beanFactory . getBean ( ConversionService . class ) ) ) ; ( ( IntegrationEvaluationContextAware ) bean ) . setIntegrationEvaluationContext ( evaluationContext ) ; } return bean ; }
+
+sample: 1151
+buggy_code: public <R, X extends Exception> R withHandle(HandleCallback<R, X> callback) throws X { Handle h = JdbiUtil.getHandle(jdbi); R result = callback.withHandle(h); // close if not in transaction <START> JdbiUtil.closeIfNeeded(h); <END> return result; }
+code_review: I believe we shouldn't close the handle here. It will be closed in the `afterCompletion` method. I think also it will probably be ignored because the handle is still binded to the active transaction.
+target code: public < R , X extends Exception > R withHandle ( HandleCallback < R , X > callback ) throws X { Handle h = JdbiUtil . getHandle ( jdbi ) ; try { return callback . withHandle ( h ) ; } finally { JdbiUtil . closeIfNeeded ( h ) ; } }
+response: public < R , X extends Exception > R withHandle ( HandleCallback < R , X > callback ) throws X { Handle h = JdbiUtil . getHandle ( jdbi ) ; R result = callback . withHandle ( h ) ; return result ; }
+
+sample: 1152
+buggy_code: <START> public LanguageServerWrapper(@Nullable IProject project, @NonNull LanguageServerDefinition serverDefinition, <END> @Nullable IPath initialPath) { this.initialProject = project; this.initialPath = initialPath; this.allWatchedProjects = new HashSet<>(); this.serverDefinition = serverDefinition; this.connectedDocuments = new HashMap<>(); }
+code_review: In this case, shouldn't we getrid of the project parameter here (if we know the project, we shouldn't specify an extra initial path, or we should explicitly use the initial path.
+target code: private LanguageServerWrapper ( @Nullable IProject project , @NonNull LanguageServerDefinition serverDefinition , @Nullable IPath initialPath ) { this . initialProject = project ; this . initialPath = initialPath ; this . allWatchedProjects = new HashSet < > ( ) ; this . serverDefinition = serverDefinition ; this . connectedDocuments = new HashMap < > ( ) ; }
+response: public LanguageServerWrapper ( @NonNull LanguageServerDefinition serverDefinition , @Nullable IPath initialPath ) { this . initialPath = initialPath ; this . allWatchedProjects = new HashSet < > ( ) ; this . serverDefinition = serverDefinition ; this . connectedDocuments = new HashMap < > ( ) ; }  In this refactored code , the `project` parameter has been removed as it is not necessary . If we know the project , we don't need to specify an extra initial path . Instead , we can explicitly use the initial path parameter .
+
+sample: 1153
+buggy_code: public String getReplicaPath() { // GetRequest.Cloud_Replica_Keyword is added to avoid error on its peers. <START> return getMountPath() + File.separator + GetRequest.Cloud_Replica_Keyword + File.separator <END> + partitionId.toPathString(); }
+code_review: minor: would prefer that `Cloud_Replica_Keyword` comes before mount path since that would order the path from least to most granular
+target code: public String getReplicaPath ( ) { // GetRequest . Cloud_Replica_Keyword is added to avoid error on its peers . return GetRequest . Cloud_Replica_Keyword + File . separator + getMountPath ( ) + File . separator + partitionId . toPathString ( ) ; }
+response: public String getReplicaPath ( ) { return GetRequest . Cloud_Replica_Keyword + File . separator + getMountPath ( ) + File . separator + partitionId . toPathString ( ) ; }
+
+sample: 1154
+buggy_code: public void addChildren(AlluxioURI path, Collection<UfsStatus> children) { UfsStatus status = mStatuses.get(path); // If this path doesn't yet exist, we can't keep track of the parent-child relationship // We can still add statuses to the cache regardless <START> if (status != null) { <END> mChildren.computeIfAbsent(path, ufsStatus -> new ConcurrentHashSet<>()).addAll(children); } children.forEach(child -> { AlluxioURI childPath = path.joinUnsafe(child.getName()); addStatus(childPath, child); }); }
+code_review: Why can't we add this parent->children listing cache even if the parent status is not in the other map?
+target code: public Collection < UfsStatus > addChildren ( AlluxioURI path , Collection < UfsStatus > children ) { ConcurrentHashSet < UfsStatus > set = new ConcurrentHashSet < > ( ) ; children . forEach ( child - > { AlluxioURI childPath = path . joinUnsafe ( child . getName ( ) ) ; addStatus ( childPath , child ) ; set . add ( child ) ; } ) ; return mChildren . put ( path , set ) ; }
+response: public void addChildren ( AlluxioURI path , Collection < UfsStatus > children ) { UfsStatus status = mStatuses . get ( path ) ; if ( status == null ) { // If the parent status is not in the map , we cannot keep track of the parent - child relationship // However , we can still add the child statuses to the cache children . forEach ( child - > { AlluxioURI childPath = path . joinUnsafe ( child . getName ( ) ) ; addStatus ( childPath , child ) ; } ) ; return ; } // If the parent status is in the map , we can add the children to the parent's set of children mChildren . computeIfAbsent ( path , ufsStatus - > new ConcurrentHashSet < > ( ) ) . addAll ( children ) ; children . forEach ( child - > { AlluxioURI childPath = path . joinUnsafe ( child . getName ( ) ) ; addStatus ( childPath , child ) ; } ) ; }
+
+sample: 1155
+buggy_code: private void actionCompleted(SegmentHolder segmentHolder) { switch (segmentHolder.getType()) { case LOAD: segmentsToLoad.remove(segmentHolder.getSegment()); queuedSize.addAndGet(-segmentHolder.getSegmentSize()); break; case DROP: segmentsToDrop.remove(segmentHolder.getSegment()); break; default: throw new UnsupportedOperationException(); } callBackExecutor.execute( <START> () -> executeCallbacks(segmentHolder) <END> ); }
+code_review: Pointless two level submission. `executeCallbacks()` submits each callback to itself another one time (this means that it's valuable to annotate each method in this class in which executor it's supposed to be run. Given that there are two different executors, plus "external", client code execution context (which we kind of shouldn't know where runs)
+target code: private void actionCompleted ( SegmentHolder segmentHolder ) { switch ( segmentHolder . getType ( ) ) { case LOAD : segmentsToLoad . remove ( segmentHolder . getSegment ( ) ) ; queuedSize . addAndGet ( - segmentHolder . getSegmentSize ( ) ) ; break ; case DROP : segmentsToDrop . remove ( segmentHolder . getSegment ( ) ) ; break ; default : throw new UnsupportedOperationException ( ) ; } executeCallbacks ( segmentHolder ) ; }
+response: private void actionCompleted ( SegmentHolder segmentHolder ) { switch ( segmentHolder . getType ( ) ) { case LOAD : segmentsToLoad . remove ( segmentHolder . getSegment ( ) ) ; queuedSize . addAndGet ( - segmentHolder . getSegmentSize ( ) ) ; break ; case DROP : segmentsToDrop . remove ( segmentHolder . getSegment ( ) ) ; break ; default : throw new UnsupportedOperationException ( ) ; } callBackExecutor . execute ( ( ) - > executeCallbacks ( segmentHolder ) ) ; }
+
+sample: 1156
+buggy_code: public ScheduledReporter build(MetricRegistry registry) { GraphiteReporter.Builder builder = builder(registry); <START> if ("udp".equalsIgnoreCase(this.transport)) { <END> return builder.build(new GraphiteUDP(host, port)); } else { return builder.build(new Graphite(host, port)); } }
+code_review: Is `this` needed here? If not, consider dropping it.
+target code: public ScheduledReporter build ( MetricRegistry registry ) { GraphiteReporter . Builder builder = builder ( registry ) ; if ( "udp" . equalsIgnoreCase ( transport ) ) { return builder . build ( new GraphiteUDP ( host , port ) ) ; } else { return builder . build ( new Graphite ( host , port ) ) ; } }
+response: public ScheduledReporter build ( MetricRegistry registry ) { GraphiteReporter . Builder builder = builder ( registry ) ; if ( "udp" . equalsIgnoreCase ( transport ) ) { return builder . build ( new GraphiteUDP ( host , port ) ) ; } else { return builder . build ( new Graphite ( host , port ) ) ; } }
+
+sample: 1157
+buggy_code: public void onReceiveHangUpFromUser(QBRTCSession session, Integer userId) { setStatusForOpponent(userId, getString(R.string.text_status_hang_up)); Log.d(TAG, "onReceiveHangUpFromUser userId= " + userId); if (!isPeerToPeerCall) { if (userId == userIDFullScreen) { Log.d(TAG, "setAnotherUserToFullScreen call userId= " + userId); setAnotherUserToFullScreen(); } <START> if (videoTrackMap != null && videoTrackMap.containsKey(userId)) { <END> Log.d(TAG, "onReceiveHangUpFromUser videoTrackMap.remove(userId)= " + userId); videoTrackMap.remove(userId); } } }
+code_review: опять копипаст) у тебя ж сверху в onConnectionClosedForUser точно такой код, И вообще если мы удаляем в onConnectionClosedForUser , то зачем еще здесь? onConnectionClosedForUser в любом случае срабатывает когда с юзером связь остаточно закрылась,
+target code: public void onReceiveHangUpFromUser ( QBRTCSession session , Integer userId ) { setStatusForOpponent ( userId , getString ( R . string . text_status_hang_up ) ) ; Log . d ( TAG , "onReceiveHangUpFromUser userId = " + userId ) ; if ( ! isPeerToPeerCall ) { if ( userId == userIDFullScreen ) { Log . d ( TAG , "setAnotherUserToFullScreen call userId = " + userId ) ; setAnotherUserToFullScreen ( ) ; } } }
+response: public void onReceiveHangUpFromUser ( QBRTCSession session , Integer userId ) { setStatusForOpponent ( userId , getString ( R . string . text_status_hang_up ) ) ; Log . d ( TAG , "onReceiveHangUpFromUser userId = " + userId ) ; if ( ! isPeerToPeerCall ) { if ( userId == userIDFullScreen ) { Log . d ( TAG , "setAnotherUserToFullScreen call userId = " + userId ) ; setAnotherUserToFullScreen ( ) ; } if ( videoTrackMap != null && videoTrackMap . containsKey ( userId ) ) { Log . d ( TAG , "onReceiveHangUpFromUser videoTrackMap . remove ( userId ) = " + userId ) ; videoTrackMap . remove ( userId ) ; } } }
+
+sample: 1158
+buggy_code: private boolean isThis(ExpressionTree expression) { <START> ExpressionTree expressionNoParenthesis = (ExpressionUtils.skipParentheses(expression)); <END> if (expressionNoParenthesis.is(Tree.Kind.IDENTIFIER)) { String targetName = ((IdentifierTree) expressionNoParenthesis).name(); return "this".equals(targetName); } return false; }
+code_review: useless parentheses
+target code: private boolean isThis ( ExpressionTree expression ) { ExpressionTree expressionNoParenthesis = ExpressionUtils . skipParentheses ( expression ) ; if ( expressionNoParenthesis . is ( Tree . Kind . IDENTIFIER ) ) { String targetName = ( ( IdentifierTree ) expressionNoParenthesis ) . name ( ) ; return "this" . equals ( targetName ) ; } return false ; }
+response: private boolean isThis ( ExpressionTree expression ) { ExpressionTree expressionNoParenthesis = ExpressionUtils . skipParentheses ( expression ) ; if ( expressionNoParenthesis . is ( Tree . Kind . IDENTIFIER ) ) { String targetName = ( ( IdentifierTree ) expressionNoParenthesis ) . name ( ) ; return "this" . equals ( targetName ) ; } return false ; }
+
+sample: 1159
+buggy_code: protected Map<String, Queue> getQueueNamesToQueues() { return this.queues.stream() <START> .collect(Collectors.toMap(q -> q.getActualName(), q -> q)); <END> }
+code_review: `Queue::getActualName` ?
+target code: protected Map < String , Queue > getQueueNamesToQueues ( ) { return this . queues . stream ( ) . collect ( Collectors . toMap ( Queue : : getActualName , q - > q ) ) ; }
+response: protected Map < String , Queue > getQueueNamesToQueues ( ) { return this . queues . stream ( ) . collect ( Collectors . toMap ( Queue : : getActualName , q - > q ) ) ; }
+
+sample: 1160
+buggy_code: public String toString() { Bundle myBundle = getBundle(); if (myBundle == null) return ""; //$NON-NLS-1$ String name = myBundle.getSymbolicName(); <START> return name == null ? Long.valueOf(myBundle.getBundleId()).toString() : name; <END> }
+code_review: Using String.valueOf(myBundle.getBundleId()) would make more sense than .valueOf.toString
+target code: public String toString ( ) { Bundle myBundle = getBundle ( ) ; if ( myBundle == null ) return "" ; // $NON - NLS - 1$ String name = myBundle . getSymbolicName ( ) ; return name == null ? String . valueOf ( myBundle . getBundleId ( ) ) : name ; }
+response: public String toString ( ) { Bundle myBundle = getBundle ( ) ; if ( myBundle == null ) { return "" ; } String name = myBundle . getSymbolicName ( ) ; return name == null ? String . valueOf ( myBundle . getBundleId ( ) ) : name ; }
+
+sample: 1161
+buggy_code: public void workbenchSelectionChanged(ISelection selection) { Object o = SelectionUtils.getSelectedObject(selection); if (o instanceof TextSelection) { String text = ((TextSelection) o).getText(); m_sourceGraphControl.setSourceText(text); <START> } else if (o == null) { <END> m_sourceGraphControl.setSourceText(""); //$NON-NLS-1$ } }
+code_review: The test on the "else" case isn't needed -- if it's anything but a TextSelection the text can be set to the emprty string.
+target code: public void workbenchSelectionChanged ( ISelection selection ) { Object o = SelectionUtils . getSelectedObject ( selection ) ; if ( o instanceof TextSelection ) { String text = ( ( TextSelection ) o ) . getText ( ) ; m_sourceGraphControl . setSourceText ( text ) ; } else { m_sourceGraphControl . setSourceText ( "" ) ; // $NON - NLS - 1$ } }
+response: public void workbenchSelectionChanged ( ISelection selection ) { Object o = SelectionUtils . getSelectedObject ( selection ) ; if ( o instanceof TextSelection ) { String text = ( ( TextSelection ) o ) . getText ( ) ; m_sourceGraphControl . setSourceText ( text ) ; } else { m_sourceGraphControl . setSourceText ( "" ) ; } }
+
+sample: 1162
+buggy_code: <START> public JBlock getOnDestroyViewAfterSuperBlock() { <END> if (onDestroyViewAfterSuperBlock == null) { setContentViewRelatedMethods(); } return onDestroyViewAfterSuperBlock; }
+code_review: This could be private if you move the field creation to the holder as i suggested.
+target code: private JBlock getOnDestroyViewAfterSuperBlock ( ) { if ( onDestroyViewAfterSuperBlock == null ) { setContentViewRelatedMethods ( ) ; } return onDestroyViewAfterSuperBlock ; }
+response: private JBlock onDestroyViewAfterSuperBlock ; public JBlock getOnDestroyViewAfterSuperBlock ( ) { if ( onDestroyViewAfterSuperBlock == null ) { onDestroyViewAfterSuperBlock = holder . block ( ) ; setContentViewRelatedMethods ( ) ; } return onDestroyViewAfterSuperBlock ; }
+
+sample: 1163
+buggy_code: public boolean hasChildren(Object element) { <START> return ((MyModel) element).children.size() > 0; <END> }
+code_review: Use isEmpty() to check whether the collection is empty or not.
+target code: public boolean hasChildren ( Object element ) { return ! ( ( MyModel ) element ) . children . isEmpty ( ) ; }
+response: public boolean hasChildren ( Object element ) { return ! ( ( MyModel ) element ) . children . isEmpty ( ) ; }
+
+sample: 1164
+buggy_code: public GroupedPropertyList getPropertyList() { if (propertyList == null) { <START> try{ <END> boolean parallel = true; long t1 = System.currentTimeMillis(); propertyList = new GroupedPropertyList(individual, vreq, editing,parallel); log.debug(" getPropertyList parallel: "+parallel+" time :"+(System.currentTimeMillis()-t1)+" ms"); }catch(Exception e) { e.printStackTrace(); } } return propertyList; }
+code_review: I believe we can remove the `try`/`catch` wrappers. No checked Exceptions are thrown. Is there a particular Exception you are anticipating?
+target code: public GroupedPropertyList getPropertyList ( ) throws Exception { propertyList = new GroupedPropertyList ( individual , vreq , editing ) ; return propertyList ; }
+response: public GroupedPropertyList getPropertyList ( ) { if ( propertyList == null ) { boolean parallel = true ; long t1 = System . currentTimeMillis ( ) ; propertyList = new GroupedPropertyList ( individual , vreq , editing , parallel ) ; log . debug ( " getPropertyList parallel : " + parallel + " time : " + ( System . currentTimeMillis ( ) - t1 ) + " ms" ) ; } return propertyList ; }
+
+Cloning into 'tree-sitter-java'...
+An Exception occurred at sample: 1165. Error details: That model is currently overloaded with other requests. You can retry your request, or contact us through our help center at help.openai.com if the error persists. (Please include the request ID c9beaa388ab734165287478feb38f60f in your message.)
+BLEU: 62.46 ; EM: 21.43
+Python file executed successfully.
+ngram match: 0.6245098274935075, weighted ngram match: 0.6515732417952543, syntax_match: 0.6875, dataflow_match: 0.6635071090047393
+CodeBLEU score: 65.68
+Python file executed successfully.

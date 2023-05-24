@@ -93,21 +93,21 @@ def heuristic_remove_redundant_words(line):
 
 def modify_file_name(file_name, start_index, end_index):
     file_name_parts = file_name.split(".")
-    file_name = f"{file_name_parts[0]}_{start_index}_{end_index-1}.{file_name_parts[1]}"
+    file_name = f"{file_name_parts[0]}_{start_index}_{end_index - 1}.{file_name_parts[1]}"
     return file_name
 
 
 def write_list_to_file(file_name, list_name, start_index=0, end_index=None):
     if end_index is None:
         end_index = len(list_name)
-    file = open(file_name, "w")
+    file = open(file_name, "w", encoding="UTF-8")
     file.writelines([item + "\n" for item in list_name[start_index:end_index]])
     file.close()
 
 
 def read_env_file(file_path):
     env_variables = {}
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="UTF-8") as file:
         for line in file:
             line = line.strip()
             if line and not line.startswith("#"):
@@ -135,7 +135,7 @@ def modify_R4R_dataset(buggy_code, target):
 
 
 def get_EM(file1, file2):
-    with open(file1, "r") as f1, open(file2, "r") as f2:
+    with open(file1, "r", encoding="UTF-8") as f1, open(file2, "r", encoding="UTF-8") as f2:
         refs = f1.readlines()
         preds = f2.readlines()
 
@@ -150,7 +150,9 @@ def get_EM(file1, file2):
 
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
-    with open(source_file_path) as src_file, open(target_file_path) as tgt_file:
+    with open(source_file_path, "r", encoding="UTF-8") as src_file, open(
+        target_file_path, "r", encoding="UTF-8"
+    ) as tgt_file:
         source_codes = src_file.readlines()
         target_codes = tgt_file.readlines()
 
@@ -235,7 +237,7 @@ def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predic
 def get_predictions_from_openai_and_write_to_file(
     prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
-    system_command = "You are a coding assistant. You generate only the source code."
+    system_prompt = "You are a coding assistant. You generate only the source code."
     user_command = "Refactor the Buggy Code using the Review without comments"
 
     prediction_list = []
@@ -243,19 +245,17 @@ def get_predictions_from_openai_and_write_to_file(
     test_samples = [i for i in range(start_index, end_index)]
 
     log_file_name = (
-        f"logs/LOGS_{prediction_file_path.split('/')[1].replace('.txt', '')}_{start_index}_{end_index-1}.txt"
+        f"logs/LOGS_{prediction_file_path.split('/')[1].replace('.txt', '')}_{start_index}_{end_index - 1}.txt"
     )
     log_file = open(log_file_name, "w", encoding="UTF-8")
 
     for i in test_samples:
-        buggy_code = buggy_codes[i]
-        code_review = code_reviews[i]
-        target_code = target_codes[i]
-
-        system_prompt = system_command
-        user_prompt = f"Buggy Code: {buggy_code}\nReview: {code_review}\n{user_command}"
-
         try:
+            buggy_code = buggy_codes[i]
+            code_review = code_reviews[i]
+            target_code = target_codes[i]
+
+            user_prompt = f"Buggy Code: {buggy_code}\nReview: {code_review}\n{user_command}"
             prediction = prompt_response(system_prompt, user_prompt)
         except Exception as e:
             print(f"An Exception occurred at sample: {i}. Error details: {str(e)}")
@@ -312,3 +312,16 @@ def get_predictions_from_openai_and_write_to_file(
         prediction_file_path,
         ground_truth_path,
     )
+
+
+def transfer_content_to_another_file(keyword, input_file, output_file):
+    input = open(input_file, "r", encoding="UTF-8")
+    input_lines = input.readlines()
+
+    output_lines = []
+    for input_line in input_lines:
+        if keyword in input_line:
+            output_line = input_line.split(keyword)[1].strip()
+            output_lines.append(output_line)
+
+    write_list_to_file(file_name=output_file, list_name=output_lines)
