@@ -90,6 +90,7 @@ def heuristic_adjust_spaces(text):
 def heuristic_remove_redundant_words(line):
     redundant_words = [
         "Here's the",
+        "Code Refactored :",
         "Refactored code :",
         "Updated code :",
         "Fixed code :",
@@ -111,7 +112,16 @@ def heuristic_remove_starts_with_java(line):
 
 
 def heuristic_remove_code_explanation_at_the_end(line):
-    end_words = ["Explanation :", "Note :", "In the refactored code", "The refactored code"]
+    end_words = [
+        "Explanation :",
+        "Note :",
+        "Reasoning :",
+        "In the refactored code",
+        "The refactored code",
+        "Changes made :",
+        "Changes Made :",
+        "Refactored Review :",
+    ]
     for end_word in end_words:
         line = line.split(end_word)[0]
 

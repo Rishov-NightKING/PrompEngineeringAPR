@@ -59,5 +59,5 @@ if __name__ == "__main__":
     #     for line in input_lines:
     #         output_line = apply_heuristics(line)
     #         output_lines.append(output_line)
-
+    #
     #     write_list_to_file("outputs/tufano_predictions_raw_heuristics_applied.txt", output_lines)
