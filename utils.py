@@ -305,19 +305,21 @@ def get_bleu_and_codebleu(prediction_file_path, ground_truth_path):
 def get_predictions_from_openai_and_write_to_file(
     prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
+    if end_index is None:
+        end_index = len(target_codes)
+
     system_prompt = "You are a coding assistant. You generate only the source code."
     user_command = "Refactor the Buggy Code using the Review without comments"
 
     prediction_list = []
-
-    test_samples = [i for i in range(start_index, end_index)]
 
     log_file_name = (
         f"logs/LOGS_{prediction_file_path.split('/')[1].replace('.txt', '')}_{start_index}_{end_index - 1}.txt"
     )
     log_file = open(log_file_name, "w", encoding="UTF-8")
 
-    for i in test_samples:
+    i = start_index
+    while i < end_index:
         try:
             buggy_code = buggy_codes[i]
             code_review = code_reviews[i]
@@ -325,38 +327,37 @@ def get_predictions_from_openai_and_write_to_file(
 
             user_prompt = f"Buggy Code: {buggy_code}\nReview: {code_review}\n{user_command}"
             prediction = prompt_response(system_prompt, user_prompt)
+
+            # apply all heuristics
+            # prediction = apply_heuristics(prediction)
+            prediction = remove_extra_spaces(prediction)
+            prediction_list.append(prediction)
+
+            SAMPLE_NO = f"sample: {i}"
+            BUGGY_CODE = f"buggy_code: {buggy_code}"
+            CODE_REVIEW = f"code_review: {code_review}"
+            TARGET_CODE = f"target code: {target_code}"
+            PREDICTION = f"response: {prediction}"
+
+            print(SAMPLE_NO)
+            print(BUGGY_CODE)
+            print(CODE_REVIEW)
+            print(TARGET_CODE)
+            print(PREDICTION)
+            print()
+
+            log_file.write(SAMPLE_NO + "\n")
+            log_file.write(BUGGY_CODE + "\n")
+            log_file.write(CODE_REVIEW + "\n")
+            log_file.write(TARGET_CODE + "\n")
+            log_file.write(PREDICTION + "\n")
+            log_file.write("\n")
+
+            time.sleep(20)
+            i += 1
         except Exception as e:
             print(f"An Exception occurred at sample: {i}. Error details: {str(e)}")
-            end_index = i
-            break
-
-        # heuristic 1
-        prediction = heuristic_adjust_spaces(prediction)
-        # heuristic 2
-        prediction = heuristic_remove_redundant_words(prediction)
-        prediction_list.append(prediction)
-
-        SAMPLE_NO = f"sample: {i}"
-        BUGGY_CODE = f"buggy_code: {buggy_code}"
-        CODE_REVIEW = f"code_review: {code_review}"
-        TARGET_CODE = f"target code: {target_code}"
-        PREDICTION = f"response: {prediction}"
-
-        print(SAMPLE_NO)
-        print(BUGGY_CODE)
-        print(CODE_REVIEW)
-        print(TARGET_CODE)
-        print(PREDICTION)
-        print()
-
-        log_file.write(SAMPLE_NO + "\n")
-        log_file.write(BUGGY_CODE + "\n")
-        log_file.write(CODE_REVIEW + "\n")
-        log_file.write(TARGET_CODE + "\n")
-        log_file.write(PREDICTION + "\n")
-        log_file.write("\n")
-
-        time.sleep(20)
+            time.sleep(60)
 
     prediction_file_path = modify_file_name(prediction_file_path, start_index, end_index)
     ground_truth_path = modify_file_name(ground_truth_path, start_index, end_index)
