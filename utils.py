@@ -276,13 +276,13 @@ def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predic
 
     try:
         # Run the Python file with arguments
-        if bleu_type == "CodeBLEU":
-            tree_sitter_build_bash_path = "evaluation/CodeBLEU/parser/build.sh"
-            subprocess.run(["bash", tree_sitter_build_bash_path], check=True)
+        # if bleu_type == "CodeBLEU":
+        #     tree_sitter_build_bash_path = "evaluation/CodeBLEU/parser/build.sh"
+        #     subprocess.run(["bash", tree_sitter_build_bash_path], check=True)
         subprocess.run(["python", python_file_path] + arguments, check=True)
-        print("Python file executed successfully.")
+        # print("Python file executed successfully.")
     except subprocess.CalledProcessError as e:
-        print(f"Error while executing Python file: {e}")
+        print(f"Error while executing Python file {python_file_path}: {e}")
 
 
 def get_bleu_and_codebleu(prediction_file_path, ground_truth_path):
