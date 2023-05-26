@@ -180,7 +180,15 @@ def modify_R4R_dataset(buggy_code, target):
 
     before_context = buggy_code[:first_end_point]
     after_context = buggy_code[second_end_point:]
+
+    # handling del targets
+    if target.strip() == '<|del|>':
+        target = ''
+
     output = before_context + target.strip() + after_context
+
+    # handling extra spaces for del targets
+    output = remove_extra_spaces(output)
 
     return output
 
