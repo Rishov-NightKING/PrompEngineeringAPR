@@ -8,6 +8,7 @@ from utils import (
     get_predictions_from_openai_and_write_to_file,
     read_raw_tufano_dataset_from_csv,
     write_list_to_file,
+    read_dataset
 )
 
 if __name__ == "__main__":
@@ -21,29 +22,37 @@ if __name__ == "__main__":
     R4R_TARGET_FILE_PATH = "datasets/R4R/test_CC_tgt.txt"
 
     START_INDEX = 0
-    END_INDEX = None
-    # code_reviews, buggy_codes, target_codes = read_dataset(
-    #     dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
-    # )
-
-    code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
-
-    # get_predictions_from_openai_and_write_to_file(
-    #     f"{OUTPUT_DIRECTORY}/tufano_predictions_raw_no_heuristic.txt",
-    #     f"{OUTPUT_DIRECTORY}/tufano_ground_truths_raw_no_heuristic.txt",
-    #     code_reviews,
-    #     buggy_codes,
-    #     target_codes
-    # )
-
-    print("************** WITHOUT HEURISTICS RESULT *******************")
-    get_bleu_and_codebleu(
-        "outputs/tufano_ground_truths_raw_no_heuristic_0_1718.txt",
-        "outputs/tufano_predictions_raw_no_heuristics_formatted.txt",
+    END_INDEX = 100
+    code_reviews, buggy_codes, target_codes = read_dataset(
+        dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
     )
 
-    print("************** WITH HEURISTICS RESULT *******************")
-    get_bleu_and_codebleu("outputs/tufano_ground_truths_raw.txt", "outputs/tufano_predictions_raw.txt")
+    # code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
+
+    # get_predictions_from_openai_and_write_to_file(
+    #     f"{OUTPUT_DIRECTORY}/r4r_predictions_raw_no_heuristic.txt",
+    #     f"{OUTPUT_DIRECTORY}/r4r_ground_truths_raw_no_heuristic.txt",
+    #     code_reviews,
+    #     buggy_codes,
+    #     target_codes,
+    #     START_INDEX,
+    #     END_INDEX
+    # )
+    
+    print("************** WITHOUT HEURISTICS RESULT *******************")
+    get_bleu_and_codebleu(
+        "outputs/r4r_ground_truths_raw_no_heuristic_0_99.txt",
+        "outputs/r4r_predictions_raw_no_heuristic_0_99.txt",
+    )
+
+    # print("************** WITHOUT HEURISTICS RESULT *******************")
+    # get_bleu_and_codebleu(
+    #     "outputs/tufano_ground_truths_raw_no_heuristic_0_1718.txt",
+    #     "outputs/tufano_predictions_raw_no_heuristics_formatted.txt",
+    # )
+
+    # print("************** WITH HEURISTICS RESULT *******************")
+    # get_bleu_and_codebleu("outputs/tufano_ground_truths_raw.txt", "outputs/tufano_predictions_raw.txt")
 
     # transfer_content_to_another_file(
     #     keyword="response:",
