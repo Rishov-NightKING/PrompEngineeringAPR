@@ -41,8 +41,8 @@ if __name__ == "__main__":
     
     print("************** WITHOUT HEURISTICS RESULT *******************")
     get_bleu_and_codebleu(
-        "outputs/r4r_ground_truths_raw_no_heuristic_0_99.txt",
-        "outputs/r4r_predictions_raw_no_heuristic_0_99.txt",
+        "outputs/r4r_ground_truths_raw_no_heuristic_0_99_formatted.txt",
+        "outputs/r4r_predictions_raw_no_heuristic_0_99_formatted.txt",
     )
 
     # print("************** WITHOUT HEURISTICS RESULT *******************")
@@ -68,11 +68,10 @@ if __name__ == "__main__":
     # combine_output_files("ground_truths", "outputs", "tufano_ground_truths_raw.txt")
     # combine_output_files("predictions", "outputs", "tufano_predictions_raw.txt")
 
-    # with open("outputs/tufano_predictions_raw_no_heuristic_0_1718.txt", "r", encoding="UTF-8") as input_file:
+    # with open("outputs/r4r_predictions_raw_no_heuristic_0_99.txt", "r", encoding="UTF-8") as input_file:
     #     input_lines = input_file.readlines()
     #     output_lines = []
     #     for line in input_lines:
-    #         output_line = heuristic_adjust_spaces(line)
+    #         output_line = apply_heuristics(line)
     #         output_lines.append(output_line)
-    #     write_list_to_file("outputs/tufano_predictions_raw_no_heuristics_formatted.txt", output_lines)
-    #
+    #     write_list_to_file("outputs/r4r_predictions_raw_no_heuristic_0_99_formatted.txt", output_lines)
