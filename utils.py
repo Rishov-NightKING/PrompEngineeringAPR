@@ -12,7 +12,7 @@ def prompt_response(system_prompt, user_prompt):
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": f"{system_prompt}"}, {"role": "user", "content": f"{user_prompt}"}],
         temperature=0,
-        max_tokens=300,
+        max_tokens=500,  # for tufano - 200, R4R - 500
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
@@ -182,8 +182,8 @@ def modify_R4R_dataset(buggy_code, target):
     after_context = buggy_code[second_end_point:]
 
     # handling del targets
-    if target.strip() == '<|del|>':
-        target = ''
+    if target.strip() == "<|del|>":
+        target = ""
 
     output = before_context + target.strip() + after_context
 
@@ -193,24 +193,46 @@ def modify_R4R_dataset(buggy_code, target):
     return output
 
 
-def get_EM(file1, file2):
-    with open(file1, "r", encoding="UTF-8") as f1, open(file2, "r", encoding="UTF-8") as f2:
+def modify_R4R_for_EM(buggy_code, target):
+    start_focus_tag = "<|startfocus|>"
+    end_focus_tag = "<|endfocus|>"
+    first_end_point = buggy_code.index(start_focus_tag) + len(start_focus_tag)
+    second_end_point = buggy_code.index(end_focus_tag)
+    focus_part = buggy_code[first_end_point: second_end_point].strip()
+    target = target.strip()
+    if target.startswith("<|del|>"):
+        target += focus_part
+    return target
+
+def heuristic_count_frequency(target_string, target_substring):
+    return target_string.count(target_substring)
+
+
+def get_EM_R4R(ref_file, pred_file):
+    with open(ref_file, "r", encoding="UTF-8") as f1, open(pred_file, "r", encoding="UTF-8") as f2:
         refs = f1.readlines()
         preds = f2.readlines()
 
     count = 0
     matches = []
+    del_matches = []
     for i, (r, p) in enumerate(zip(refs, preds)):
-        if r == p:
+        if r.startswith("<|del|>"):
+            focus_part = r[7:]
+            if heuristic_count_frequency(p, focus_part) == 0:
+                count += 1
+                del_matches.append(i)
+        elif r == p:
             count += 1
             matches.append(i)
     print(f"EM: {count / len(refs) * 100}%")
     print(f"matched indices: {matches}")
+    print(f"delete matches: {del_matches}")
 
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
     with open(source_file_path, "r", encoding="UTF-8") as src_file, open(
-        target_file_path, "r", encoding="UTF-8"
+            target_file_path, "r", encoding="UTF-8"
     ) as tgt_file:
         source_codes = src_file.readlines()
         target_codes = tgt_file.readlines()
@@ -218,23 +240,27 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
     buggy_codes = []
     code_reviews = []
     modified_target_codes = []
+    targets_modified_for_EM = []
     for code, target_code in zip(source_codes, target_codes):
         start_comment_tag = "<|startcomment|>"
         end_comment_tag = "<|endcomment|>"
         end_point = code.index(end_comment_tag) + len(end_comment_tag)
 
         code_review = code[:end_point].replace(start_comment_tag, "").replace(end_comment_tag, "")
-        buggy_code = code[end_point + 1 :].replace("\n", "")
+        buggy_code = code[end_point + 1:].replace("\n", "")
 
         code_reviews.append(code_review)
         buggy_codes.append(buggy_code)
         if dataset_name == "R4R":
             full_target_code = modify_R4R_dataset(buggy_code, target_code)
+            target_modified_for_EM = modify_R4R_for_EM(buggy_code, target_code)
             modified_target_codes.append(full_target_code)
+            targets_modified_for_EM.append(target_modified_for_EM)
 
     if dataset_name == "tufano":
         return code_reviews, buggy_codes, target_codes
     elif dataset_name == "R4R":
+        write_list_to_file("outputs/r4r_ground_truth_paths_modified_for_EM.txt", targets_modified_for_EM)
         return code_reviews, buggy_codes, modified_target_codes
 
 
