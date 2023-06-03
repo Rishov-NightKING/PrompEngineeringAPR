@@ -11,6 +11,7 @@ from utils import (
     read_dataset,
     get_EM_R4R,
     format_file,
+    transfer_content_to_another_file,
 )
 
 if __name__ == "__main__":
@@ -45,13 +46,13 @@ if __name__ == "__main__":
     #     "outputs/r4r_predictions_raw_no_heuristic_0_99_formatted.txt",
     # )
 
-    # print("************** WITHOUT HEURISTICS RESULT *******************")
+    # print("************** BEFORE WITHOUT HEURISTICS RESULT *******************")
     # get_bleu_and_codebleu(
     #     "outputs/tufano_ground_truths_raw_no_heuristic_0_1718.txt",
     #     "outputs/tufano_predictions_raw_no_heuristics_formatted.txt",
     # )
-
-    # print("************** WITH HEURISTICS RESULT *******************")
+    #
+    # print("************** BEFORE WITH HEURISTICS RESULT *******************")
     # get_bleu_and_codebleu("outputs/tufano_ground_truths_raw.txt", "outputs/tufano_predictions_raw.txt")
 
     # transfer_content_to_another_file(
@@ -68,24 +69,44 @@ if __name__ == "__main__":
     # combine_output_files("ground_truths", "outputs", "tufano_ground_truths_raw.txt")
     # combine_output_files("predictions", "outputs", "tufano_predictions_raw.txt")
 
-    
     # format_file("outputs/r4r_ground_truths_raw_no_heuristic_0_2954.txt", heuristic_adjust_spaces)
     # format_file("outputs/r4r_predictions_raw_no_heuristic_0_2954.txt", apply_heuristics)
 
     # format_file("outputs/r4r_ground_truth_paths_modified_for_EM.txt", heuristic_adjust_spaces)
-    get_EM_R4R("outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt", "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt")
+    get_EM_R4R(
+        "outputs/r4r_ground_truths_raw_no_heuristic_0_2954_formatted.txt",
+        "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
+    )
+    get_EM_R4R(
+        "outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt",
+        "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
+    )
 
-    # with open("outputs/r4r_ground_truths_raw_no_heuristic_0_99_formatted.txt", "r", encoding="UTF-8") as tgt, open(
-    #     "outputs/r4r_predictions_raw_no_heuristic_0_99_formatted.txt", "r", encoding="UTF-8"
-    # ) as pred:
-    #     target = tgt.readlines()
-    #     prediction = pred.readlines()
-    
-    #     count = 0
-    #     idx = []
-    #     for i, (t, p) in enumerate(zip(target, prediction)):
-    #         if t.strip() in p.strip():
-    #             count += 1
-    #             idx.append(i)
-    
-    #     print(f"Exact Match Count: {count}, indices: {idx}")
+    # transfer_content_to_another_file(
+    #     keyword="response:",
+    #     input_file="logs/uninterrupted_LOGS_tufano_predictions_raw_no_heuristic_0_1718.txt",
+    #     output_file="outputs/tufano_predictions_raw_from_log.txt",
+    # )
+    # transfer_content_to_another_file(
+    #     keyword="target code:",
+    #     input_file="logs/uninterrupted_LOGS_tufano_predictions_raw_no_heuristic_0_1718.txt",
+    #     output_file="outputs/tufano_ground_truths_raw_from_log.txt",
+    # )
+
+    # format_file("outputs/tufano_predictions_raw_from_log.txt", apply_heuristics)
+
+    # get_EM_R4R(
+    #     "outputs/tufano_ground_truths_raw_from_log.txt",
+    #     "outputs/tufano_predictions_raw_from_log_no_heuristics.txt",
+    # )
+    #
+    # print("************** AFTER WITHOUT HEURISTICS RESULT *******************")
+    # get_bleu_and_codebleu(
+    #     "outputs/tufano_ground_truths_raw_from_log.txt",
+    #     "outputs/tufano_predictions_raw_from_log_no_heuristics.txt",
+    # )
+    #
+    # print("************** AFTER WITH HEURISTICS RESULT *******************")
+    # get_bleu_and_codebleu(
+    #     "outputs/tufano_ground_truths_raw_from_log.txt", "outputs/tufano_predictions_raw_from_log_formatted.txt"
+    # )

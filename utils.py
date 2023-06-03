@@ -206,6 +206,7 @@ def modify_R4R_for_EM(buggy_code, target):
         target += focus_part
     return target
 
+
 def heuristic_count_frequency(target_substring, target_string):
     return target_string.count(target_substring)
 
@@ -219,26 +220,41 @@ def get_EM_R4R(ref_file, pred_file):
     matches = []
     del_matches = []
     possible_duplicates = []
-
+    matches_r_equal_p = []
     del_token = "< |del| >"
+    focus_null = 0
     for i, (r, p) in enumerate(zip(refs, preds)):
         r, p = r.strip(), p.strip()
         if r.startswith(del_token):
             focus_part = r[len(del_token):]
-            if heuristic_count_frequency(focus_part, p) == 0:
+            if focus_part == "":
+                count += 1
+                focus_null += 1
+            elif heuristic_count_frequency(focus_part, p) == 0:
                 count += 1
                 del_matches.append(i)
-        elif r in p:
+        if r in p:
             if heuristic_count_frequency(r, p) > 1:
                 possible_duplicates.append(i)
-
             count += 1
             matches.append(i)
+        if r == p:
+            matches_r_equal_p.append(i)
+
+    set1 = set(matches)
+    set2 = set(matches_r_equal_p)
+    intersected_set = set1.intersection(set2)
+
+    r_in_p = list(set1 - intersected_set)
+    r_equal_p = list(set2 - intersected_set)
+    print(f"r in p: {sorted(r_in_p)} len: {len(r_in_p)}")
+    print(f"r == p: {r_equal_p}")
+
     print(f"EM: {count / len(refs) * 100:.2f}%")
     print(f"matched indices: {matches}, len: {len(matches)}")
     print(f"delete matches: {del_matches}, len: {len(del_matches)}")
     print(f"possible_duplicates matches: {possible_duplicates}, len: {len(possible_duplicates)}")
-    
+    print(f"focus null: {focus_null}")
 
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
@@ -348,7 +364,7 @@ def get_bleu_and_codebleu(prediction_file_path, ground_truth_path):
 
 
 def get_predictions_from_openai_and_write_to_file(
-    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     if end_index is None:
         end_index = len(target_codes)
@@ -459,10 +475,10 @@ def format_file(filename, function_name):
     with open(filename, "r", encoding="UTF-8") as file:
         input = file.readlines()
         output_lines = []
-        
+
         for line in input:
-            output_line = function_name(line) 
+            output_line = function_name(line)
             output_lines.append(output_line)
-            
+
         output_file_name = f"{filename.split('.')[0]}_formatted.txt"
         write_list_to_file(f"{output_file_name}", output_lines)
