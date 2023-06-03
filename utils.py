@@ -92,6 +92,8 @@ def heuristic_remove_redundant_words(line):
         "Here's the",
         "Code Refactored :",
         "Refactored code :",
+        "// Refactored code without comments",
+        "// Refactored code",
         "Updated code :",
         "Fixed code :",
         "Corrected code :",
@@ -204,7 +206,7 @@ def modify_R4R_for_EM(buggy_code, target):
         target += focus_part
     return target
 
-def heuristic_count_frequency(target_string, target_substring):
+def heuristic_count_frequency(target_substring, target_string):
     return target_string.count(target_substring)
 
 
@@ -216,18 +218,27 @@ def get_EM_R4R(ref_file, pred_file):
     count = 0
     matches = []
     del_matches = []
+    possible_duplicates = []
+
+    del_token = "< |del| >"
     for i, (r, p) in enumerate(zip(refs, preds)):
-        if r.startswith("<|del|>"):
-            focus_part = r[7:]
-            if heuristic_count_frequency(p, focus_part) == 0:
+        r, p = r.strip(), p.strip()
+        if r.startswith(del_token):
+            focus_part = r[len(del_token):]
+            if heuristic_count_frequency(focus_part, p) == 0:
                 count += 1
                 del_matches.append(i)
-        elif r == p:
+        elif r in p:
+            if heuristic_count_frequency(r, p) > 1:
+                possible_duplicates.append(i)
+
             count += 1
             matches.append(i)
-    print(f"EM: {count / len(refs) * 100}%")
-    print(f"matched indices: {matches}")
-    print(f"delete matches: {del_matches}")
+    print(f"EM: {count / len(refs) * 100:.2f}%")
+    print(f"matched indices: {matches}, len: {len(matches)}")
+    print(f"delete matches: {del_matches}, len: {len(del_matches)}")
+    print(f"possible_duplicates matches: {possible_duplicates}, len: {len(possible_duplicates)}")
+    
 
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
@@ -442,3 +453,16 @@ def combine_output_files(keyword, directory_path, combined_file_name):
         combined_file.writelines(input_lines)
 
     combined_file.close()
+
+
+def format_file(filename, function_name):
+    with open(filename, "r", encoding="UTF-8") as file:
+        input = file.readlines()
+        output_lines = []
+        
+        for line in input:
+            output_line = function_name(line) 
+            output_lines.append(output_line)
+            
+        output_file_name = f"{filename.split('.')[0]}_formatted.txt"
+        write_list_to_file(f"{output_file_name}", output_lines)

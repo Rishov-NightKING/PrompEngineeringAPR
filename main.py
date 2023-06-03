@@ -9,6 +9,8 @@ from utils import (
     read_raw_tufano_dataset_from_csv,
     write_list_to_file,
     read_dataset,
+    get_EM_R4R,
+    format_file,
 )
 
 if __name__ == "__main__":
@@ -23,19 +25,19 @@ if __name__ == "__main__":
 
     START_INDEX = 0
     END_INDEX = 100
-    code_reviews, buggy_codes, target_codes = read_dataset(
-        dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
-    )
+    # code_reviews, buggy_codes, target_codes = read_dataset(
+    #     dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
+    # )
 
     # code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
 
-    get_predictions_from_openai_and_write_to_file(
-        f"{OUTPUT_DIRECTORY}/r4r_predictions_raw_no_heuristic.txt",
-        f"{OUTPUT_DIRECTORY}/r4r_ground_truths_raw_no_heuristic.txt",
-        code_reviews,
-        buggy_codes,
-        target_codes
-    )
+    # get_predictions_from_openai_and_write_to_file(
+    #     f"{OUTPUT_DIRECTORY}/r4r_predictions_raw_no_heuristic.txt",
+    #     f"{OUTPUT_DIRECTORY}/r4r_ground_truths_raw_no_heuristic.txt",
+    #     code_reviews,
+    #     buggy_codes,
+    #     target_codes
+    # )
 
     # print("************** WITHOUT HEURISTICS RESULT *******************")
     # get_bleu_and_codebleu(
@@ -66,28 +68,24 @@ if __name__ == "__main__":
     # combine_output_files("ground_truths", "outputs", "tufano_ground_truths_raw.txt")
     # combine_output_files("predictions", "outputs", "tufano_predictions_raw.txt")
 
-    # with open("datasets/R4R/test_CC_tgt.txt", "r", encoding="UTF-8") as input_file:
-    #     input_lines = input_file.readlines()
-    #     output_lines = []
-    #     for line in input_lines:
-    #         output_line = heuristic_adjust_spaces(line)
-    #         output_lines.append(output_line)
-    #     write_list_to_file("outputs/r4r_ground_truths_raw_0_99_just_modified_code.txt", output_lines)
+    
+    # format_file("outputs/r4r_ground_truths_raw_no_heuristic_0_2954.txt", heuristic_adjust_spaces)
+    # format_file("outputs/r4r_predictions_raw_no_heuristic_0_2954.txt", apply_heuristics)
+
+    # format_file("outputs/r4r_ground_truth_paths_modified_for_EM.txt", heuristic_adjust_spaces)
+    get_EM_R4R("outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt", "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt")
 
     # with open("outputs/r4r_ground_truths_raw_no_heuristic_0_99_formatted.txt", "r", encoding="UTF-8") as tgt, open(
     #     "outputs/r4r_predictions_raw_no_heuristic_0_99_formatted.txt", "r", encoding="UTF-8"
     # ) as pred:
     #     target = tgt.readlines()
     #     prediction = pred.readlines()
-    #
+    
     #     count = 0
     #     idx = []
     #     for i, (t, p) in enumerate(zip(target, prediction)):
     #         if t.strip() in p.strip():
     #             count += 1
     #             idx.append(i)
-    #
+    
     #     print(f"Exact Match Count: {count}, indices: {idx}")
-
-    # s = "public void describeTo(Description description) { description.appendText(toString('yu"
-    # print(fix_incomplete_brackets(s))
