@@ -12,6 +12,7 @@ from utils import (
     get_EM_R4R,
     format_file,
     transfer_content_to_another_file,
+    get_predictions_from_edit_api_and_write_to_file
 )
 
 if __name__ == "__main__":
@@ -25,12 +26,22 @@ if __name__ == "__main__":
     R4R_TARGET_FILE_PATH = "datasets/R4R/test_CC_tgt.txt"
 
     START_INDEX = 0
-    END_INDEX = 100
-    # code_reviews, buggy_codes, target_codes = read_dataset(
-    #     dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
-    # )
+    END_INDEX = None
+    code_reviews, buggy_codes, target_codes = read_dataset(
+        dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
+    )
 
-    # code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
+    #code_reviews, buggy_codes, target_codes = read_raw_tufano_dataset_from_csv(TUFANO_RAW_DATASET_FILE_PATH)
+
+    get_predictions_from_edit_api_and_write_to_file(
+        f"{OUTPUT_DIRECTORY}/edit_r4r_predictions_raw_no_heuristic.txt",
+        f"{OUTPUT_DIRECTORY}/edit_r4r_ground_truths_raw_no_heuristic.txt",
+        code_reviews,
+        buggy_codes,
+        target_codes,
+        start_index=START_INDEX,
+        end_index=END_INDEX
+    )
 
     # get_predictions_from_openai_and_write_to_file(
     #     f"{OUTPUT_DIRECTORY}/r4r_predictions_raw_no_heuristic.txt",
@@ -42,8 +53,8 @@ if __name__ == "__main__":
 
     # print("************** WITHOUT HEURISTICS RESULT *******************")
     # get_bleu_and_codebleu(
-    #     "outputs/r4r_ground_truths_raw_no_heuristic_0_99_formatted.txt",
-    #     "outputs/r4r_predictions_raw_no_heuristic_0_99_formatted.txt",
+    #     "outputs/r4r_ground_truths_raw_no_heuristic_0_2954_formatted.txt",
+    #     "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
     # )
 
     # print("************** BEFORE WITHOUT HEURISTICS RESULT *******************")
@@ -73,14 +84,14 @@ if __name__ == "__main__":
     # format_file("outputs/r4r_predictions_raw_no_heuristic_0_2954.txt", apply_heuristics)
 
     # format_file("outputs/r4r_ground_truth_paths_modified_for_EM.txt", heuristic_adjust_spaces)
-    get_EM_R4R(
-        "outputs/r4r_ground_truths_raw_no_heuristic_0_2954_formatted.txt",
-        "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
-    )
-    get_EM_R4R(
-        "outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt",
-        "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
-    )
+    # get_EM_R4R(
+    #     "outputs/r4r_ground_truths_raw_no_heuristic_0_2954_formatted.txt",
+    #     "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
+    # )
+    # get_EM_R4R(
+    #     "outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt",
+    #     "outputs/r4r_predictions_raw_no_heuristic_0_2954_formatted.txt",
+    # )
 
     # transfer_content_to_another_file(
     #     keyword="response:",
@@ -99,13 +110,13 @@ if __name__ == "__main__":
     #     "outputs/tufano_ground_truths_raw_from_log.txt",
     #     "outputs/tufano_predictions_raw_from_log_no_heuristics.txt",
     # )
-    #
+    # #
     # print("************** AFTER WITHOUT HEURISTICS RESULT *******************")
     # get_bleu_and_codebleu(
     #     "outputs/tufano_ground_truths_raw_from_log.txt",
     #     "outputs/tufano_predictions_raw_from_log_no_heuristics.txt",
     # )
-    #
+    # #
     # print("************** AFTER WITH HEURISTICS RESULT *******************")
     # get_bleu_and_codebleu(
     #     "outputs/tufano_ground_truths_raw_from_log.txt", "outputs/tufano_predictions_raw_from_log_formatted.txt"

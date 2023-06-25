@@ -1,0 +1,360 @@
+sample: 1659
+buggy_code: <START> public AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) { <END> }
+code_review: seems like these constructors should set `protected` properties on the base class. They're called via `super` below.
+target code: protected AbstractBlockFamily ( BlockFamilyDefinition definition , BlockShape shape , BlockBuilderHelper blockBuilder ) { }
+response: <START> protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) { <END> }
+
+sample: 1660
+buggy_code: public void onStop() { super.onStop(); mGoogleApiClient.stopAutoManage(getActivity()); <START> if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) { <END> mGoogleApiClient.disconnect(); } }
+code_review: Maybe we can move the null check on `mGoogleApiClient` a level above so to protect also the access to `stopAutoManage`. wdyt?
+target code: public void onStop ( ) { super . onStop ( ) ; if ( mGoogleApiClient != null ) { mGoogleApiClient . stopAutoManage ( getActivity ( ) ) ; if ( mGoogleApiClient . isConnected ( ) ) { mGoogleApiClient . disconnect ( ) ; } } }
+response: public void onStop() { super.onStop(); <START> if (mGoogleApiClient != null) { <END> mGoogleApiClient.stopAutoManage(getActivity()); if (mGoogleApiClient.isConnected()) { mGoogleApiClient.disconnect(); } } }
+
+sample: 1661
+buggy_code: protected Guid getQuotaId() { <START> if (getNewDisk() != null && (isInternalManagedDisk())) { <END> return ((DiskImage) getNewDisk()).getQuotaId(); } return null; }
+code_review: please remove redundant brackets (isInter...)
+target code: protected Guid getQuotaId ( ) { if ( getNewDisk ( ) != null && isInternalManagedDisk ( ) ) { return ( ( DiskImage ) getNewDisk ( ) ) . getQuotaId ( ) ; } return null ; }
+response: protected Guid getQuotaId() { <START> if (getNewDisk() != null && isInternalManagedDisk()) { <END> return ((DiskImage) getNewDisk()).getQuotaId(); } return null; }
+
+sample: 1662
+buggy_code: public JClogin() { <START> logger.trace("JClogin(constructor) called."); <END> logger.trace("JClogin(this={}) called.",this); }
+code_review: One of these two trace lines should be removed.
+target code: public JClogin ( ) { logger . trace ( "JClogin ( constructor ) called . " ) ; }
+response: public JClogin() { <START> logger.trace("JClogin(this={}) called.",this); <END> logger.trace("JClogin(constructor) called."); }
+
+sample: 1663
+buggy_code: public ScriptingJobs(ScriptingAdaptor adaptor, XenonEngine xenonEngine, SchedulerConnectionFactory connectionFactory) { this.adaptor = adaptor; this.xenonEngine = xenonEngine; this.adaptorName = adaptor.getName(); this.connectionFactory = connectionFactory; <START> connections = Utils.emptyMap(1); <END> }
+code_review: I think using this util obfuscates the code
+target code: public ScriptingJobs ( ScriptingAdaptor adaptor , XenonEngine xenonEngine , SchedulerConnectionFactory connectionFactory ) { this . adaptor = adaptor ; this . xenonEngine = xenonEngine ; this . adaptorName = adaptor . getName ( ) ; this . connectionFactory = connectionFactory ; connections = new HashMap < > ( ) ; }
+response: public ScriptingJobs(ScriptingAdaptor adaptor, XenonEngine xenonEngine, SchedulerConnectionFactory connectionFactory) { this.adaptor = adaptor; this.xenonEngine = xenonEngine; this.adaptorName = adaptor.getName(); this.connectionFactory = connectionFactory; <START> connections = new HashMap<>(); <END> }
+
+sample: 1664
+buggy_code: public TMSKeyBuilder(final String prefix, TileLayerDispatcher layers) { <START> this.prefix = Strings.isNullOrEmpty(prefix) ? "" : prefix + "/"; <END> this.layers = layers; }
+code_review: I really dislike how this confuses things. Most of the `/`s are in the templates, but then this one special slash is being added here. This is a really good opportunity for future mistakes. Maybe this is a case for changing from using `String.format()` with templates that all do essentially the same thing for varying numbers of parameters to say just using `String.join()`.
+target code: public TMSKeyBuilder ( final String prefix , TileLayerDispatcher layers ) { this . prefix = prefix ; this . layers = layers ; }
+response: public TMSKeyBuilder(final String prefix, TileLayerDispatcher layers) { <START> this.prefix = Strings.isNullOrEmpty(prefix) ? "" : prefix; <END> this.layers = layers; }
+
+sample: 1665
+buggy_code: public void testLeftJoinMissingStats() { PlanNodeStatsEstimate leftStats = planNodeStats( 0, <START> new SymbolStatistics(LEFT_JOIN_COLUMN, SymbolStatsEstimate.unknown()), <END> new SymbolStatistics(LEFT_OTHER_COLUMN, SymbolStatsEstimate.unknown())); PlanNodeStatsEstimate rightStats = planNodeStats( 0, new SymbolStatistics(RIGHT_JOIN_COLUMN, SymbolStatsEstimate.unknown()), new SymbolStatistics(RIGHT_OTHER_COLUMN, SymbolStatsEstimate.unknown())); assertJoinStats(LEFT, leftStats, rightStats, leftStats); }
+code_review: nit: I somehow liked the old, more concise `UNKNOWN_STATS`
+target code: public void testLeftJoinMissingStats ( ) { PlanNodeStatsEstimate leftStats = planNodeStats ( 0 , new SymbolStatistics ( LEFT_JOIN_COLUMN , SymbolStatsEstimate . unknown ( ) ) , new SymbolStatistics ( LEFT_OTHER_COLUMN , SymbolStatsEstimate . unknown ( ) ) ) ; PlanNodeStatsEstimate rightStats = planNodeStats ( 0 , new SymbolStatistics ( RIGHT_JOIN_COLUMN , SymbolStatsEstimate . unknown ( ) ) , new SymbolStatistics ( RIGHT_OTHER_COLUMN , SymbolStatsEstimate . unknown ( ) ) ) ; assertJoinStats ( LEFT , leftStats , rightStats , PlanNodeStatsEstimate . unknown ( ) ) ; }
+response: public void testLeftJoinMissingStats() { PlanNodeStatsEstimate leftStats = planNodeStats( 0, <START> new SymbolStatistics(LEFT_JOIN_COLUMN, UNKNOWN_STATS), <END> new SymbolStatistics(LEFT_OTHER_COLUMN, UNKNOWN_STATS)); PlanNodeStatsEstimate rightStats = planNodeStats( 0, new SymbolStatistics(RIGHT_JOIN_COLUMN, UNKNOWN_STATS), new SymbolStatistics(RIGHT_OTHER_COLUMN, UNKNOWN_STATS)); assertJoinStats(LEFT, leftStats, rightStats, leftStats); }
+
+sample: 1666
+buggy_code: public Collection<ClassDefinition> generate(ExtensionContext input) throws UnableToCompleteException { PrintWriter printWriter = tryCreate(); if (printWriter != null) { mergeTemplate(printWriter); commit(printWriter); registerGinBinding(); } else { getLogger().debug("Jackson Mapper Provider already generated. Returning."); } <START> return Lists.newArrayList(getClassDefinition()); <END> }
+code_review: Didn't you remove guava from GWTP?
+target code: public Collection < ClassDefinition > generate ( ExtensionContext input ) throws UnableToCompleteException { PrintWriter printWriter = tryCreate ( ) ; if ( printWriter != null ) { mergeTemplate ( printWriter ) ; commit ( printWriter ) ; registerGinBinding ( ) ; } else { getLogger ( ) . debug ( "Jackson Mapper Provider already generated . Returning . " ) ; } return Arrays . asList ( getClassDefinition ( ) ) ; }
+response: public Collection<ClassDefinition> generate(ExtensionContext input) throws UnableToCompleteException { PrintWriter printWriter = tryCreate(); if (printWriter != null) { mergeTemplate(printWriter); commit(printWriter); registerGinBinding(); } else { getLogger().debug("Jackson Mapper Provider already generated. Returning."); } <START> return Collections.singletonList(getClassDefinition()); <END> }
+
+sample: 1667
+buggy_code: @Test public void shouldHandleSchemeInsensitiveCase() { String[] schemes = { "http", "https", "HTTP", "HTTPS", "HTtP", }; for (String scheme : schemes) { final Uri uri = URI_1.buildUpon().scheme(scheme).build(); final Boolean shouldHandle = networkHandler.canHandleRequest( <START> TestUtils.mockRequest(uri) <END> ); assertThat(shouldHandle).isTrue(); } }
+code_review: 👍 ah. a good reason to make `picasso3` the package name, so long as it has common names like `Request` in the API.
+target code: @Test public void shouldHandleSchemeInsensitiveCase ( ) { String [ ] schemes = { "http" , "https" , "HTTP" , "HTTPS" , "HTtP" , } ; for ( String scheme : schemes ) { Uri uri = URI_1 . buildUpon ( ) . scheme ( scheme ) . build ( ) ; assertThat ( networkHandler . canHandleRequest ( TestUtils . mockRequest ( uri ) ) ) . isTrue ( ) ; } }
+response: @Test public void shouldHandleSchemeInsensitiveCase() { String[] schemes = { "http", "https", "HTTP", "HTTPS", "HTtP", }; for (String scheme : schemes) { final Uri uri = URI_1.buildUpon().scheme(scheme).build(); final Boolean shouldHandle = networkHandler.canHandleRequest( <START> TestUtils.mockRequest(uri) <END> ); assertThat(shouldHandle).isTrue(); } }
+
+sample: 1668
+buggy_code: public void populate(CoreSession session) throws ClientException { UserManager um = Framework.getLocalService(UserManager.class); Framework.doPrivileged(() -> { // Create some users if (um != null) { createUsersAndGroups(um); } <START> }); <END> }
+code_review: if (um != null) { Framework.doPrivileged(() -> createUsersAndGroups(um)); }
+target code: public void populate ( CoreSession session ) throws ClientException { UserManager um = Framework . getLocalService ( UserManager . class ) ; // Create some users if ( um != null ) { Framework . doPrivileged ( ( ) - > createUsersAndGroups ( um ) ) ; } }
+response: public void populate(CoreSession session) throws ClientException { UserManager um = Framework.getLocalService(UserManager.class); // Create some users if (um != null) { Framework.doPrivileged(() -> createUsersAndGroups(um)); } <START> } <END>
+
+sample: 1669
+buggy_code: public void stop(BundleContext context) throws Exception { try { Job.getJobManager().join(LUCENE_JOB_FAMILY, null); <START> plugin = null; <END> } finally { super.stop(context); } }
+code_review: Might be also in finally?
+target code: public void stop ( BundleContext context ) throws Exception { try { Job . getJobManager ( ) . join ( LUCENE_JOB_FAMILY , null ) ; } finally { plugin = null ; super . stop ( context ) ; } }
+response: public void stop(BundleContext context) throws Exception { try { Job.getJobManager().join(LUCENE_JOB_FAMILY, null); <START> plugin = null; <END> } finally { super.stop(context); } }
+
+sample: 1670
+buggy_code: public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) { ObjectUtil.checkNotNull(unit, "unit"); if (delay < 0) { delay = 0; } validateScheduled0(delay, unit); return schedule(new ScheduledFutureTask<Void>( this, <START> ObjectUtil.checkNotNull(command, "command"), <END> deadlineNanos(unit.toNanos(delay)))); }
+code_review: move null check back as first action to not change behaviour.
+target code: public ScheduledFuture < ? > schedule ( Runnable command , long delay , TimeUnit unit ) { ObjectUtil . checkNotNull ( command , "command" ) ; ObjectUtil . checkNotNull ( unit , "unit" ) ; if ( delay < 0 ) { delay = 0 ; } validateScheduled0 ( delay , unit ) ; return schedule ( new ScheduledFutureTask < Void > ( this , command , deadlineNanos ( unit . toNanos ( delay ) ) ) ) ; }
+response: public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) { ObjectUtil.checkNotNull(unit, "unit"); if (delay < 0) { delay = 0; } validateScheduled0(delay, unit); return schedule(new ScheduledFutureTask<Void>( this, <START> deadlineNanos(unit.toNanos(delay)), <END> ObjectUtil.checkNotNull(command, "command"))); }
+
+sample: 1671
+buggy_code: public Integer invoke() { Integer result = 0; try (InputStream in = cache.getViaStream(key)) { int read = 0; while ((read = in.read(buffer)) != -1) result = result + read; return value = result; } catch (IOException e) { throw new RuntimeException(e); <START> } catch (NullPointerException e) { <END> return null; } }
+code_review: I think that `if (in == null) return null` is a slightly better way to deal with this...
+target code: public Integer invoke ( ) { Integer result = 0 ; try ( InputStream in = cache . getViaStream ( key ) ) { if ( in == null ) return null ; int read = 0 ; while ( ( read = in . read ( buffer ) ) != - 1 ) result = result + read ; return value = result ; } catch ( IOException e ) { throw new RuntimeException ( e ) ; } }
+response: public Integer invoke() { Integer result = 0; try (InputStream in = cache.getViaStream(key)) { if (in == null) return null; int read = 0; while ((read = in.read(buffer)) != -1) result = result + read; return value = result; } catch (IOException e) { throw new RuntimeException(e); <START> } catch (NullPointerException e) { <END> return null; } }
+
+sample: 1672
+buggy_code: public CoreEvent process(CoreEvent event) throws MuleException { try { return processToApply(event, this); } catch (Exception error) { Throwable cause = error.getCause(); <START> if (cause instanceof RetryContextInitializationException && <END> cause.getCause() instanceof ExpressionRuntimeException) { // Runtime exception caused by Retry Ctx initialization, propagating throw ((ExpressionRuntimeException) cause.getCause()); } else { // Not caused by context initialization. Throwing as raised. throw error; } } }
+code_review: check for `cause != null`
+target code: public CoreEvent process ( CoreEvent event ) throws MuleException { try { return processToApply ( event , this ) ; } catch ( Exception error ) { Throwable cause = error . getCause ( ) ; if ( cause != null && cause instanceof RetryContextInitializationException && cause . getCause ( ) instanceof ExpressionRuntimeException ) { // Runtime exception caused by Retry Ctx initialization , propagating throw ( ( ExpressionRuntimeException ) cause . getCause ( ) ) ; } else { // Not caused by context initialization . Throwing as raised . throw error ; } } }
+response: public CoreEvent process(CoreEvent event) throws MuleException { try { return processToApply(event, this); } catch (Exception error) { Throwable cause = error.getCause(); <START> if (cause != null && <END> cause.getCause() instanceof ExpressionRuntimeException) { // Runtime exception caused by Retry Ctx initialization, propagating throw ((ExpressionRuntimeException) cause.getCause()); } else { // Not caused by context initialization. Throwing as raised. throw error; } } }
+
+sample: 1673
+buggy_code: private static void addChildren(Map<String, List<PatchLineComment>> parentMap, List<PatchLineComment> children, List<PatchLineComment> outResult) { if (children != null) { for (PatchLineComment c : children) { outResult.add(c); <START> addChildren(parentMap, parentMap.get(c.getKey()), outResult); <END> } } }
+code_review: Missing a .get() here after .getKey() as the UUID is the key in the map, not the PatchLineComment.Key object instance.
+target code: private static void addChildren ( Map < String , List < PatchLineComment > > parentMap , List < PatchLineComment > children , List < PatchLineComment > outResult ) { if ( children != null ) { for ( PatchLineComment c : children ) { outResult . add ( c ) ; addChildren ( parentMap , parentMap . get ( c . getKey ( ) . get ( ) ) , outResult ) ; } } }
+response: private static void addChildren(Map<String, List<PatchLineComment>> parentMap, List<PatchLineComment> children, List<PatchLineComment> outResult) { if (children != null) { for (PatchLineComment c : children) { outResult.add(c); <START> addChildren(parentMap, parentMap.get(c.getKey().get()), outResult); <END> } } }
+
+sample: 1674
+buggy_code: public void dispose() { <START> LogManager.logInfo("Disposing", this); //$NON-NLS-1$ <END> fWindow= null; }
+code_review: What is this logging buying us ? Do we really need so much of it?
+target code: public void dispose ( ) { fWindow = null ; }
+response: public void dispose() { <START> LogManager.logInfo("Disposing", this); //$NON-NLS-1$ <END> fWindow= null; }
+
+sample: 1675
+buggy_code: public boolean equals(byte[] obj, Object otherObj) { if (obj == otherObj) return true; <START> if (obj == null || byte[].class != obj.getClass()) return false; <END> if (otherObj == null || byte[].class != otherObj.getClass()) return false; byte[] byteArray = obj; byte[] otherByteArray = (byte[]) otherObj; return Arrays.equals(byteArray, otherByteArray); }
+code_review: the second part of the OR is redundant: byte[].class != obj.getClass()
+target code: public boolean equals ( byte [ ] obj , Object otherObj ) { if ( obj == otherObj ) return true ; if ( obj == null ) return false ; if ( otherObj == null || byte [ ] . class != otherObj . getClass ( ) ) return false ; byte [ ] otherByteArray = ( byte [ ] ) otherObj ; return Arrays . equals ( obj , otherByteArray ) ; }
+response: public boolean equals(byte[] obj, Object otherObj) { if (obj == otherObj) return true; <START> if (obj == null || !(obj instanceof byte[])) return false; <END> if (otherObj == null || byte[].class != otherObj.getClass()) return false; byte[] byteArray = obj; byte[] otherByteArray = (byte[]) otherObj; return Arrays.equals(byteArray, otherByteArray); }
+
+sample: 1676
+buggy_code: <START> public EngineSearcherTotalHitsMatcher(Query query, int totalHits) { <END> this.query = query; this.totalHits = totalHits; }
+code_review: can be private
+target code: private EngineSearcherTotalHitsMatcher ( Query query , int totalHits ) { this . query = query ; this . totalHits = totalHits ; }
+response: <START> private EngineSearcherTotalHitsMatcher(Query query, int totalHits) { <END> this.query = query; this.totalHits = totalHits; }
+
+sample: 1677
+buggy_code: protected boolean processEntryForContext(final ILogData data) { if (data != null) { try { <START> final Object payload = data.getPayload(runtime); <END> } catch (Throwable e) { log.error("Exception caught at address {}, {}, {}", data.getGlobalAddress(), data.getStreams(), data.getType()); throw e; } } return false; }
+code_review: Why don't you push this down to `LogData::getPayload` ? (since that's when deserialize is actually invoked)
+target code: protected boolean processEntryForContext ( final ILogData data ) { if ( data != null ) { final Object payload = data . getPayload ( runtime ) ; } return false ; }
+response: protected boolean processEntryForContext(final ILogData data) { if (data != null) { try { <START> final Object payload = data.getPayload(runtime); <END> } catch (Throwable e) { log.error("Exception caught at address {}, {}, {}", data.getGlobalAddress(), data.getStreams(), data.getType()); throw e; } } return false; }
+
+sample: 1678
+buggy_code: public boolean isQueryCacheable(Query query) { // O(n) impl, but I don't think we'll ever have a million query types here <START> return !query.isDescending() && !unCacheable.contains(query.getType()); <END> }
+code_review: any reason for disabling cache for descending order queries ?
+target code: public boolean isQueryCacheable ( Query query ) { // O ( n ) impl , but I don't think we'll ever have a million query types here return ! unCacheable . contains ( query . getType ( ) ) ; }
+response: public boolean isQueryCacheable(Query query) { // O(n) impl, but I don't think we'll ever have a million query types here <START> return !unCacheable.contains(query.getType()); <END> }
+
+sample: 1679
+buggy_code: public static boolean isMoeFile(IResource resource) { if(resource instanceof IFile ) { <START> String fileExtension = resource.getFileExtension(); return fileExtension != null && resource.getFileExtension().equals(MODEL_OBJECT_ELEMENTFILE_EXTENSION); <END> } return false; }
+code_review: Just replace all this new code with MODEL_OBJECT_ELEMENTFILE_EXTENSION.equals(resource.getFileExtension()).
+target code: public static boolean isMoeFile ( IResource resource ) { return resource instanceof IFile && MODEL_OBJECT_ELEMENTFILE_EXTENSION . equals ( resource . getFileExtension ( ) ) ; }
+response: public static boolean isMoeFile(IResource resource) { if(resource instanceof IFile ) { <START> return MODEL_OBJECT_ELEMENTFILE_EXTENSION.equals(resource.getFileExtension()); <END> } return false; }
+
+sample: 1680
+buggy_code: <START> public Property[] getProperties() { <END> return m_properties.toArray(new Property[m_properties.size()]); }
+code_review: could we change to List<Properties> or is this API fixed?
+target code: public List < Property > getProperties ( ) { return m_properties ; }
+response: <START> public List<Property> getProperties() { <END> return m_properties; }
+
+sample: 1681
+buggy_code: public void setup() throws NoSuchFieldException, IllegalAccessException { // Before "onCreate", we need to record the instance count for the test <START> instanceCountField = OpenHelperManager.class.getDeclaredField("instanceCount"); <END> instanceCountField.setAccessible(true); instanceCount = instanceCountField.getInt(null); activity = Robolectric.buildActivity(OrmLiteActivity_.class).create().get(); }
+code_review: No need for this. The tests must be independent, hence the instance count here should be zero.
+target code: public void setup ( ) { activity = Robolectric . buildActivity ( OrmLiteActivity_ . class ) . create ( ) . get ( ) ; }
+response: public void setup() throws NoSuchFieldException, IllegalAccessException { // Before "onCreate", we need to record the instance count for the test <START> instanceCountField = OpenHelperManager.class.getDeclaredField("instanceCount"); <END> instanceCountField.setAccessible(true); instanceCount = instanceCountField.getInt(null); activity = Robolectric.buildActivity(OrmLiteActivity_.class).create().get(); }
+
+sample: 1682
+buggy_code: public static Injector getInjector() { if ( injector == null ) { <START> injector = Guice.createInjector( new GuiceModule( emf ) ); <END> } return injector; }
+code_review: Do we need to do this here? This seems like it's creating a circular dependency of the EMF into Guice, but the EMF depends on Guice.
+target code: public static Injector getInjector ( ) { if ( injector == null ) { injector = Guice . createInjector ( new GuiceModule ( ) ) ; } return injector ; }
+response: public static Injector getInjector() { if ( injector == null ) { <START> injector = Guice.createInjector( new GuiceModule( emf ) ); <END> } return injector; }
+
+sample: 1683
+buggy_code: public void serialize() throws Exception { String xml = serializer.serialize(header); <START> System.out.println(xml); <END> XMLAssert.assertXpathExists("/subscriptionHeader/contentUri", xml); XMLAssert.assertXpathExists("/subscriptionHeader/packageHeader", xml); XMLAssert.assertXpathExists("/subscriptionHeader/packageHeader/name", xml); }
+code_review: We don't like System.out :)
+target code: public void serialize ( ) throws Exception { String xml = serializer . serialize ( header ) ; XMLAssert . assertXpathExists ( " / subscriptionHeader / contentUri" , xml ) ; XMLAssert . assertXpathExists ( " / subscriptionHeader / packageHeader" , xml ) ; XMLAssert . assertXpathExists ( " / subscriptionHeader / packageHeader / name" , xml ) ; }
+response: public void serialize() throws Exception { String xml = serializer.serialize(header); <START> log.debug(xml); <END> XMLAssert.assertXpathExists("/subscriptionHeader/contentUri", xml); XMLAssert.assertXpathExists("/subscriptionHeader/packageHeader", xml); XMLAssert.assertXpathExists("/subscriptionHeader/packageHeader/name", xml); }
+
+sample: 1684
+buggy_code: protected IMicroblockContainerTile getMicroblockTile(IBlockAccess world, BlockPos pos) <START> { <END> TileEntity tile = world.getTileEntity(pos); return tile instanceof IMicroblockContainerTile ? (IMicroblockContainerTile) tile : null; }
+code_review: Instanceof nightmare?
+target code: protected IMicroblockContainerTile getMicroblockTile ( IBlockAccess world , BlockPos pos ) { TileEntity tile = world . getTileEntity ( pos ) ; if ( tile == null ) { return null ; } return getMicroblockTile ( tile ) ; }
+response: protected IMicroblockContainerTile getMicroblockTile(IBlockAccess world, BlockPos pos) <START> { <END> TileEntity tile = world.getTileEntity(pos); return tile instanceof IMicroblockContainerTile ? (IMicroblockContainerTile) tile : null;
+
+sample: 1685
+buggy_code: <START> public void setMethod(final ZonemasterRequest.Method method) { <END> this.method = method.getMethod(); this.id = method.getId(); }
+code_review: should be a protected method
+target code: protected void setMethod ( final ZonemasterRequest . Method method ) { this . method = method . getMethod ( ) ; this . id = method . getId ( ) ; }
+response: <START> protected void setMethod(final ZonemasterRequest.Method method) { <END> this.method = method.getMethod(); this.id = method.getId(); }
+
+sample: 1686
+buggy_code: <START> public Dimension getFloatingItemOffset() { <END> if (editPart instanceof FloatingLabelEditPart) { return ((FloatingLabelEditPart) editPart).getFloatingItemOffset(); } return new Dimension(); }
+code_review: Multi return is forbidden.
+target code: public Dimension getFloatingItemOffset ( ) { Dimension offset = null ; if ( editPart instanceof FloatingLabelEditPart ) { offset = ( ( FloatingLabelEditPart ) editPart ) . getFloatingItemOffset ( ) ; } return offset != null ? offset : new Dimension ( ) ; }
+response: <START> public Dimension getFloatingItemOffset() { <END> if (editPart instanceof FloatingLabelEditPart) { return ((FloatingLabelEditPart) editPart).getFloatingItemOffset(); } Dimension dimension = new Dimension(); return dimension; }
+
+sample: 1687
+buggy_code: private static synchronized ITerminalConnector getConnector(IRemoteConnection irc) throws RemoteConnectionException { ITerminalConnector con = cons.get(irc.getAddress()); if(con == null) { con = TerminalConnectorExtension.makeTerminalConnector( "org.eclipse.ptp.remote.internal.terminal.RemoteToolsConnector"); //$NON-NLS-1$ cons.put(irc.getAddress(),con); <START> } else if(irc.isOpen()) { <END> return null; } else { irc.open(new NullProgressMonitor()); return null; } return con; }
+code_review: irc is not open if con is null initially. The logic here is a bit muddled.
+target code: private static synchronized ITerminalConnector getConnector ( IRemoteConnection irc ) throws RemoteConnectionException { ITerminalConnector con = cons . get ( irc . getAddress ( ) ) ; if ( con == null ) { con = TerminalConnectorExtension . makeTerminalConnector ( "org . eclipse . ptp . remote . internal . terminal . RemoteToolsConnector" ) ; // $NON - NLS - 1$ cons . put ( irc . getAddress ( ) , con ) ; } return con ; }
+response: private static synchronized ITerminalConnector getConnector(IRemoteConnection irc) throws RemoteConnectionException { ITerminalConnector con = cons.get(irc.getAddress()); if(con == null) { con = TerminalConnectorExtension.makeTerminalConnector( "org.eclipse.ptp.remote.internal.terminal.RemoteToolsConnector"); //$NON-NLS-1$ cons.put(irc.getAddress(),con); <START> } else if(irc.isOpen()) { <END> return null; } else { irc.open(new NullProgressMonitor()); return null; } return con; }
+
+sample: 1688
+buggy_code: public long getGlobalClassLoaderId() { <START> return (long) ClassLoaderIdentifier.GLOBAL_ID; <END> }
+code_review: Why not declare GLOBAL_ID as a long?
+target code: public long getGlobalClassLoaderId ( ) { return ClassLoaderIdentifier . GLOBAL_ID ; }
+response: public long getGlobalClassLoaderId() { <START> return ClassLoaderIdentifier.GLOBAL_ID; <END> }
+
+sample: 1689
+buggy_code: private int getCmasSeverity() { switch (messageIdentifier) { case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_IMMEDIATE_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_IMMEDIATE_LIKELY: return SmsCbCmasInfo.CMAS_SEVERITY_EXTREME; case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_EXPECTED_OBSERVED: <START> case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_EXPECTED_LIKELY: <END> case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_IMMEDIATE_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_IMMEDIATE_LIKELY: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_EXPECTED_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_EXPECTED_LIKELY: return SmsCbCmasInfo.CMAS_SEVERITY_SEVERE; default: return SmsCbCmasInfo.CMAS_SEVERITY_UNKNOWN; } }
+code_review: Even though these two are "CMAS Severe Alerts", shouldn't getCmasSeverity() still return CMAS_SEVERITY_EXTREME? Spec says "Severity of Extreme, Urgency of Expected..."
+target code: private int getCmasSeverity ( ) { switch ( messageIdentifier ) { case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_EXTREME_IMMEDIATE_OBSERVED : case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_EXTREME_IMMEDIATE_LIKELY : case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_EXTREME_EXPECTED_OBSERVED : case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_EXTREME_EXPECTED_LIKELY : return SmsCbCmasInfo . CMAS_SEVERITY_EXTREME ; case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_SEVERE_IMMEDIATE_OBSERVED : case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_SEVERE_IMMEDIATE_LIKELY : case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_SEVERE_EXPECTED_OBSERVED : case SmsCbConstants . MESSAGE_ID_CMAS_ALERT_SEVERE_EXPECTED_LIKELY : return SmsCbCmasInfo . CMAS_SEVERITY_SEVERE ; default : return SmsCbCmasInfo . CMAS_SEVERITY_UNKNOWN ; } }
+response: private int getCmasSeverity() { switch (messageIdentifier) { case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_IMMEDIATE_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_IMMEDIATE_LIKELY: return SmsCbCmasInfo.CMAS_SEVERITY_EXTREME; case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_EXPECTED_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_EXTREME_EXPECTED_LIKELY: <START> return SmsCbCmasInfo.CMAS_SEVERITY_EXTREME; <END> case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_IMMEDIATE_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_IMMEDIATE_LIKELY: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_EXPECTED_OBSERVED: case SmsCbConstants.MESSAGE_ID_CMAS_ALERT_SEVERE_EXPECTED_LIKELY: return SmsCbCmasInfo.CMAS_SEVERITY_SEVERE; default: return SmsCbCmasInfo.CMAS_SEVERITY_UNKNOWN; } }
+
+sample: 1690
+buggy_code: public Collection<String> getAliases(final KeyStore keyStore) throws ScriptSignatureException { try { if (keyStore != null) return Collections.list(keyStore.aliases()); } catch (KeyStoreException e) { throw new ScriptSignatureException("Keystore not initialized properly. Try again.", e); } <START> throw new ScriptSignatureException("Keystore not initialized properly. Try again.", null); <END> }
+code_review: instead of thowing we could return an empty list
+target code: public Collection < String > getAliases ( final KeyStore keyStore ) { try { if ( keyStore != null ) return Collections . list ( keyStore . aliases ( ) ) ; } catch ( KeyStoreException e ) { return null ; } return null ; }
+response: public Collection<String> getAliases(final KeyStore keyStore) throws ScriptSignatureException { try { if (keyStore != null) return Collections.list(keyStore.aliases()); } catch (KeyStoreException e) { throw new ScriptSignatureException("Keystore not initialized properly. Try again.", e); } <START> return Collections.emptyList(); <END> }
+
+sample: 1691
+buggy_code: public List<Expression> getExpressions() { <START> List<Expression> result = new ArrayList<Expression>(groupByAttributes); <END> result.add(expression); return result; }
+code_review: Type argument Expression is not need.
+target code: public List < Expression > getExpressions ( ) { List < Expression > result = new ArrayList < > ( groupByAttributes ) ; result . add ( expression ) ; return result ; }
+response: public List<Expression> getExpressions() { <START> List<Expression> result = new ArrayList<>(groupByAttributes); <END> result.add(expression); return result; }
+
+sample: 1692
+buggy_code: <START> public boolean isIdentityProvider() { <END> try { PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES); for (ActivityInfo activityInfo : packageInfo.activities) { if (activityInfo.name.equals(IDPAccountPickerActivity.class.getName())) { return true; } } } catch (NameNotFoundException e) { SalesforceSDKLogger.e(TAG, "Exception occurred while examining application info", e); } return false; }
+code_review: Could we keep this API private?
+target code: private boolean isIdentityProvider ( ) { try { PackageInfo packageInfo = context . getPackageManager ( ) . getPackageInfo ( context . getPackageName ( ) , PackageManager . GET_ACTIVITIES ) ; for ( ActivityInfo activityInfo : packageInfo . activities ) { if ( activityInfo . name . equals ( IDPAccountPickerActivity . class . getName ( ) ) ) { return true ; } } } catch ( NameNotFoundException e ) { SalesforceSDKLogger . e ( TAG , "Exception occurred while examining application info" , e ) ; } return false ; }
+response: <START> private boolean isIdentityProvider() { <END> try { PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES); for (ActivityInfo activityInfo : packageInfo.activities) { if (activityInfo.name.equals(IDPAccountPickerActivity.class.getName())) { return true; } } } catch (NameNotFoundException e) { SalesforceSDKLogger.e(TAG, "Exception occurred while examining application info", e); } return false; }
+
+sample: 1693
+buggy_code: <START> public List<BlockedItem> getBlockedItems() { <END> return new ArrayList<BlockedItem>(snapshot.blockedProjects); }
+code_review: @olivergondza noted in the commit that this should not be public as it is for testing only
+target code: protected List < BlockedItem > getBlockedItems ( ) { return new ArrayList < BlockedItem > ( snapshot . blockedProjects ) ; }
+response: <START> List<BlockedItem> getBlockedItems() { <END> return new ArrayList<BlockedItem>(snapshot.blockedProjects); }
+
+sample: 1694
+buggy_code: public IStatus validate(String path) { if (fTrace == null) { <START> return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceTypeHelper_ValidateNoTrace); <END> } return fTrace.validate(null, path); }
+code_review: I don't think it makes sense for the trace to be null here. We shouldn't have to create a new Message file for this case...
+target code: public IStatus validate ( String path ) { return fTrace . validate ( null , path ) ; }
+response: public IStatus validate(String path) { if (fTrace == null) { <START> return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Trace is null"); <END> } return fTrace.validate(null, path); }
+
+sample: 1695
+buggy_code: public static boolean isTCCPacket(ByteArrayBuffer baf) { int rc = RTCPHeaderUtils.getReportCount(baf); <START> return isRTPFBPacket(baf) && rc == FMT; <END> }
+code_review: just wondering...is it worth putting the `rc == FMT` check first for a short-circuiting efficiency improvement?
+target code: public static boolean isTCCPacket ( ByteArrayBuffer baf ) { int rc = RTCPHeaderUtils . getReportCount ( baf ) ; return rc == FMT && isRTPFBPacket ( baf ) ; }
+response: public static boolean isTCCPacket(ByteArrayBuffer baf) { int rc = RTCPHeaderUtils.getReportCount(baf); <START> return rc == FMT && isRTPFBPacket(baf); <END> }
+
+sample: 1696
+buggy_code: private Result waitForCompletion() throws InterruptedException, IOException { // wait for the completion Result result; <START> while((result = checkForCompletion()) != null) { <END> Thread.sleep(1000); } return result; }
+code_review: @bkmeneguello Are you sure that <code>!=</code> is correct?
+target code: private Result waitForCompletion ( ) throws InterruptedException , IOException { // wait for the completion Result result ; while ( ( result = checkForCompletion ( ) ) == null ) { Thread . sleep ( 1000 ) ; } return result ; }
+response: private Result waitForCompletion() throws InterruptedException, IOException { // wait for the completion Result result; <START> while((result = checkForCompletion()) == null) { <END> Thread.sleep(1000); } return result; }
+
+sample: 1697
+buggy_code: public void testUnderlyingReaders() throws IOException, FormatException { FakeReader reader = new FakeReader(); FileStitcher fs = new FileStitcher(reader); assertNotNull(fs.getUnderlyingReaders()); fs.setId("test_z<0-2>.fake"); assertNotNull(fs.getUnderlyingReaders()); <START> } <END>
+code_review: Missing fs.close()
+target code: public void testUnderlyingReaders ( ) throws IOException , FormatException { FakeReader reader = new FakeReader ( ) ; FileStitcher fs = new FileStitcher ( reader ) ; assertNotNull ( fs . getUnderlyingReaders ( ) ) ; fs . setId ( "test_z < 0 - 2 > . fake" ) ; assertNotNull ( fs . getUnderlyingReaders ( ) ) ; fs . close ( ) ; }
+response: public void testUnderlyingReaders() throws IOException, FormatException { FakeReader reader = new FakeReader(); FileStitcher fs = new FileStitcher(reader); assertNotNull(fs.getUnderlyingReaders()); fs.setId("test_z<0-2>.fake"); assertNotNull(fs.getUnderlyingReaders()); fs.close(); <START> } <END>
+
+sample: 1698
+buggy_code: public void shouldGetDiagnosisByUuid() { <START> String uuid = "4e663d66-6b78-11e0-93c3-18a905e044dc"; <END> int diagnosisId = 1; Diagnosis diagnosis = diagnosisDAO.getDiagnosisByUuid(uuid); assertEquals(diagnosisId, (int) diagnosis.getId()); }
+code_review: We can get rid of these variables if they are being used in one place.
+target code: public void shouldGetDiagnosisByUuid ( ) { Diagnosis diagnosis = diagnosisDAO . getDiagnosisByUuid ( "4e663d66 - 6b78 - 11e0 - 93c3 - 18a905e044dc" ) ; assertEquals ( 1 , ( int ) diagnosis . getId ( ) ) ; }
+response: public void shouldGetDiagnosisByUuid() { <START> String uuid = "4e663d66-6b78-11e0-93c3-18a905e044dc"; <END> int diagnosisId = 1; Diagnosis diagnosis = diagnosisDAO.getDiagnosisByUuid(uuid); assertEquals(1, (int) diagnosis.getId()); }
+
+sample: 1699
+buggy_code: public void setUpCallToAction(String callToActionText) { if (callToActionText == null) { callToActionContainer.setVisibility(GONE); } else { callToActionContainer.setVisibility(VISIBLE); <START> callToActionTextView.setText(callToActionText); <END> } }
+code_review: I don't think the logic is necessary. We can have the default visibility as `GONE`.
+target code: public void setUpCallToAction ( String callToActionText ) { if ( callToActionText != null ) { callToActionContainer . setVisibility ( VISIBLE ) ; callToActionTextView . setText ( callToActionText ) ; } else { callToActionContainer . setVisibility ( GONE ) ; } }
+response: public void setUpCallToAction(String callToActionText) { if (callToActionText == null) { callToActionContainer.setVisibility(GONE); } else { callToActionContainer.setVisibility(VISIBLE); <START> callToActionTextView.setText(callToActionText); <END> } }
+
+sample: 1700
+buggy_code: <START> public AbstractTableViewer <END> getTableViewer() { return actionContext.getViewer(); }
+code_review: Could this be protected as well?
+target code: protected AbstractTableViewer getTableViewer ( ) { return actionContext . getViewer ( ) ; }
+response: <START> protected AbstractTableViewer <END> getTableViewer() { return actionContext.getViewer(); }
+
+sample: 1701
+buggy_code: <START> void start() { <END> if (!started) { log.info("Starting prefetching thread."); executorService.execute(new DefaultGetRecordsCacheDaemon()); } started = true; }
+code_review: This probably should be public, and in the interface.
+target code: public void start ( ) { if ( ! started ) { log . info ( "Starting prefetching thread . " ) ; executorService . execute ( new DefaultGetRecordsCacheDaemon ( ) ) ; } started = true ; }
+response: <START> public void start() { <END> if (!started) { log.info("Starting prefetching thread."); executorService.execute(new DefaultGetRecordsCacheDaemon()); } started = true; }
+
+sample: 1702
+buggy_code: public SymbolTableBuilder(String fullyQualifiedModuleName) { <START> this.fullyQualifiedModuleName = new ArrayList<>(Arrays.asList(fullyQualifiedModuleName.split("\\."))); <END> }
+code_review: Why `new ArrayList<>(`?
+target code: public SymbolTableBuilder ( String fullyQualifiedModuleName ) { this . fullyQualifiedModuleName = Arrays . asList ( fullyQualifiedModuleName . split ( "\\ . " ) ) ; }
+response: public SymbolTableBuilder(String fullyQualifiedModuleName) { <START> this.fullyQualifiedModuleName = Arrays.asList(fullyQualifiedModuleName.split("\\.")); <END> }
+
+sample: 1703
+buggy_code: public long getNextTimestamp() throws TimestampIOException { long nextTS = _timestampCounter.addAndGet(TIMESTAMP_INCREMENT); <START> long maxTS = _maxReservedTimestamp; // avoid the double volatile read <END> if (nextTS > maxTS) { reserveNextBlock(nextTS); } _numTimestampsCreated.incrementAndGet(); // JMX metric return nextTS; }
+code_review: Double volatile read is gone. Can get rid of maxTS.
+target code: public long getNextTimestamp ( ) throws TimestampIOException { long nextTS = _timestampCounter . addAndGet ( TIMESTAMP_INCREMENT ) ; if ( nextTS > _maxReservedTimestamp ) { reserveNextBlock ( nextTS ) ; } _numTimestampsCreated . incrementAndGet ( ) ; // JMX metric return nextTS ; }
+response: public long getNextTimestamp() throws TimestampIOException { long nextTS = _timestampCounter.addAndGet(TIMESTAMP_INCREMENT); <START> if (nextTS > _maxReservedTimestamp) { reserveNextBlock(nextTS); } <END> _numTimestampsCreated.incrementAndGet(); // JMX metric return nextTS; }
+
+sample: 1704
+buggy_code: public TileRenderRunnable( TileCanvasViewGroup viewGroup, Tile tile) { <START> this.mTileCanvasViewGroup = new WeakReference<>( viewGroup ); <END> this.mTile = new WeakReference<>( tile ); }
+code_review: please remove `this.` on this line and the next
+target code: public TileRenderRunnable ( TileCanvasViewGroup viewGroup , Tile tile ) { mTileCanvasViewGroup = new WeakReference < > ( viewGroup ) ; mTile = new WeakReference < > ( tile ) ; }
+response: public TileRenderRunnable( TileCanvasViewGroup viewGroup, Tile tile) { <START> mTileCanvasViewGroup = new WeakReference<>( viewGroup ); <END> mTile = new WeakReference<>( tile ); }
+
+sample: 1705
+buggy_code: public Response viewDataverse(@PathParam("identifier") String idtf) { return allowCors(response(req -> ok( json(execCommand(new GetDataverseCommand(req, findDataverseOrDie(idtf))), false, <START> settingsService.isTrueForKey(SettingsServiceBean.Key.ExcludeEmailFromExport, false) <END> )))); }
+code_review: @matthew-a-dunlap please update the docs on `:ExcludeEmailFromExport`. Thanks!
+target code: public Response viewDataverse ( @PathParam ( "identifier" ) String idtf ) { return allowCors ( response ( req - > ok ( json ( execCommand ( new GetDataverseCommand ( req , findDataverseOrDie ( idtf ) ) ) , settingsService . isTrueForKey ( SettingsServiceBean . Key . ExcludeEmailFromExport , false ) ) ) ) ) ; }
+response: public Response viewDataverse(@PathParam("identifier") String idtf) { return allowCors(response(req -> ok( json(execCommand(new GetDataverseCommand(req, findDataverseOrDie(idtf))), false, <START> settingsService.isTrueForKey(SettingsServiceBean.Key.ExcludeEmailFromExport, false) <END> )))); }
+
+sample: 1706
+buggy_code: public ResourceNotFoundException(IdString id) { <START> super(id.encoded()); <END> }
+code_review: Should this better be: super(id.get()) ? At least in some other places [1] we provide the decoded id to ResourceNotFoundException(String). Shouldn't it be the same in all places, either always the decoded id or always the encoded id? [1] https://gerrit-review.googlesource.com/#/c/41733/1/gerrit-server/src/main/java/com/google/gerrit/server/group/GroupsCollection.java
+target code: public ResourceNotFoundException ( IdString id ) { super ( id . get ( ) ) ; }
+response: public ResourceNotFoundException(IdString id) { <START> super(id.get()); <END> }
+
+sample: 1707
+buggy_code: private AppiumDriver getDriverSafe() { WebDriver driver = getDriver(); if (driver instanceof EventFiringWebDriver) { driver = ((EventFiringWebDriver) driver).getWrappedDriver(); <START> if (driver instanceof AppiumDriver) { <END> return (AppiumDriver) driver; } } throw new ClassCastException("Appium Driver can not be casted from the actual driver."); }
+code_review: if you use AppiumDriver<?> driver = (AppiumDriver<?>) getDriverSafe(); then there is no sense in if (driver instanceof AppiumDriver)
+target code: private WebDriver getDriverSafe ( ) { WebDriver driver = getDriver ( ) ; if ( driver instanceof EventFiringWebDriver ) { driver = ( ( EventFiringWebDriver ) driver ) . getWrappedDriver ( ) ; } return driver ; }
+response: private AppiumDriver getDriverSafe() { WebDriver driver = getDriver(); if (driver instanceof EventFiringWebDriver) { driver = ((EventFiringWebDriver) driver).getWrappedDriver(); <START> return (AppiumDriver) driver; <END> } throw new ClassCastException("Appium Driver can not be casted from the actual driver."); }
+
+sample: 1708
+buggy_code: public void assertSimilarity(final File actualFile, final double maxDistance) throws IOException { BufferedImage tempImg = ImageIO.read(actualFile); File tempFile = File.createTempFile("print-test", ".png"); ImageIO.write(tempImg, "png", tempFile); <START> assertSimilarity(ImageIO.read(tempFile), maxDistance); <END> }
+code_review: You forgot to revert that
+target code: public void assertSimilarity ( final File actualFile , final double maxDistance ) throws IOException { assertSimilarity ( ImageIO . read ( actualFile ) , maxDistance ) ; }
+response: public void assertSimilarity(final File actualFile, final double maxDistance) throws IOException { BufferedImage tempImg = ImageIO.read(actualFile); File tempFile = File.createTempFile("print-test", ".png"); ImageIO.write(tempImg, "png", tempFile); <START> assertSimilarity(ImageIO.read(tempFile), maxDistance); <END> }
+
+sample: 1709
+buggy_code: public URI getLocationHeaderAsURI() { try { return locationHeader != null ? new URI(locationHeader) : null; } catch (URISyntaxException e) { if (LRALogger.logger.isInfoEnabled()) { <START> LRALogger.logger.infof("LRARecord.doEnd missing Location header on ACCEPTED response %s failed: %s", <END> getRequestURI(), e.getMessage()); } return null; } }
+code_review: Good catch. I also just spotted that a few other log messages in tryDoEnd are attribued to this. It will be clearer to just remove the LRARecord.doEnd prefix I think.
+target code: public URI getLocationHeaderAsURI ( ) throws URISyntaxException { return locationHeader != null ? new URI ( locationHeader ) : null ; }
+response: public URI getLocationHeaderAsURI() { try { return locationHeader != null ? new URI(locationHeader) : null; } catch (URISyntaxException e) { if (LRALogger.logger.isInfoEnabled()) { <START> LRALogger.logger.infof("missing Location header on ACCEPTED response %s failed: %s", <END> getRequestURI(), e.getMessage()); } return null; } }
+
+sample: 1710
+buggy_code: public void setup(Method method) throws Exception { logger.info("test name: " + method.getName()); <START> KerberosHelper.loginFromKeytab(MerlinConstants.CURRENT_USER_NAME); <END> bundles[0] = Util.readELBundles()[0][0]; bundles[0] = new Bundle(bundles[0], cluster.getEnvFileName(), cluster.getPrefix()); bundles[0].generateUniqueBundle(); bundles[0].setProcessWorkflow(aggregateWorkflowDir); }
+code_review: This seems redundant to me as we are logging in as the current user in the base class.
+target code: public void setup ( Method method ) throws Exception { logger . info ( "test name : " + method . getName ( ) ) ; bundles [ 0 ] = Util . readELBundles ( ) [ 0 ] [ 0 ] ; bundles [ 0 ] = new Bundle ( bundles [ 0 ] , cluster . getEnvFileName ( ) , cluster . getPrefix ( ) ) ; bundles [ 0 ] . generateUniqueBundle ( ) ; bundles [ 0 ] . setProcessWorkflow ( aggregateWorkflowDir ) ; }
+response: public void setup(Method method) throws Exception { logger.info("test name: " + method.getName()); <START> KerberosHelper.loginFromKeytab(MerlinConstants.CURRENT_USER_NAME); <END> bundles[0] = Util.readELBundles()[0][0]; bundles[0] = new Bundle(bundles[0], cluster.getEnvFileName(), cluster.getPrefix()); bundles[0].generateUniqueBundle(); bundles[0].setProcessWorkflow(aggregateWorkflowDir); }
+
+sample: 1711
+buggy_code: public View getOverflowMenuAnchor() { View view = getToolbar().findViewById(R.id.menu_overflow_button); <START> return getToolbar(); <END> }
+code_review: Any reason not to check value of the view?
+target code: public View getOverflowMenuAnchor ( ) { View view = getToolbar ( ) . findViewById ( R . id . menu_overflow_button ) ; return view == null ? getToolbar ( ) : view ; }
+response: public View getOverflowMenuAnchor() { View view = getToolbar().findViewById(R.id.menu_overflow_button); <START> if (view != null) { return view; } return getToolbar(); <END> }
+
+sample: 1712
+buggy_code: public List<ResponseInfo> sendAndPoll(List<RequestInfo> requestInfos) throws IOException { if (closed) { throw new IllegalStateException("The NetworkClient is closed."); } List<ResponseInfo> responseInfoList = new ArrayList<ResponseInfo>(); for (RequestInfo requestInfo : requestInfos) { pendingRequests.add(new RequestMetadata(time.milliseconds(), requestInfo, null)); } List<NetworkSend> sends = prepareSends(responseInfoList); selector.poll(POLL_TIMEOUT_MS, sends); handleSelectorEvents(responseInfoList); <START> return responseInfoList; <END> }
+code_review: I thought we will catch the exception and call close() here and then rethrow
+target code: public List < ResponseInfo > sendAndPoll ( List < RequestInfo > requestInfos ) throws IOException { if ( closed ) { throw new IllegalStateException ( "The NetworkClient is closed . " ) ; } List < ResponseInfo > responseInfoList = new ArrayList < ResponseInfo > ( ) ; for ( RequestInfo requestInfo : requestInfos ) { pendingRequests . add ( new RequestMetadata ( time . milliseconds ( ) , requestInfo ) ) ; } List < NetworkSend > sends = prepareSends ( responseInfoList ) ; selector . poll ( POLL_TIMEOUT_MS , sends ) ; handleSelectorEvents ( responseInfoList ) ; return responseInfoList ; }
+response: public List<ResponseInfo> sendAndPoll(List<RequestInfo> requestInfos) throws IOException { if (closed) { throw new IllegalStateException("The NetworkClient is closed."); } List<ResponseInfo> responseInfoList = new ArrayList<ResponseInfo>(); for (RequestInfo requestInfo : requestInfos) { pendingRequests.add(new RequestMetadata(time.milliseconds(), requestInfo, null)); } List<NetworkSend> sends = prepareSends(responseInfoList); selector.poll(POLL_TIMEOUT_MS, sends); handleSelectorEvents(responseInfoList); return responseInfoList; }
+
+sample: 1713
+buggy_code: public void handleQuotaColumnVisibility() { isQuotaVisible = false; SystemTreeItemModel treeItem = (SystemTreeItemModel) CommonModel.getInstance().getSystemTree().getSelectedItem(); if (treeItem != null <START> && SystemTreeItemType.DataCenter.equals(treeItem.getType())) { <END> StoragePool storagePool = (StoragePool) treeItem.getEntity(); if (!QuotaEnforcementTypeEnum.DISABLED.equals(storagePool.getQuotaEnforcementType())) { isQuotaVisible = true; } } onDiskViewTypeChanged(); }
+code_review: As far as I know, enums can be used with the ==/!= operators. It's a matter of style, but I prefer them (since an instance of an enum is really the same referenced entity as the enum constant). However, you can do whatever you like, either is fine by me.
+target code: public void handleQuotaColumnVisibility ( ) { isQuotaVisible = false ; SystemTreeItemModel treeItem = ( SystemTreeItemModel ) CommonModel . getInstance ( ) . getSystemTree ( ) . getSelectedItem ( ) ; if ( treeItem != null && SystemTreeItemType . DataCenter == treeItem . getType ( ) ) { StoragePool storagePool = ( StoragePool ) treeItem . getEntity ( ) ; if ( QuotaEnforcementTypeEnum . DISABLED != storagePool . getQuotaEnforcementType ( ) ) { isQuotaVisible = true ; } } onDiskViewTypeChanged ( ) ; }
+response: public void handleQuotaColumnVisibility() { isQuotaVisible = false; SystemTreeItemModel treeItem = (SystemTreeItemModel) CommonModel.getInstance().getSystemTree().getSelectedItem(); if (treeItem != null <START> && SystemTreeItemType.DataCenter == treeItem.getType()) { <END> StoragePool storagePool = (StoragePool) treeItem.getEntity(); if (QuotaEnforcementTypeEnum.DISABLED != storagePool.getQuotaEnforcementType()) { isQuotaVisible = true; } } onDiskViewTypeChanged(); }
+
+sample: 1714
+buggy_code: public CompletableFuture<StaticResource> getResource(String name) { StaticResource template = templates.get(name); if (template != null) { return CompletableFuture.completedFuture(template); } return delegate .getResource(name) .exceptionally((th) -> { templates.putIfAbsent(name, null); return null; } ) <START> .thenApply( (file) -> { templates.putIfAbsent(name, file); return file; }); <END> }
+code_review: shouldn't you force the put? Otherwise, what is returned might be different than what's in the cache, it's also possible that doesn't matter.
+target code: public CompletableFuture < Optional < StaticResource > > getResource ( String name ) { Optional < StaticResource > template = templates . get ( name ) ; if ( template != null ) { return CompletableFuture . completedFuture ( template ) ; } return delegate . getResource ( name ) . exceptionally ( ( th ) - > { return Optional . empty ( ) ; } ) . thenApply ( ( file ) - > { templates . put ( name , file ) ; return file ; } ) ; }
+response: public CompletableFuture<StaticResource> getResource(String name) { StaticResource template = templates.get(name); if (template != null) { return CompletableFuture.completedFuture(template); } return delegate .getResource(name) .exceptionally((th) -> { templates.putIfAbsent(name, null); return null; } ) <START> .thenApply( (file) -> { templates.put(name, file); return file; }); <END> }
+
+sample: 1715
+buggy_code: public void testSessionTicketsWithTLSv13AndNoKey() throws Throwable { assumeTrue(OpenSsl.isTlsv13Supported()); <START> assumeTrue(OpenSsl.isBoringSSL()); <END> testSessionTickets(SslUtils.PROTOCOL_TLS_V1_3, false); }
+code_review: OpenSSL also supports it in a similar way on the server-side. See SSL_OP_NO_TICKET on this page: https://www.openssl.org/docs/man1.1.1/man3/SSL_CTX_set_options.html.
+target code: public void testSessionTicketsWithTLSv13AndNoKey ( ) throws Throwable { assumeTrue ( OpenSsl . isTlsv13Supported ( ) ) ; testSessionTickets ( SslUtils . PROTOCOL_TLS_V1_3 , false ) ; }
+response: public void testSessionTicketsWithTLSv13AndNoKey() throws Throwable { assumeTrue(OpenSsl.isTlsv13Supported()); testSessionTickets(SslUtils.PROTOCOL_TLS_V1_3, false); }
+
+sample: 1716
+buggy_code: <START> public void setUp() { <END> TmfEventMatching.registerMatchObject(new TcpEventMatching()); TmfEventMatching.registerMatchObject(new TcpLttngEventMatching()); }
+code_review: a BeforeClass has to be static (it doesn't tell you until you actually try to run it) I was wondering why this passed Hudson, but then remembered the perf tests don't run, yet...
+target code: public static void setUp ( ) { TmfEventMatching . registerMatchObject ( new TcpEventMatching ( ) ) ; TmfEventMatching . registerMatchObject ( new TcpLttngEventMatching ( ) ) ; }
+response: <START> public static void setUp() { <END> TmfEventMatching.registerMatchObject(new TcpEventMatching()); TmfEventMatching.registerMatchObject(new TcpLttngEventMatching()); }
+
+sample: 1717
+buggy_code: protected void updateTitle(String brand) { <START> if (brand != null) { <END> IBrandManager brandManager = TasksUiPlugin.getDefault().getBrandManager(); setTitle(brandManager.getConnectorLabel(getConnector(), brand)); } }
+code_review: Would it make more sense to mark the brand parameter of setBrand as @NonNull instead of checking it here?
+target code: protected void updateTitle ( String brand ) { IBrandManager brandManager = TasksUiPlugin . getDefault ( ) . getBrandManager ( ) ; setTitle ( brandManager . getConnectorLabel ( getConnector ( ) , brand ) ) ; }
+response: protected void updateTitle(String brand) { <START> IBrandManager brandManager = TasksUiPlugin.getDefault().getBrandManager(); setTitle(brandManager.getConnectorLabel(getConnector(), brand)); <END> }
+
+sample: 1718
+buggy_code: public static int getSegmentForKey(Object key, Cache cache) { KeyPartitioner keyPartitioner = extractComponent(cache, KeyPartitioner.class); if (keyPartitioner != null) { return keyPartitioner.getSegment(key); } <START> return SegmentSpecificCommand.UNKNOWN_SEGMENT; <END> }
+code_review: I'd rather throw an exception
+target code: public static int getSegmentForKey ( Object key , Cache cache ) { KeyPartitioner keyPartitioner = extractComponent ( cache , KeyPartitioner . class ) ; return keyPartitioner . getSegment ( key ) ; }
+response: public static int getSegmentForKey(Object key, Cache cache) { KeyPartitioner keyPartitioner = extractComponent(cache, KeyPartitioner.class); if (keyPartitioner != null) { return keyPartitioner.getSegment(key); } <START> throw new IllegalStateException("No key partitioner found for cache " + cache.getName()); <END> }
+

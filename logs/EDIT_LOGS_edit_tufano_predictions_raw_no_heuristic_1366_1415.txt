@@ -1,0 +1,300 @@
+sample: 1366
+buggy_code: public void testQuantileAtValueBigint() { QuantileDigest qdigest = new QuantileDigest(1); addAll(qdigest, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9); functionAssertions.assertFunction(format("quantile_at_value(CAST(X'%s' AS qdigest(bigint)), 20)", toHexString(qdigest)), <START> DOUBLE, <END> 1.0); functionAssertions.assertFunction(format("quantile_at_value(CAST(X'%s' AS qdigest(bigint)), 6)", toHexString(qdigest)), DOUBLE, 0.6); functionAssertions.assertFunction(format("quantile_at_value(CAST(X'%s' AS qdigest(bigint)), -1)", toHexString(qdigest)), DOUBLE, 0.0); }
+code_review: I see some surprising results here when adding additional test cases for doubles: * `Double.NaN` as the input value returns 1.0 (Edit: Double.MIN_VALUE is fine, I forgot this was just slightly greater than 0)
+target code: public void testQuantileAtValueBigint ( ) { QuantileDigest qdigest = new QuantileDigest ( 1 ) ; addAll ( qdigest , 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 ) ; functionAssertions . assertFunction ( format ( "quantile_at_value ( CAST ( X' % s' AS qdigest ( bigint ) ) , 20 ) " , toHexString ( qdigest ) ) , DOUBLE , null ) ; functionAssertions . assertFunction ( format ( "quantile_at_value ( CAST ( X' % s' AS qdigest ( bigint ) ) , 6 ) " , toHexString ( qdigest ) ) , DOUBLE , 0 . 6 ) ; functionAssertions . assertFunction ( format ( "quantile_at_value ( CAST ( X' % s' AS qdigest ( bigint ) ) , - 1 ) " , toHexString ( qdigest ) ) , DOUBLE , null ) ; }
+response: public void testQuantileAtValueBigint() { QuantileDigest qdigest = new QuantileDigest(1); addAll(qdigest, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9); functionAssertions.assertFunction(format("quantile_at_value(CAST(X'%s' AS qdigest(bigint)), 20)", toHexString(qdigest)), DOUBLE, 1.0); functionAssertions.assertFunction(format("quantile_at_value(CAST(X'%s' AS qdigest(bigint)), 6)", toHexString(qdigest)), DOUBLE, 0.6); functionAssertions.assertFunction(format("quantile_at_value(CAST(X'%s' AS qdigest(bigint)), -1)", toHexString(qdigest)), DOUBLE, 0.0); }
+
+sample: 1367
+buggy_code: public boolean isOverutilized() { <START> return memoryManager.isOverUtilized(); <END> }
+code_review: I'm ok with either capitalization. But it needs to be consistent. The `overutilized` 2 lines above is capitalized differently.
+target code: public boolean isOverutilized ( ) { return memoryManager . isOverutilized ( ) ; }
+response: public boolean isOverutilized() { <START> return memoryManager.isOverutilized(); <END> }
+
+sample: 1368
+buggy_code: public String explain() throws CouchbaseLiteException { <START> if (c4query == null) <END> check(); synchronized (getDatabase().getLock()) { return c4query.explain(); } }
+code_review: c4query should also be synchronized. Move c4query checks to the check method itself. The same thing for the execute() method. See https://github.com/couchbase/couchbase-lite-ios/blob/feature/2.0/Objective-C/CBLQuery.mm#L605-L606
+target code: public String explain ( ) throws CouchbaseLiteException { synchronized ( getDatabase ( ) . getLock ( ) ) { check ( ) ; return c4query . explain ( ) ; } }
+response: public String explain() throws CouchbaseLiteException { <START> check(); synchronized (getDatabase().getLock()) { return c4query.explain(); } <END> }
+
+sample: 1369
+buggy_code: public boolean isObjectFactory() { <START> return getTargetTypeParameter() != null || getParameters().isEmpty(); <END> }
+code_review: just return `false` here.
+target code: public boolean isObjectFactory ( ) { return false ; }
+response: public boolean isObjectFactory() { <START> return false; <END> }
+
+sample: 1370
+buggy_code: <START> StandardRotationPolicy(DelegatingSessionFactory<?> factory, List<KeyDirectory> keyDirectories, <END> boolean fair) { Assert.notNull(factory, "factory cannot be null"); Assert.notNull(keyDirectories, "keyDirectories cannot be null"); Assert.isTrue(keyDirectories.size() > 0, "At least one KeyDirectory is required"); this.factory = factory; this.keyDirectories.addAll(keyDirectories); this.fair = fair; this.iterator = this.keyDirectories.iterator(); }
+code_review: Shound't this ctor be `public` or at least `protected`? Otherwise I don't see reason in all those `protected` methods below.
+target code: public StandardRotationPolicy ( DelegatingSessionFactory < ? > factory , List < KeyDirectory > keyDirectories , boolean fair ) { Assert . notNull ( factory , "factory cannot be null" ) ; Assert . notNull ( keyDirectories , "keyDirectories cannot be null" ) ; Assert . isTrue ( keyDirectories . size ( ) > 0 , "At least one KeyDirectory is required" ) ; this . factory = factory ; this . keyDirectories . addAll ( keyDirectories ) ; this . fair = fair ; this . iterator = this . keyDirectories . iterator ( ) ; }
+response: <START> public StandardRotationPolicy(DelegatingSessionFactory<?> factory, List<KeyDirectory> keyDirectories, <END> boolean fair) { Assert.notNull(factory, "factory cannot be null"); Assert.notNull(keyDirectories, "keyDirectories cannot be null"); Assert.isTrue(keyDirectories.size() > 0, "At least one KeyDirectory is required"); this.factory = factory; this.keyDirectories.addAll(keyDirectories); this.fair = fair; this.iterator = this.keyDirectories.iterator(); }
+
+sample: 1371
+buggy_code: public void add(EntityType entity) { validateAddAllowed(entity); <START> createAcl(entity); <END> super.add(entity); }
+code_review: Tricky! `validateAddAllowed` currently checks if you have the WRITE_META permission on the entity. Acl gets created after the check. This breaks OneClickImporter
+target code: public void add ( EntityType entity ) { createAcl ( entity ) ; super . add ( entity ) ; }
+response: public void add(EntityType entity) { <START> createAcl(entity); <END> validateAddAllowed(entity); super.add(entity); }
+
+sample: 1372
+buggy_code: private ArtifactCoordinates getArtifactCoordinates(Path p) { <START> return ThrowingFunction.unchecked(RepositoryFiles::readCoordinates).apply((RepositoryPath) p); <END> }
+code_review: @adavid9 can you please add `throws IOException` here and use `TrowingFunction` at `GroupRepositoryProvider.search` ?
+target code: private ArtifactCoordinates getArtifactCoordinates ( Path p ) throws IOException { return RepositoryFiles . readCoordinates ( ( RepositoryPath ) p ) ; }
+response: private ArtifactCoordinates getArtifactCoordinates(Path p) throws IOException { <START> return RepositoryFiles.readCoordinates((RepositoryPath) p); <END> }
+
+sample: 1373
+buggy_code: <START> public IPinUpdater<? extends ActivityNode> instantiate(ActivityNode node){ <END> IPinUpdater<? extends ActivityNode> updater = null; if(node instanceof CallBehaviorAction){ updater = new CallBehaviorActionPinUpdater(); }else if(node instanceof CallOperationAction){ updater = new CallOperationActionPinUpdater(); }else if(node instanceof SendSignalAction){ updater = new SendSignalActionPinUpdater(); } return updater; }
+code_review: To avoid accidental class casts, you can use the following signature: public <T extends ActivityNode> IPinUpdater<T> instantiate(T node) Then unchecked casts can be regrouped into this method (Rather than in each Clients)
+target code: public < T extends ActivityNode > IPinUpdater < T > instantiate ( ActivityNode node ) { IPinUpdater < T > updater = null ; if ( node instanceof CallBehaviorAction ) { updater = ( IPinUpdater < T > ) new CallBehaviorActionPinUpdater ( ) ; } else if ( node instanceof CallOperationAction ) { updater = ( IPinUpdater < T > ) new CallOperationActionPinUpdater ( ) ; } else if ( node instanceof SendSignalAction ) { updater = ( IPinUpdater < T > ) new SendSignalActionPinUpdater ( ) ; } return updater ; }
+response: <START> public <T extends ActivityNode> IPinUpdater<T> instantiate(T node){ <END> IPinUpdater<T> updater = null; if(node instanceof CallBehaviorAction){ updater = (IPinUpdater<T>) new CallBehaviorActionPinUpdater(); }else if(node instanceof CallOperationAction){ updater = (IPinUpdater<T>) new CallOperationActionPinUpdater(); }else if(node instanceof SendSignalAction){ updater = (IPinUpdater<T>) new SendSignalActionPinUpdater(); } return updater; }
+
+sample: 1374
+buggy_code: public boolean supportsScroll() { StorageConfiguration conf = coreFeature.getStorageConfiguration(); // DBS mem and marklogic are not yet supported <START> return conf.isDBSMongoDB() || conf.isVCS(); <END> }
+code_review: Please don't do cleanups in the same commit as bugfixes/features/improvements
+target code: public boolean supportsScroll ( ) { StorageConfiguration conf = coreFeature . getStorageConfiguration ( ) ; // DBS mem and marklogic are not yet supported return ( conf . isDBSMongoDB ( ) || conf . isVCS ( ) ) ; }
+response: public boolean supportsScroll() { StorageConfiguration conf = coreFeature.getStorageConfiguration(); // DBS mem and marklogic are not yet supported <START> return conf.isDBSMongoDB() || conf.isVCS(); <END> }
+
+sample: 1375
+buggy_code: public void onResume() { super.onResume(); addCachedDevices(); <START> if (mLocalAdapter.getBluetoothState() != BluetoothAdapter.STATE_ON) <END> removeAllDevices(); if (mStartScanOnResume) { mLocalAdapter.startScanning(true); mStartScanOnResume = false; } }
+code_review: Style issue: please use braces in a multiline conditional.
+target code: public void onResume ( ) { super . onResume ( ) ; addCachedDevices ( ) ; if ( mLocalAdapter . getBluetoothState ( ) != BluetoothAdapter . STATE_ON ) { removeAllDevices ( ) ; } if ( mStartScanOnResume ) { mLocalAdapter . startScanning ( true ) ; mStartScanOnResume = false ; } }
+response: public void onResume() { super.onResume(); addCachedDevices(); <START> if (mLocalAdapter.getBluetoothState() != BluetoothAdapter.STATE_ON) { <END> removeAllDevices(); } if (mStartScanOnResume) { mLocalAdapter.startScanning(true); mStartScanOnResume = false; } }
+
+sample: 1376
+buggy_code: protected void upgradeNexusVersion() throws IOException { final String currentVersion = checkNotNull( applicationStatusSource.getSystemStatus().getVersion() ); final String previousVersion = getConfiguration().getNexusVersion(); if ( currentVersion.equals( previousVersion ) ) { setInstanceUpgraded( false ); } else { setInstanceUpgraded( true ); getConfiguration().setNexusVersion( currentVersion ); storeConfiguration(); <START> eventMulticaster.notifyEventListeners( new NexusVersionChangedEvent( this, previousVersion, <END> currentVersion ) ); } }
+code_review: Not sure i'd go with events (yet). Model upgrade was not emitting events either, and Status flags with this change would be properly set. Let's go with baby steps, and not introduce events for these yet (unless some other good reason mentioned for it's need)
+target code: protected void upgradeNexusVersion ( ) throws IOException { final String currentVersion = checkNotNull ( applicationStatusSource . getSystemStatus ( ) . getVersion ( ) ) ; final String previousVersion = getConfiguration ( ) . getNexusVersion ( ) ; if ( currentVersion . equals ( previousVersion ) ) { setInstanceUpgraded ( false ) ; } else { setInstanceUpgraded ( true ) ; getConfiguration ( ) . setNexusVersion ( currentVersion ) ; storeConfiguration ( ) ; } }
+response: protected void upgradeNexusVersion() throws IOException { final String currentVersion = checkNotNull( applicationStatusSource.getSystemStatus().getVersion() ); final String previousVersion = getConfiguration().getNexusVersion(); if ( currentVersion.equals( previousVersion ) ) { setInstanceUpgraded( false ); } else { setInstanceUpgraded( true ); getConfiguration().setNexusVersion( currentVersion ); storeConfiguration(); } }
+
+sample: 1377
+buggy_code: <START> public DefDeclaration(String name, Type returnType, List<NameBinding> argNames, <END> TypedAST body, boolean isClassDef, FileLocation location) { if (argNames == null) { argNames = new LinkedList<NameBinding>(); } this.type = getMethodType(argNames, returnType); this.name = name; this.body = (ExpressionAST) body; this.argNames = argNames; this.isClass = isClassDef; this.location = location; }
+code_review: Can you make the old constructor call the new one (with a default value for the additional parameter)?
+target code: public DefDeclaration ( String name , Type returnType , List < NameBinding > argNames , TypedAST body , boolean isClassDef , FileLocation location ) { this ( name , returnType , null , argNames , body , isClassDef , location ) ; }
+response: <START> public DefDeclaration(String name, Type returnType, List<NameBinding> argNames, <END> TypedAST body, boolean isClassDef, FileLocation location) { this(name, returnType, argNames, body, isClassDef, location, false); }
+
+sample: 1378
+buggy_code: <START> public Waiter<HeadBucketRequest> bucketNotExists() { <END> return new WaiterBuilder<HeadBucketRequest, HeadBucketResult>() .withSdkFunction(new HeadBucketFunction(client)) .withAcceptors( new HttpFailureStatusAcceptor(404, WaiterState.SUCCESS)) .withDefaultPollingStrategy( new PollingStrategy(new MaxAttemptsRetryStrategy(20), new FixedDelayStrategy(5))) .withExecutorService(executorService).build(); }
+code_review: Can we all add the generic parameters for the acceptors? (Like `HttpFailureStatusAcceptor<HeadBucketResult>`?)
+target code: public Waiter < HeadBucketRequest > bucketNotExists ( ) { return new WaiterBuilder < HeadBucketRequest , HeadBucketResult > ( ) . withSdkFunction ( new HeadBucketFunction ( client ) ) . withAcceptors ( new HttpFailureStatusAcceptor < HeadBucketResult > ( 404 , WaiterState . SUCCESS ) ) . withDefaultPollingStrategy ( new PollingStrategy ( new MaxAttemptsRetryStrategy ( 20 ) , new FixedDelayStrategy ( 5 ) ) ) . withExecutorService ( executorService ) . build ( ) ; }
+response: <START> public Waiter<HeadBucketRequest> bucketNotExists() { <END> return new WaiterBuilder<HeadBucketRequest, HeadBucketResult>() .withSdkFunction(new HeadBucketFunction(client)) .withAcceptors( new HttpFailureStatusAcceptor<HeadBucketResult>(404, WaiterState.SUCCESS)) .withDefaultPollingStrategy( new PollingStrategy(new MaxAttemptsRetryStrategy(20), new FixedDelayStrategy(5))) .withExecutorService(executorService).build(); }
+
+sample: 1379
+buggy_code: public TextArea createWidget() { final TextArea textArea = GWT.create(TextArea.class); textArea.addKeyDownHandler(keyDownEvent -> { final int keyCode = keyDownEvent.getNativeKeyCode(); <START> if (keyCode == KeyCodes.KEY_TAB) { <END> destroyResources(); gridPanel.setFocus(true); keyDownEvent.preventDefault(); } keyDownEvent.stopPropagation(); }); textArea.addMouseDownHandler(DomEvent::stopPropagation); return textArea; }
+code_review: @jomarko A couple of question: 1) from the ticket description it seems that somehow both TAB and ESC should be managed (in different way) but I do not see that here: is the ESC managed elsewhere or in different way? 2) is this kind of interaction specific ot ScenarioSImulation? Is it not the same for other grid editor? If the behavior should be the same on different component, then it should be better to create a builder/getter somewhere else (some abstract/parent class) to avoid duplicate this snippet
+target code: public TextArea createWidget ( ) { final TextArea textArea = GWT . create ( TextArea . class ) ; textArea . addMouseDownHandler ( DomEvent : : stopPropagation ) ; return textArea ; }
+response: public TextArea createWidget() { final TextArea textArea = GWT.create(TextArea.class); textArea.addKeyDownHandler(keyDownEvent -> { final int keyCode = keyDownEvent.getNativeKeyCode(); <START> if (keyCode == KeyCodes.KEY_TAB) { <END> destroyResources(); gridPanel.setFocus(true); keyDownEvent.preventDefault(); } keyDownEvent.stopPropagation(); }); textArea.addMouseDownHandler(DomEvent::stopPropagation); return textArea; }
+
+sample: 1380
+buggy_code: public void testHierarchyView() { DockerImagesTab imageTab = openDockerImagesTab(); buildImage(IMAGE_TEST_BUILD, DOCKERFILE_FOLDER, imageTab); if (mockitoIsUsed()) { <START> setupDataForMockito(); <END> } DockerImageHierarchyTab hierarchyTab = openDockerImageHierarchyTab(); List<TreeItem> treeItems = hierarchyTab.getTreeItems(); compareTextInFirstNode(treeItems, "alpine:3.3"); List<TreeItem> treeItems2 = treeItems.get(0).getItems(); compareTextInFirstNode(treeItems2, IMAGE_TEST_BUILD + NAME_TAG_SEPARATOR + IMAGE_TAG_LATEST); }
+code_review: Why is setupDataForMockito() called here when it is designated with the @Before keyword below? I have seen this in a few other tests as well.
+target code: public void testHierarchyView ( ) { DockerImagesTab imageTab = openDockerImagesTab ( ) ; buildImage ( IMAGE_TEST_BUILD , DOCKERFILE_FOLDER , imageTab ) ; if ( mockitoIsUsed ( ) ) { buildImage ( ) ; } DockerImageHierarchyTab hierarchyTab = openDockerImageHierarchyTab ( ) ; List < TreeItem > treeItems = hierarchyTab . getTreeItems ( ) ; compareTextInFirstNode ( treeItems , "alpine : 3 . 3" ) ; List < TreeItem > treeItems2 = treeItems . get ( 0 ) . getItems ( ) ; compareTextInFirstNode ( treeItems2 , IMAGE_TEST_BUILD + NAME_TAG_SEPARATOR + IMAGE_TAG_LATEST ) ; }
+response: public void testHierarchyView() { DockerImagesTab imageTab = openDockerImagesTab(); buildImage(IMAGE_TEST_BUILD, DOCKERFILE_FOLDER, imageTab); DockerImageHierarchyTab hierarchyTab = openDockerImageHierarchyTab(); List<TreeItem> treeItems = hierarchyTab.getTreeItems(); compareTextInFirstNode(treeItems, "alpine:3.3"); List<TreeItem> treeItems2 = treeItems.get(0).getItems(); compareTextInFirstNode(treeItems2, IMAGE_TEST_BUILD + NAME_TAG_SEPARATOR + IMAGE_TAG_LATEST); }
+
+sample: 1381
+buggy_code: <START> void doBadOffsetInputTest(String name, long offset) { <END> try { new Offset(name, offset); fail("Should have thrown because one of the inputs is invalid"); } catch (IllegalArgumentException e) { // expected. } }
+code_review: private
+target code: private void doBadOffsetInputTest ( String name , long offset ) { try { new Offset ( name , offset ) ; fail ( "Should have thrown because one of the inputs is invalid" ) ; } catch ( IllegalArgumentException e ) { // expected . } }
+response: <START> private void doBadOffsetInputTest(String name, long offset) { <END> try { new Offset(name, offset); fail("Should have thrown because one of the inputs is invalid"); } catch (IllegalArgumentException e) { // expected. } }
+
+sample: 1382
+buggy_code: private void enablePhiro() { SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); if (!sharedPreferences.getBoolean(Constants.PHIRO_INITIALIZED, false)) { <START> BaseSettingsActivity.setPhiroSharedPreferenceEnabled(this, true); <END> sharedPreferences.edit().putBoolean(Constants.PHIRO_INITIALIZED, true).apply(); } }
+code_review: why is the same code still present in the SettingsActivity?
+target code: private void enablePhiro ( ) { SharedPreferences sharedPreferences = PreferenceManager . getDefaultSharedPreferences ( this ) ; if ( ! sharedPreferences . getBoolean ( PHIRO_INITIALIZED , false ) ) { BaseSettingsActivity . setPhiroSharedPreferenceEnabled ( this , true ) ; sharedPreferences . edit ( ) . putBoolean ( PHIRO_INITIALIZED , true ) . apply ( ) ; } }
+response: private void enablePhiro() { SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); if (!sharedPreferences.getBoolean(Constants.PHIRO_INITIALIZED, false)) { <START> BaseSettingsActivity.setPhiroSharedPreferenceEnabled(this, true); <END> sharedPreferences.edit().putBoolean(Constants.PHIRO_INITIALIZED, true).apply(); } }
+
+sample: 1383
+buggy_code: private void checkReturnedValue(ReturnStatementTree tree, String nonNullAnnotation) { SymbolicValue returnedValue = programState.peekValue(); Constraint constraint = programState.getConstraint(returnedValue); if (constraint == null) { <START> reportIssue(tree, "This method''s return value is marked \"{0}\" but null may be returned.", nonNullAnnotation); <END> } else if (constraint.isNull()) { reportIssue(tree, "This method''s return value is marked \"{0}\" but null is returned.", nonNullAnnotation); } }
+code_review: We should not raise issues in this case, as we are not certain. As we are not (yet) doing cross-procedural analysis, doing the assumption that we may end up with a null value with necessarily raise à lot of FPs.
+target code: private void checkReturnedValue ( ReturnStatementTree tree , String nonNullAnnotation ) { SymbolicValue returnedValue = programState . peekValue ( ) ; Constraint constraint = programState . getConstraint ( returnedValue ) ; if ( constraint != null && constraint . isNull ( ) ) { reportIssue ( tree , "This method''s return value is marked \" { 0 } \" but null is returned . " , nonNullAnnotation ) ; } }
+response: private void checkReturnedValue(ReturnStatementTree tree, String nonNullAnnotation) { SymbolicValue returnedValue = programState.peekValue(); Constraint constraint = programState.getConstraint(returnedValue); if (constraint == null) { <START> reportIssue(tree, "This method''s return value is marked \"{0}\" but null may be returned.", nonNullAnnotation); <END> } else if (constraint.isNull()) { reportIssue(tree, "This method''s return value is marked \"{0}\" but null is returned.", nonNullAnnotation); } }
+
+sample: 1384
+buggy_code: private void verifyEditResultCode(EditingResult result) { <START> assertThat(result.getResult(), equalTo(SUCCESS)); <END> }
+code_review: Minor: consider replacing equalTo with is from Hamcrest here and below.
+target code: private void verifyEditResultCode ( EditingResult result ) { assertThat ( result . getResult ( ) , is ( SUCCESS ) ) ; }
+response: private void verifyEditResultCode(EditingResult result) { <START> assertThat(result.getResult(), is(SUCCESS)); <END> }
+
+sample: 1385
+buggy_code: <START> public EnginesPreferencePage() { <END> }
+code_review: should call super(); explicitly
+target code: public EnginesPreferencePage ( ) { super ( ) ; }
+response: public EnginesPreferencePage() { super(); }
+
+sample: 1386
+buggy_code: public List<AmbryReplica> getReplicaIds() { <START> return clusterManagerCallback.getReplicaIdsForPartition(this) <END> .stream() .map(r -> (AmbryReplica) r) .collect(Collectors.toList()); }
+code_review: Instead of copying the list and requiring a (potentially) unsafe cast. I think we could make more use of generics in `ClusterManagerCallback`.
+target code: public List < AmbryReplica > getReplicaIds ( ) { return clusterManagerCallback . getReplicaIdsForPartition ( this ) ; }
+response: public List<AmbryReplica> getReplicaIds() { <START> return clusterManagerCallback.getReplicaIdsForPartition(this) <END> .stream() .map(r -> (AmbryReplica) r) .collect(Collectors.toList()); }
+
+sample: 1387
+buggy_code: private String blockingSSLConnect(int socketBufSize) throws IOException { String connectionId = selector.connect(new InetSocketAddress("localhost", server.port), socketBufSize, socketBufSize, PortType.SSL); while (!selector.connected().contains(connectionId)) { <START> System.out.println("here"); <END> selector.poll(10000L); } return connectionId; }
+code_review: remove?
+target code: private String blockingSSLConnect ( int socketBufSize ) throws IOException { String connectionId = selector . connect ( new InetSocketAddress ( "localhost" , server . port ) , socketBufSize , socketBufSize , PortType . SSL ) ; while ( ! selector . connected ( ) . contains ( connectionId ) ) { selector . poll ( 10000L ) ; } return connectionId ; }
+response: private String blockingSSLConnect(int socketBufSize) throws IOException { String connectionId = selector.connect(new InetSocketAddress("localhost", server.port), socketBufSize, socketBufSize, PortType.SSL); while (!selector.connected().contains(connectionId)) { <START> System.out.println("here"); selector.poll(10000L); <END> } return connectionId; }
+
+sample: 1388
+buggy_code: <START> public EDDifferentialPrivacy(double epsilon, double delta, <END> DataGeneralizationScheme generalization) { super(delta); this.epsilon = epsilon; this.generalization = generalization; this.beta = calculateBeta(epsilon); this.k = calculateK(getDelta(), epsilon, this.beta); }
+code_review: Why does this constructor not simply call the other one?
+target code: public EDDifferentialPrivacy ( double epsilon , double delta , DataGeneralizationScheme generalization ) { this ( epsilon , delta , generalization , false ) ; }
+response: <START> public EDDifferentialPrivacy(double epsilon, double delta, <END> DataGeneralizationScheme generalization) { this(epsilon, delta); this.generalization = generalization; }
+
+sample: 1389
+buggy_code: private final String getSessionIndex(Assertion subjectAssertion) { List<AuthnStatement> authnStatements = subjectAssertion.getAuthnStatements(); if(authnStatements != null && authnStatements.size() > 0) { AuthnStatement statement = authnStatements.get(0); <START> return statement.getSessionIndex(); <END> } return null; }
+code_review: Can `statement` be null?
+target code: private final String getSessionIndex ( Assertion subjectAssertion ) { List < AuthnStatement > authnStatements = subjectAssertion . getAuthnStatements ( ) ; if ( authnStatements != null && authnStatements . size ( ) > 0 ) { AuthnStatement statement = authnStatements . get ( 0 ) ; if ( statement != null ) { return statement . getSessionIndex ( ) ; } } return null ; }
+response: private final String getSessionIndex(Assertion subjectAssertion) { List<AuthnStatement> authnStatements = subjectAssertion.getAuthnStatements(); if(authnStatements != null && authnStatements.size() > 0) { AuthnStatement statement = authnStatements.get(0); <START> return statement.getSessionIndex(); <END> } return null; }
+
+sample: 1390
+buggy_code: public void visitNode(Tree tree) { if (!hasSemantic()) { return; } MethodTree method = (MethodTree) tree; <START> if (!INPUT_STREAM_READ.matches(method) || method.block() == null) { <END> return; } method.accept(new ReturnStatementVisitor()); }
+code_review: I would switch those two conditions.
+target code: public void visitNode ( Tree tree ) { if ( ! hasSemantic ( ) ) { return ; } MethodTree method = ( MethodTree ) tree ; if ( method . block ( ) != null && INPUT_STREAM_READ . matches ( method ) ) { method . accept ( new ReturnStatementVisitor ( ) ) ; } }
+response: public void visitNode(Tree tree) { if (!hasSemantic()) { return; } MethodTree method = (MethodTree) tree; <START> if (method.block() == null || !INPUT_STREAM_READ.matches(method)) { <END> return; } method.accept(new ReturnStatementVisitor()); }
+
+sample: 1391
+buggy_code: protected void onFinishInflate() { super.onFinishInflate(); View.inflate(getContext(), R.layout.merge_login_view, this); loginButton = Views.findById(this, R.id.sign_in_button); <START> loginButton.setSize(SignInButton.SIZE_WIDE); <END> }
+code_review: Can't be set in xml ?
+target code: protected void onFinishInflate ( ) { super . onFinishInflate ( ) ; View . inflate ( getContext ( ) , R . layout . merge_login_view , this ) ; loginButton = Views . findById ( this , R . id . sign_in_button ) ; }
+response: protected void onFinishInflate() { super.onFinishInflate(); View.inflate(getContext(), R.layout.merge_login_view, this); loginButton = Views.findById(this, R.id.sign_in_button); loginButton.setSize(SignInButton.SIZE_WIDE); }
+
+sample: 1392
+buggy_code: <START> private int encode(int bucketIndex, int value) <END> { return (bucketIndex << VALUE_BITS) | value; }
+code_review: static
+target code: private static int encode ( int bucketIndex , int value ) { return ( bucketIndex < < VALUE_BITS ) | value ; }
+response: <START> private static int encode(int bucketIndex, int value) <END> { return (bucketIndex << VALUE_BITS) | value; }
+
+sample: 1393
+buggy_code: public void onUberfireDocksInteractionEvent(@Observes final UberfireDocksInteractionEvent uberfireDocksInteractionEvent) { <START> if (isUberfireDocksInteractionEventToManage(uberfireDocksInteractionEvent) && !uberfireDocksInteractionEvent.getTargetDock().getIdentifier().equals(TestToolsPresenter.IDENTIFIER)) { <END> populateRightDocks(uberfireDocksInteractionEvent.getTargetDock().getIdentifier()); } }
+code_review: Are you sure that `getTargetDock().getIdentifier()` is always not `null`? I suggest to rewrite the condition as `!TestToolsPresenter.IDENTIFIER.equals(uberfireDocksInteractionEvent.getTargetDock().getIdentifier())`
+target code: public void onUberfireDocksInteractionEvent ( @Observes final UberfireDocksInteractionEvent uberfireDocksInteractionEvent ) { if ( isUberfireDocksInteractionEventToManage ( uberfireDocksInteractionEvent ) && ! TestToolsPresenter . IDENTIFIER . equals ( uberfireDocksInteractionEvent . getTargetDock ( ) . getIdentifier ( ) ) ) { populateRightDocks ( uberfireDocksInteractionEvent . getTargetDock ( ) . getIdentifier ( ) ) ; } }
+response: public void onUberfireDocksInteractionEvent(@Observes final UberfireDocksInteractionEvent uberfireDocksInteractionEvent) { <START> if (isUberfireDocksInteractionEventToManage(uberfireDocksInteractionEvent) && !TestToolsPresenter.IDENTIFIER.equals(uberfireDocksInteractionEvent.getTargetDock().getIdentifier())) { <END> populateRightDocks(uberfireDocksInteractionEvent.getTargetDock().getIdentifier()); } }
+
+sample: 1394
+buggy_code: public String getDocType() { if (Objects.isNull(docType)) { List<SelectItem> allDocTypes = getAllDoctypes(); for (SelectItem item : allDocTypes) { <START> if ("Monograph".equals(item.getValue())) { <END> setDocType((String) item.getValue()); return docType; } } setDocType((String) allDocTypes.get(0).getValue()); } return docType; }
+code_review: No, such a feature has not been requested so far. The current state is that each division can be the type of root element. It was discussed that we might later add a possibility that these types can be restricted. In the context, one could also implement the selection of a standard type.
+target code: public String getDocType ( ) { if ( Objects . isNull ( docType ) && ! allDocTypes . isEmpty ( ) ) { setDocType ( ( String ) allDocTypes . get ( 0 ) . getValue ( ) ) ; } return docType ; }
+response: public String getDocType() { if (Objects.isNull(docType)) { List<SelectItem> allDocTypes = getAllDoctypes(); for (SelectItem item : allDocTypes) { if ("Monograph".equals(item.getValue())) { setDocType((String) item.getValue()); return docType; } } setDocType((String) allDocTypes.get(0).getValue()); } return docType; }
+
+sample: 1395
+buggy_code: <START> public boolean shouldUseCommitTemplate() { <END> return Activator.getDefault().getPreferenceStore() .getBoolean(UIPreferences.COMMIT_DIALOG_MESSAGE_TEMPLATE) && getCommitMessage() == null && getCommitTemplate().isPresent(); }
+code_review: why is this needed ?
+target code: public boolean shouldUseCommitTemplate ( ) { return getCommitMessage ( ) == null && getCommitTemplate ( ) . isPresent ( ) ; }
+response: <START> public boolean shouldUseCommitTemplate() { <END> return Activator.getDefault().getPreferenceStore() .getBoolean(UIPreferences.COMMIT_DIALOG_MESSAGE_TEMPLATE) && getCommitMessage() == null && getCommitTemplate().isPresent(); }
+
+sample: 1396
+buggy_code: public void waitUntilAllBlocked() { try { _blockersDoneLatch.await(); } <START> catch (Exception ex) { <END> } }
+code_review: missing exception. either log, rethrow runtime or rename exception ignored. Expand Exception
+target code: public void waitUntilAllBlocked ( ) throws InterruptedException { _blockersDoneLatch . await ( ) ; }
+response: public void waitUntilAllBlocked() { try { _blockersDoneLatch.await(); } <START> catch (InterruptedException ex) { <END> } }
+
+sample: 1397
+buggy_code: private static boolean hasMatrixParam(List<PathSegment> pathSegments, String param) { if (pathSegments != null) for (PathSegment segement : pathSegments) { MultivaluedMap<String, String> matrixParams = segement.getMatrixParameters(); if (matrixParams != null && !matrixParams.isEmpty()) for (String key : matrixParams.keySet()) { if (key.equals(param)) return true; <START> } <END> } return false; }
+code_review: Why not if (matrixParams.containsKey(param) { ... } ?
+target code: private static boolean hasMatrixParam ( List < PathSegment > pathSegments , String param ) { if ( pathSegments != null ) for ( PathSegment segement : pathSegments ) { MultivaluedMap < String , String > matrixParams = segement . getMatrixParameters ( ) ; if ( matrixParams != null && ! matrixParams . isEmpty ( ) && matrixParams . containsKey ( param ) ) return true ; } return false ; }
+response: private static boolean hasMatrixParam(List<PathSegment> pathSegments, String param) { if (pathSegments != null) for (PathSegment segement : pathSegments) { MultivaluedMap<String, String> matrixParams = segement.getMatrixParameters(); if (matrixParams != null && !matrixParams.isEmpty()) for (String key : matrixParams.keySet()) { if (key.equals(param)) return true; <START> } <END> } return false; }
+
+sample: 1398
+buggy_code: public void setAttached(boolean attached) { <START> attached = attached; <END> }
+code_review: this is self assignment - please modify to: this.attached = attached
+target code: public void setAttached ( boolean attached ) { this . attached = attached ; }
+response: public void setAttached(boolean attached) { <START> this.attached = attached; <END> }
+
+sample: 1399
+buggy_code: public void visited(RevObject o) { <START> lowestDepthVisited.put(o, Long.valueOf(walk.getTreeDepth())); <END> }
+code_review: Stupid question: why long/Long? walk.getTreeDepth() returns int, so why not use Integer (also in the Map, and intValue() above)?
+target code: public void visited ( RevObject o ) { lowestDepthVisited . put ( o , Integer . valueOf ( walk . getTreeDepth ( ) ) ) ; }
+response: public void visited(RevObject o) { <START> lowestDepthVisited.put(o, Integer.valueOf(walk.getTreeDepth())); <END> }
+
+sample: 1400
+buggy_code: private List<Object[]> convertIntegerToLong(List<Object[]> list, int index) { for (Object[] item : list) { <START> item[index] = new Long((long) item[index]); <END> } return list; }
+code_review: Is this superfluous casting?
+target code: private List < Object [ ] > convertIntegerToLong ( List < Object [ ] > list , int index ) { for ( Object [ ] item : list ) { item [ index ] = ( long ) item [ index ] ; } return list ; }
+response: private List<Object[]> convertIntegerToLong(List<Object[]> list, int index) { for (Object[] item : list) { <START> item[index] = new Long((long) item[index]); <END> } return list; }
+
+sample: 1401
+buggy_code: private void flushAll() throws AuthException { for (DynamicMap.Entry<Cache<?, ?>> e : cacheMap) { CacheResource cacheResource = new CacheResource(e.getPluginName(), e.getExportName(), e.getProvider()); if (FlushCache.WEB_SESSIONS.equals(cacheResource.getName())) { continue; } flushCache.get().apply(cacheResource, <START> new FlushCache.Input()); <END> } }
+code_review: No new for constant object in loop. Either pass null, or construct the instance outside of the looop.
+target code: private void flushAll ( ) throws AuthException { for ( DynamicMap . Entry < Cache < ? , ? > > e : cacheMap ) { CacheResource cacheResource = new CacheResource ( e . getPluginName ( ) , e . getExportName ( ) , e . getProvider ( ) ) ; if ( FlushCache . WEB_SESSIONS . equals ( cacheResource . getName ( ) ) ) { continue ; } flushCache . apply ( cacheResource , null ) ; } }
+response: private void flushAll() throws AuthException { for (DynamicMap.Entry<Cache<?, ?>> e : cacheMap) { CacheResource cacheResource = new CacheResource(e.getPluginName(), e.getExportName(), e.getProvider()); if (FlushCache.WEB_SESSIONS.equals(cacheResource.getName())) { continue; } flushCache.get().apply(cacheResource, <START> null); <END> } }
+
+sample: 1402
+buggy_code: <START> public static Map<String, IAnalysisModule> getAnalysisModules() { <END> if (fAnalysisModules.isEmpty()) { TmfAnalysisType analysis = TmfAnalysisType.getInstance(); List<IAnalysisModule> modules = analysis.getAnalysisModules(); for (IAnalysisModule module : modules) { fAnalysisModules.add(module); } } return getExecutableModules(); }
+code_review: I'm not sure I like the fact we're creating 2-3 Lists and Maps everytime the "get" is called. Wouldn't there be a way to keep the fAnalsysiModules map always up-to-date as analyzes register, so that the get can simply return the map directly (wrapped into a Collections.unmodifiableMap of course) ?
+target code: public static Map < String , IAnalysisModule > getAnalysisModules ( ) { synchronized ( fAnalysisModules ) { if ( fAnalysisModules . isEmpty ( ) ) { TmfAnalysisType analysis = TmfAnalysisType . getInstance ( ) ; List < IAnalysisModule > modules = analysis . getAnalysisModules ( ) ; for ( IAnalysisModule module : modules ) { fAnalysisModules . add ( module ) ; } } } return getExecutableModules ( ) ; }
+response: <START> public static Map<String, IAnalysisModule> getAnalysisModules() { <END> if (fAnalysisModules.isEmpty()) { TmfAnalysisType analysis = TmfAnalysisType.getInstance(); List<IAnalysisModule> modules = analysis.getAnalysisModules(); for (IAnalysisModule module : modules) { fAnalysisModules.add(module); } } return getExecutableModules(); }
+
+sample: 1403
+buggy_code: void validateValueParameter(String name, Object value) { Class<? extends IValueValidator> validators[] = wrappedParameter.validateValueWith(); <START> if (validators != null && validators.length>0) { <END> for(final Class<? extends IValueValidator> validator: validators) { validateValueParameter(validator, name, value); } } }
+code_review: Spaces.
+target code: void validateValueParameter ( String name , Object value ) { final Class < ? extends IValueValidator > validators [ ] = wrappedParameter . validateValueWith ( ) ; if ( validators != null && validators . length > 0 ) { for ( final Class < ? extends IValueValidator > validator : validators ) { validateValueParameter ( validator , name , value ) ; } } }
+response: void validateValueParameter(String name, Object value) { Class<? extends IValueValidator> validators[] = wrappedParameter.validateValueWith(); <START> if (validators != null && validators.length > 0) { <END> for(final Class<? extends IValueValidator> validator: validators) { validateValueParameter(validator, name, value); } } }
+
+sample: 1404
+buggy_code: <START> public <C> Stream<Match> match(Object object, Captures captures, C context) <END> { if (previous.isPresent()) { return previous.get().match(object, captures, context) .flatMap(match -> accept(object, match.captures(), context)); } else { return accept(object, captures, context); } }
+code_review: final?
+target code: public final < C > Stream < Match > match ( Object object , Captures captures , C context ) { if ( previous . isPresent ( ) ) { return previous . get ( ) . match ( object , captures , context ) . flatMap ( match - > accept ( object , match . captures ( ) , context ) ) ; } else { return accept ( object , captures , context ) ; } }
+response: <START> public <C> Stream<Match> match(Object object, Captures captures, C context) <END> { if (previous.isPresent()) { return previous.get().match(object, captures, context) .flatMap(match -> accept(object, match.captures(), context)); } else { return accept(object, captures, context); } }
+
+sample: 1405
+buggy_code: public ArticlePageObject savePage() { waitForElementInViewPort(editSummary); waitForElementInViewPort(reviewChangesButton); waitForElementVisibleByElement(savePanel); publishButton.click(); <START> PageObjectLogging.log("savePage", "The 2nd Publish Button is clicked", true); <END> return new ArticlePageObject(driver); }
+code_review: Global listener catch each click. You don't need to log it.
+target code: public ArticlePageObject savePage ( ) { waitForElementInViewPort ( editSummary ) ; waitForElementInViewPort ( reviewChangesButton ) ; waitForElementVisibleByElement ( savePanel ) ; publishButton . click ( ) ; return new ArticlePageObject ( driver ) ; }
+response: public ArticlePageObject savePage() { waitForElementInViewPort(editSummary); waitForElementInViewPort(reviewChangesButton); waitForElementVisibleByElement(savePanel); publishButton.click(); return new ArticlePageObject(driver); }
+
+sample: 1406
+buggy_code: public void executeCommand(CommandSender sender, List<String> arguments) { // Get the list of banned players Set<OfflinePlayer> bannedPlayers = bukkitService.getBannedPlayers(); Set<String> namedBanned = new HashSet<>(bannedPlayers.size()); for (OfflinePlayer offlinePlayer : bannedPlayers) { namedBanned.add(offlinePlayer.getName()); } <START> purgeService.purgePlayers(sender, namedBanned, bannedPlayers.toArray(new OfflinePlayer[0])); <END> }
+code_review: Please revert. I know it's an IntelliJ warning but why should we tell Java to create an array generically by reflection when we literally know the size beforehand?
+target code: public void executeCommand ( CommandSender sender , List < String > arguments ) { // Get the list of banned players Set < OfflinePlayer > bannedPlayers = bukkitService . getBannedPlayers ( ) ; Set < String > namedBanned = new HashSet < > ( bannedPlayers . size ( ) ) ; for ( OfflinePlayer offlinePlayer : bannedPlayers ) { namedBanned . add ( offlinePlayer . getName ( ) ) ; } purgeService . purgePlayers ( sender , namedBanned , bannedPlayers . toArray ( new OfflinePlayer [ bannedPlayers . size ( ) ] ) ) ; }
+response: public void executeCommand(CommandSender sender, List<String> arguments) { // Get the list of banned players Set<OfflinePlayer> bannedPlayers = bukkitService.getBannedPlayers(); Set<String> namedBanned = new HashSet<>(bannedPlayers.size()); for (OfflinePlayer offlinePlayer : bannedPlayers) { namedBanned.add(offlinePlayer.getName()); } <START> purgeService.purgePlayers(sender, namedBanned, bannedPlayers.toArray(new OfflinePlayer[bannedPlayers.size()])); <END> }
+
+sample: 1407
+buggy_code: <START> public static Keyspace getKeyspace() { <END> return keyspace; }
+code_review: Why do we need to make this public? It should be package scoped, protected would work as well. All Astyanax classes in com.rackspace.blueflood.io.astyanax.\* should be able to call this method without it being public.
+target code: protected static Keyspace getKeyspace ( ) { return keyspace ; }
+response: <START> static Keyspace getKeyspace() { <END> return keyspace; }
+
+sample: 1408
+buggy_code: void setNewElementYPosition(final Element elementReference, final Element newElement) { <START> int referencePosition = getDndListComponent().getPositionY(elementReference); <END> getDndListComponent().setPositionY(newElement, referencePosition); }
+code_review: just for consistency, can we use `final int`?
+target code: void setNewElementYPosition ( final Element elementReference , final Element newElement ) { final int referencePosition = getDndListComponent ( ) . getPositionY ( elementReference ) ; getDndListComponent ( ) . setPositionY ( newElement , referencePosition ) ; }
+response: void setNewElementYPosition(final Element elementReference, final Element newElement) { <START> final int referencePosition = getDndListComponent().getPositionY(elementReference); <END> getDndListComponent().setPositionY(newElement, referencePosition); }
+
+sample: 1409
+buggy_code: public void layoutTopRight(CTabFolder ctf) { Composite trComp = getTRComposite(ctf); if (trComp.getChildren().length > 0) { trComp.setVisible(true); ctf.setTopRight(trComp, SWT.RIGHT | SWT.WRAP); } else { ctf.setTopRight(null); trComp.setVisible(false); } trComp.pack(); <START> ctf.layout(true, true); <END> }
+code_review: I'm not sure if we should fix it in this way. Removing the CTabFolder.layout invocation is a part of the optimization process that is needed to fix the issue exposed by the "JRockit Mission Control " application. It blocks the similar applications to be migrated to the E4 (poor GUI rendering performance) Daniel
+target code: public void layoutTopRight ( CTabFolder ctf ) { Composite trComp = getTRComposite ( ctf ) ; if ( trComp . getChildren ( ) . length > 0 ) { trComp . setVisible ( true ) ; ctf . setTopRight ( trComp , SWT . RIGHT | SWT . WRAP ) ; } else { ctf . setTopRight ( null ) ; trComp . setVisible ( false ) ; } trComp . pack ( ) ; trComp . layout ( true , true ) ; }
+response: public void layoutTopRight(CTabFolder ctf) { Composite trComp = getTRComposite(ctf); if (trComp.getChildren().length > 0) { trComp.setVisible(true); ctf.setTopRight(trComp, SWT.RIGHT | SWT.WRAP); } else { ctf.setTopRight(null); trComp.setVisible(false); } trComp.pack(); }
+
+sample: 1410
+buggy_code: ByteBuf buffer() throws IOException { if (buf == null) { buf = Netty4Utils.toByteBuf(context.get()); context = null; <START> } <END> return buf; }
+code_review: Can we `assert context == null` here?
+target code: ByteBuf buffer ( ) throws IOException { if ( buf == null ) { buf = Netty4Utils . toByteBuf ( context . get ( ) ) ; context = null ; } assert context == null ; return buf ; }
+response: ByteBuf buffer() throws IOException { if (buf == null) { buf = Netty4Utils.toByteBuf(context.get()); context = null; assert context == null; <START> } <END> return buf; }
+
+sample: 1411
+buggy_code: public String getName() { String name = super.getName(); <START> if (name == null || name.isEmpty()) { <END> return ""; } else { return name; } }
+code_review: Now we have `isEmpty` method for Strings in Utils. Is it good idea to use it here as well? https://github.com/kiegroup/kie-wb-common/blob/master/kie-wb-common-stunner/kie-wb-common-stunner-core/kie-wb-common-stunner-api/kie-wb-common-stunner-core-api/src/main/java/org/kie/workbench/common/stunner/core/util/StringUtils.java
+target code: public String getName ( ) { String name = super . getName ( ) ; if ( StringUtils . isEmpty ( name ) ) { return "" ; } else { return name ; } }
+response: public String getName() { String name = super.getName(); <START> if (name == null || name.isEmpty()) { <END> return ""; } else { return name; } }
+
+sample: 1412
+buggy_code: private void verifyInvalidValueSize(IndexValue value, String logSegmentName) { try { int capacity = TestUtils.RANDOM.nextInt(value.getBytes().capacity()); ByteBuffer invalidValue = ByteBuffer.allocate(capacity); invalidValue.put(value.getBytes().array(), 0, capacity); <START> new IndexValue(logSegmentName, invalidValue, version); <END> fail( "Contruction of IndexValue expected to fail with invalid byte buffer capacity of " + invalidValue.capacity()); } catch (IllegalArgumentException e) { } }
+code_review: minor: put _only_ the statement you expect to fail in `try`.
+target code: private void verifyInvalidValueSize ( IndexValue value , String logSegmentName ) { int capacity = TestUtils . RANDOM . nextInt ( value . getBytes ( ) . capacity ( ) ) ; ByteBuffer invalidValue = ByteBuffer . allocate ( capacity ) ; invalidValue . put ( value . getBytes ( ) . array ( ) , 0 , capacity ) ; try { new IndexValue ( logSegmentName , invalidValue , version ) ; fail ( "Contruction of IndexValue expected to fail with invalid byte buffer capacity of " + invalidValue . capacity ( ) ) ; } catch ( IllegalArgumentException e ) { } }
+response: private void verifyInvalidValueSize(IndexValue value, String logSegmentName) { try { int capacity = TestUtils.RANDOM.nextInt(value.getBytes().capacity()); ByteBuffer invalidValue = ByteBuffer.allocate(capacity); invalidValue.put(value.getBytes().array(), 0, capacity); <START> new IndexValue(logSegmentName, invalidValue, version); <END> } catch (IllegalArgumentException e) { fail( "Contruction of IndexValue expected to fail with invalid byte buffer capacity of " + invalidValue.capacity()); } }
+
+sample: 1413
+buggy_code: void dispose() { if (semanticResourcesUpdater != null) { semanticResourcesUpdater.dispose(); semanticResourcesUpdater = null; <START> } <END> }
+code_review: session could be set to null on dispose().
+target code: void dispose ( ) { session = null ; if ( semanticResourcesUpdater != null ) { semanticResourcesUpdater . dispose ( ) ; semanticResourcesUpdater = null ; } }
+response: void dispose() { if (semanticResourcesUpdater != null) { semanticResourcesUpdater.dispose(); semanticResourcesUpdater = null; <START> } session = null; <END> }
+
+sample: 1414
+buggy_code: public void deleteByContentType(final ContentTypeIf type) throws DotDataException{ <START> final DotConnect dc = new DotConnect(); <END> dc.setSQL(sql.DELETE_RELATIONSHIP_BY_PARENT_OR_CHILD_INODE); dc.addParam(type.id()); dc.addParam(type.id()); dc.loadResults(); }
+code_review: you can do this things in one line such as ``` new DotConnect().setSQL(sql.DELETE_RELATIONSHIP_BY_PARENT_OR_CHILD_INODE).addParam(type.id()).addParam(type.id()).loadResults(); ```
+target code: public void deleteByContentType ( final ContentTypeIf type ) throws DotDataException { new DotConnect ( ) . setSQL ( sql . DELETE_RELATIONSHIP_BY_PARENT_OR_CHILD_INODE ) . addParam ( type . id ( ) ) . addParam ( type . id ( ) ) . loadResults ( ) ; }
+response: public void deleteByContentType(final ContentTypeIf type) throws DotDataException{ <START> new DotConnect().setSQL(sql.DELETE_RELATIONSHIP_BY_PARENT_OR_CHILD_INODE).addParam(type.id()).addParam(type.id()).loadResults(); <END> }
+
+sample: 1415
+buggy_code: public int getUniqueNotificationId() { if (uniqueNotificationIdCounter == null) { uniqueNotificationIdCounter = new AtomicInteger(0); <START> } <END> return uniqueNotificationIdCounter.incrementAndGet(); }
+code_review: Is the if block still needed?
+target code: public int getUniqueNotificationId ( ) { return uniqueNotificationIdCounter . incrementAndGet ( ) ; }
+response: public int getUniqueNotificationId() { if (uniqueNotificationIdCounter == null) { uniqueNotificationIdCounter = new AtomicInteger(0); } return uniqueNotificationIdCounter.incrementAndGet(); }
+

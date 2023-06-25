@@ -136,12 +136,22 @@ def apply_heuristics(line):
         heuristic_remove_redundant_words,
         heuristic_remove_starts_with_java,
         heuristic_remove_code_explanation_at_the_end,
+        remove_extra_spaces
     ]
 
     for heuristic in heuristics:
         line = heuristic(line)
 
     return line
+
+
+def apply_heuristic_in_file(input_file):
+    with open(input_file, "r", encoding="UTF-8") as f1:
+        lines = f1.readlines()
+
+    lines = [apply_heuristics(line) for line in lines]
+    output_file = f"{input_file.split('.')[0]}_formatted.txt"
+    write_list_to_file(output_file, lines)
 
 
 def modify_file_name(file_name, start_index, end_index):
@@ -231,7 +241,7 @@ def get_EM_R4R(ref_file, pred_file):
                 count += 1
                 focus_null += 1
             elif heuristic_count_frequency(focus_part, p) == 0:
-                count += 1
+                count += 0
                 del_matches.append(i)
         if r in p:
             if heuristic_count_frequency(r, p) > 1:
@@ -250,7 +260,7 @@ def get_EM_R4R(ref_file, pred_file):
     print(f"r in p: {sorted(r_in_p)} len: {len(r_in_p)}")
     print(f"r == p: {r_equal_p}")
 
-    print(f"EM: {count / len(refs) * 100:.2f}%")
+    print(f"EM: {len(matches) / len(refs) * 100:.2f}%")
     print(f"matched indices: {matches}, len: {len(matches)}")
     print(f"delete matches: {del_matches}, len: {len(del_matches)}")
     print(f"possible_duplicates matches: {possible_duplicates}, len: {len(possible_duplicates)}")
@@ -482,3 +492,126 @@ def format_file(filename, function_name):
 
         output_file_name = f"{filename.split('.')[0]}_formatted.txt"
         write_list_to_file(f"{output_file_name}", output_lines)
+
+
+def get_buggy_code_contexts(buggy_codes):
+    buggy_code_contexts = []
+    for buggy_code in buggy_codes:
+        index = buggy_code.index("<START>")
+        buggy_code_context = buggy_code[:index]
+        buggy_code_contexts.append(buggy_code_context)
+    return buggy_code_contexts
+
+
+def get_device():
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def init_hugging_face_model(hugging_face_model):
+    device = get_device()
+    tokenizer = AutoTokenizer.from_pretrained(hugging_face_model)
+    model = AutoModelForCausalLM.from_pretrained(hugging_face_model)
+    model.to(device)
+    return model, tokenizer
+
+
+def get_predictions_from_generative_model(model, tokenizer, code_reviews, buggy_code_contexts):
+    device = get_device()
+    for i, (code_review, buggy_code_context) in enumerate(zip(code_reviews, buggy_code_contexts)):
+        user_prompt = f"{code_review}\n{buggy_code_context}"
+        input_ids = tokenizer.encode(user_prompt, return_tensors='pt').to(device)
+        result = model.generate(
+            input_ids,
+            max_length=200,
+            num_beams=5,
+            num_return_sequences=1,
+            pad_token_id=tokenizer.eos_token_id,
+            temperature=0.0001,
+            early_stopping=True,
+        )
+        output = tokenizer.decode(result, skip_special_tokens=True)
+        print(f"Sample: {i}")
+        print(output)
+        print("End prediction*****************")
+
+
+def prompt_response_edit_api(code_review, buggy_code):
+    response = openai.Edit.create(
+        model="code-davinci-edit-001",
+        input=f"{buggy_code}",
+        instruction=f"Refactor the code using the Review: {code_review}",
+        temperature=0,
+        top_p=1
+    )
+    response_message = response["choices"][0]["text"]
+    response_message = response_message.replace("\n", " ")
+
+    return response_message.strip()
+
+
+def get_predictions_from_edit_api_and_write_to_file(
+        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+):
+    if end_index is None:
+        end_index = len(target_codes)
+
+    prediction_list = []
+
+    log_file_name = (
+        f"logs/EDIT_LOGS_{prediction_file_path.split('/')[1].replace('.txt', '')}_{start_index}_{end_index}.txt"
+    )
+    log_file = open(log_file_name, "w", encoding="UTF-8")
+
+    i = start_index
+    error_count = 0
+    while i <= end_index:
+        try:
+            buggy_code = buggy_codes[i]
+            code_review = code_reviews[i]
+            target_code = target_codes[i]
+
+            prediction = prompt_response_edit_api(code_review, buggy_code)
+
+            # apply all heuristics
+            # prediction = apply_heuristics(prediction)
+            prediction = remove_extra_spaces(prediction)
+            prediction_list.append(prediction)
+
+            SAMPLE_NO = f"sample: {i}"
+            BUGGY_CODE = f"buggy_code: {buggy_code}"
+            CODE_REVIEW = f"code_review: {code_review}"
+            TARGET_CODE = f"target code: {target_code}"
+            PREDICTION = f"response: {prediction}"
+
+            print(SAMPLE_NO)
+            print(BUGGY_CODE)
+            print(CODE_REVIEW)
+            print(TARGET_CODE)
+            print(PREDICTION)
+            print()
+
+            log_file.write(SAMPLE_NO + "\n")
+            log_file.write(BUGGY_CODE + "\n")
+            log_file.write(CODE_REVIEW + "\n")
+            log_file.write(TARGET_CODE + "\n")
+            log_file.write(PREDICTION + "\n")
+            log_file.write("\n")
+            i += 1
+        except Exception as e:
+            error_count += 1
+            print(f"An Exception occurred at sample: {i}. Error details: {str(e)}")
+            time.sleep(10)
+            if error_count == 5:
+                i += 1
+                error_count = 0
+
+    prediction_file_path = modify_file_name(prediction_file_path, start_index, end_index)
+    ground_truth_path = modify_file_name(ground_truth_path, start_index, end_index)
+    # write predictions to a file
+    write_list_to_file(file_name=prediction_file_path, list_name=prediction_list)
+    # write ground truths to a file
+    write_list_to_file(
+        file_name=ground_truth_path, list_name=target_codes, start_index=start_index, end_index=end_index
+    )
+    # calculate BLEU and CodeBLEU
+    get_bleu_and_codebleu(prediction_file_path, ground_truth_path)
