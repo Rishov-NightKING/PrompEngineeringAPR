@@ -101,6 +101,8 @@ def heuristic_remove_redundant_words(line):
         "```",
         "< START >",
         "< END >",
+        "Code after refactoring :"
+        "refactored code based on the review :"
     ]
     for redundant_word in redundant_words:
         line = line.replace(redundant_word, "").replace(redundant_word.lower(), "").replace(redundant_word.title(), "")
