@@ -450,7 +450,7 @@ def transfer_content_to_another_file(keyword, input_file, output_file):
 
     output_lines = []
     for input_line in input_lines:
-        if keyword in input_line:
+        if input_line.startswith(keyword):
             output_line = input_line.split(keyword)[1].strip()
             output_lines.append(output_line)
 
