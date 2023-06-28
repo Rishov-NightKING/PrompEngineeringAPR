@@ -6,6 +6,10 @@ import time
 import openai
 import pandas as pd
 
+from scipy.sparse import save_npz, load_npz
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 def prompt_response(system_prompt, user_prompt):
     response = openai.ChatCompletion.create(
@@ -101,8 +105,7 @@ def heuristic_remove_redundant_words(line):
         "```",
         "< START >",
         "< END >",
-        "Code after refactoring :"
-        "refactored code based on the review :"
+        "Code after refactoring :" "refactored code based on the review :",
     ]
     for redundant_word in redundant_words:
         line = line.replace(redundant_word, "").replace(redundant_word.lower(), "").replace(redundant_word.title(), "")
@@ -138,7 +141,7 @@ def apply_heuristics(line):
         heuristic_remove_redundant_words,
         heuristic_remove_starts_with_java,
         heuristic_remove_code_explanation_at_the_end,
-        remove_extra_spaces
+        remove_extra_spaces,
     ]
 
     for heuristic in heuristics:
@@ -212,7 +215,7 @@ def modify_R4R_for_EM(buggy_code, target):
     end_focus_tag = "<|endfocus|>"
     first_end_point = buggy_code.index(start_focus_tag) + len(start_focus_tag)
     second_end_point = buggy_code.index(end_focus_tag)
-    focus_part = buggy_code[first_end_point: second_end_point].strip()
+    focus_part = buggy_code[first_end_point:second_end_point].strip()
     target = target.strip()
     if target.startswith("<|del|>"):
         target += focus_part
@@ -238,7 +241,7 @@ def get_EM_R4R(ref_file, pred_file):
     for i, (r, p) in enumerate(zip(refs, preds)):
         r, p = r.strip(), p.strip()
         if r.startswith(del_token):
-            focus_part = r[len(del_token):]
+            focus_part = r[len(del_token) :]
             if focus_part == "":
                 count += 1
                 focus_null += 1
@@ -271,7 +274,7 @@ def get_EM_R4R(ref_file, pred_file):
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
     with open(source_file_path, "r", encoding="UTF-8") as src_file, open(
-            target_file_path, "r", encoding="UTF-8"
+        target_file_path, "r", encoding="UTF-8"
     ) as tgt_file:
         source_codes = src_file.readlines()
         target_codes = tgt_file.readlines()
@@ -286,7 +289,7 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
         end_point = code.index(end_comment_tag) + len(end_comment_tag)
 
         code_review = code[:end_point].replace(start_comment_tag, "").replace(end_comment_tag, "")
-        buggy_code = code[end_point + 1:].replace("\n", "")
+        buggy_code = code[end_point + 1 :].replace("\n", "")
 
         code_reviews.append(code_review)
         buggy_codes.append(buggy_code)
@@ -299,7 +302,7 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
     if dataset_name == "tufano":
         return code_reviews, buggy_codes, target_codes
     elif dataset_name == "R4R":
-        write_list_to_file("outputs/r4r_ground_truth_paths_modified_for_EM.txt", targets_modified_for_EM)
+        # write_list_to_file("outputs/r4r_ground_truth_paths_modified_for_EM.txt", targets_modified_for_EM)
         return code_reviews, buggy_codes, modified_target_codes
 
 
@@ -376,7 +379,7 @@ def get_bleu_and_codebleu(prediction_file_path, ground_truth_path):
 
 
 def get_predictions_from_openai_and_write_to_file(
-        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     if end_index is None:
         end_index = len(target_codes)
@@ -521,7 +524,7 @@ def get_predictions_from_generative_model(model, tokenizer, code_reviews, buggy_
     device = get_device()
     for i, (code_review, buggy_code_context) in enumerate(zip(code_reviews, buggy_code_contexts)):
         user_prompt = f"{code_review}\n{buggy_code_context}"
-        input_ids = tokenizer.encode(user_prompt, return_tensors='pt').to(device)
+        input_ids = tokenizer.encode(user_prompt, return_tensors="pt").to(device)
         result = model.generate(
             input_ids,
             max_length=200,
@@ -543,7 +546,7 @@ def prompt_response_edit_api(code_review, buggy_code):
         input=f"{buggy_code}",
         instruction=f"Refactor the code using the Review: {code_review}",
         temperature=0,
-        top_p=1
+        top_p=1,
     )
     response_message = response["choices"][0]["text"]
     response_message = response_message.replace("\n", " ")
@@ -552,7 +555,7 @@ def prompt_response_edit_api(code_review, buggy_code):
 
 
 def get_predictions_from_edit_api_and_write_to_file(
-        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     if end_index is None:
         end_index = len(target_codes)
@@ -614,6 +617,116 @@ def get_predictions_from_edit_api_and_write_to_file(
     # write ground truths to a file
     write_list_to_file(
         file_name=ground_truth_path, list_name=target_codes, start_index=start_index, end_index=end_index
+    )
+    # calculate BLEU and CodeBLEU
+    get_bleu_and_codebleu(prediction_file_path, ground_truth_path)
+
+
+def vectorize_and_dump_to_file(train_data, output_file_name):
+    vectorizer = TfidfVectorizer()
+    train_vectors = vectorizer.fit_transform(train_data)
+
+    save_npz(output_file_name, train_vectors)
+
+
+def load_vectorized_data(file_name):
+    loaded_vectors = load_npz(file_name)
+    return loaded_vectors
+
+
+def get_few_shot_predictions_from_openai_and_write_to_file(
+    prediction_file_path: str,
+    ground_truth_path: str,
+    train_dataset: tuple,
+    test_dataset: tuple,
+    top_k: int,
+    start_index: int = 0,
+    end_index: int = None,
+):
+    train_code_reviews, train_buggy_codes, train_target_codes = train_dataset
+    test_code_reviews, test_buggy_codes, test_target_codes = test_dataset
+
+    vectorizer = TfidfVectorizer()
+    train_vectors = vectorizer.fit_transform(train_code_reviews)
+    test_vectors = vectorizer.transform(test_code_reviews)
+    # calculate cosine similarity for all the test samples with train samples
+    similarities = cosine_similarity(test_vectors, train_vectors)
+
+    if end_index is None:
+        end_index = len(test_target_codes)
+
+    system_prompt = "You are a coding assistant. You generate only the source code."
+    user_command = "Refactor the Buggy Code using the Review without comments"
+
+    prediction_list = []
+
+    log_file_name = (
+        f"logs/FEW_SHOT_LOGS_{prediction_file_path.split('/')[1].replace('.txt', '')}_{start_index}_{end_index - 1}.txt"
+    )
+    log_file = open(log_file_name, "w", encoding="UTF-8")
+
+    i = start_index
+    while i < end_index:
+        try:
+            # few shot user prompt creation
+            top_k_samples = [
+                index for index, score in sorted(enumerate(similarities[i]), key=lambda x: x[1], reverse=True)[:top_k]
+            ]
+            user_prompt = ""
+            for sample_index in top_k_samples:
+                train_buggy_code = train_buggy_codes[sample_index]
+                train_code_review = train_code_reviews[sample_index]
+                train_target_code = train_target_codes[sample_index]
+                user_prompt += (
+                    f"Buggy Code: {train_buggy_code}\nReview: {train_code_review}\nFixed Code: {train_target_code}\n\n"
+                )
+
+            test_buggy_code = test_buggy_codes[i]
+            test_code_review = test_code_reviews[i]
+            test_target_code = test_target_codes[i]
+            user_prompt += f"Buggy Code: {test_buggy_code}\nReview: {test_code_review}\n{user_command}"
+            prediction = prompt_response(system_prompt, user_prompt)
+
+            # apply all heuristics
+            # prediction = apply_heuristics(prediction)
+            prediction = remove_extra_spaces(prediction)
+            prediction = heuristic_adjust_spaces(prediction)
+            prediction_list.append(prediction)
+
+            SAMPLE_NO = f"sample: {i}"
+            BUGGY_CODE = f"buggy_code: {test_buggy_code}"
+            CODE_REVIEW = f"code_review: {test_code_review}"
+            TARGET_CODE = f"target code: {test_target_code}"
+            PREDICTION = f"response: {prediction}"
+
+            print(SAMPLE_NO)
+            # print(f"user prompt: \n{user_prompt}\n\n")
+            print(BUGGY_CODE)
+            print(CODE_REVIEW)
+            print(TARGET_CODE)
+            print(PREDICTION)
+            print()
+
+            log_file.write(SAMPLE_NO + "\n")
+            log_file.write(BUGGY_CODE + "\n")
+            log_file.write(CODE_REVIEW + "\n")
+            log_file.write(TARGET_CODE + "\n")
+            log_file.write(PREDICTION + "\n")
+            log_file.write("\n")
+
+            time.sleep(20)
+            i += 1
+        except Exception as e:
+            print(f"An Exception occurred at sample: {i}. Error details: {str(e)}")
+            time.sleep(30)
+
+    prediction_file_path = modify_file_name(prediction_file_path, start_index, end_index)
+    ground_truth_path = modify_file_name(ground_truth_path, start_index, end_index)
+    # write predictions to a file
+    write_list_to_file(file_name=prediction_file_path, list_name=prediction_list)
+    # write ground truths to a file
+    write_list_to_file(
+        file_name=ground_truth_path, list_name=test_target_codes, start_index=start_index, end_index=end_index
     )
     # calculate BLEU and CodeBLEU
     get_bleu_and_codebleu(prediction_file_path, ground_truth_path)

@@ -71,7 +71,7 @@ if __name__ == "__main__":
     #     ground_truth_path=r4r_ground_truth_formatted_path,
     # )
 
-    #####################################R4R_EDIT_SAMPLE############################
+    ##################################### R4R_EDIT_SAMPLE ############################
     r4r_ground_truths_gpt_em_formatted_file = "outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt"
     r4r_ground_truths_edit_em_formatted_file = "outputs/edit_r4r_ground_truth_paths_modified_for_EM_formatted.txt"
 

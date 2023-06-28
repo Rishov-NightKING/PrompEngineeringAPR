@@ -1,0 +1,36 @@
+sample: 0
+buggy_code: private static Set<String> getRootQualifiers(ResourceTypes resourceTypes) { return resourceTypes.getRoots().stream() .map(ResourceType::getQualifier) <START> .filter(q -> !DEPRECATED_QUALIFIERS.contains(q)) <END> .collect(Collectors.toCollection(TreeSet::new)); }
+code_review: I think LIBRARY are no more used
+target code: private static Set < String > getRootQualifiers ( ResourceTypes resourceTypes ) { return resourceTypes . getRoots ( ) . stream ( ) . map ( ResourceType : : getQualifier ) . collect ( Collectors . toCollection ( TreeSet : : new ) ) ; }
+response: private static Set < String > getRootQualifiers ( ResourceTypes resourceTypes ) { return resourceTypes . getRoots ( ) . stream ( ) . map ( ResourceType : : getQualifier ) . filter ( q - > ! DEPRECATED_QUALIFIERS . contains ( q ) ) . collect ( Collectors . toCollection ( TreeSet : : new ) ) ; }
+
+sample: 1
+buggy_code: public RuntimeFilterManager(QueryWorkUnit workUnit, DrillbitContext drillbitContext) { this.rootWrapper = workUnit.getRootWrapper(); this.drillbitContext = drillbitContext; <START> lineSeparator = java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator")); <END> }
+code_review: Consider using `System.lineSeparator()` instead.
+target code: public RuntimeFilterManager ( QueryWorkUnit workUnit , DrillbitContext drillbitContext ) { this . rootWrapper = workUnit . getRootWrapper ( ) ; this . drillbitContext = drillbitContext ; }
+response: Fixed Code : ```java public RuntimeFilterManager ( QueryWorkUnit workUnit , DrillbitContext drillbitContext ) { this . rootWrapper = workUnit . getRootWrapper ( ) ; this . drillbitContext = drillbitContext ; lineSeparator = System . lineSeparator ( ) ; } ```
+
+sample: 2
+buggy_code: private void activateMarkers() { if (!fGerritClient.getRepository().getServerInfo().isAnonymous()) { String value = NLS.bind(Messages.ChangeDetailEditor_EGerriTipValue, <START> fChangeInfo.getUserSelectedRevision().get_number()); <END> UIUtils.showDialogTip(MARKERS_KEY, headerSection.getShell(), Messages.EGerriTip, value); } }
+code_review: ChangeDetailEditor_EGerriTipValue has no more arguments, should we just use it directly , no need to set the arguments ?
+target code: private void activateMarkers ( ) { if ( ! fGerritClient . getRepository ( ) . getServerInfo ( ) . isAnonymous ( ) ) { UIUtils . showDialogTip ( MARKERS_KEY , headerSection . getShell ( ) , Messages . EGerriTip , Messages . ChangeDetailEditor_EGerriTipValue ) ; } }
+response: private void activateMarkers ( ) { if ( ! fGerritClient . getRepository ( ) . getServerInfo ( ) . isAnonymous ( ) ) { String value = NLS . bind ( Messages . ChangeDetailEditor_EGerriTipValue , fChangeInfo . getUserSelectedRevision ( ) . get_number ( ) ) ; UIUtils . showDialogTip ( MARKERS_KEY , headerSection . getShell ( ) , Messages . EGerriTip , value ) ; } }
+
+sample: 3
+buggy_code: public void testCreate() throws StripeException { Map<String, Object> params = new HashMap<String, Object>(); params.put("currency", "usd"); final Order order = Order.create(params); assertNotNull(order); verifyRequest( APIResource.RequestMethod.POST, <START> "/v1/orders", <END> params ); }
+code_review: should be called `resource`
+target code: public void testCreate ( ) throws StripeException { final Map < String , Object > params = new HashMap < String , Object > ( ) ; params . put ( "currency" , "usd" ) ; final Order order = Order . create ( params ) ; assertNotNull ( order ) ; verifyRequest ( APIResource . RequestMethod . POST , " / v1 / orders" , params ) ; }
+response: public void testCreate ( ) throws StripeException { Map < String , Object > params = new HashMap < String , Object > ( ) ; params . put ( "currency" , "usd" ) ; final Order order = Order . create ( params ) ; assertNotNull ( order ) ; verifyRequest ( APIResource . RequestMethod . POST , " / v1 / orders" , params ) ; }
+
+sample: 4
+buggy_code: private FirewallRule findById(List<FirewallRule> collection, String id) { FirewallRule result = null; for (FirewallRule rule : collection) { if (rule.id().equals(id)) { <START> result = rule; <END> } } return result; }
+code_review: Just `return rule`.
+target code: private FirewallRule findById ( List < FirewallRule > collection , String id ) { for ( FirewallRule rule : collection ) { if ( rule . id ( ) . equals ( id ) ) { return rule ; } } return null ; }
+response: private FirewallRule findById ( List < FirewallRule > collection , String id ) { for ( FirewallRule rule : collection ) { if ( rule . id ( ) . equals ( id ) ) { return rule ; } } return null ; }
+
+sample: 5
+buggy_code: public void addDownload(String download){ <START> if(!downloads.contains(download)) { <END> downloads.add(download); } }
+code_review: Should probably use a Set<String> instead of a List<String> so that the intention of the code is clear by first glance.
+target code: public void addDownload ( String download ) { downloads . add ( download ) ; }
+response: public void addDownload ( String download ) { if ( ! downloads . contains ( download ) ) { downloads . add ( download ) ; } }
+
