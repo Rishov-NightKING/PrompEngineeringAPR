@@ -155,7 +155,7 @@ def apply_heuristic_in_file(input_file):
         lines = f1.readlines()
 
     lines = [apply_heuristics(line) for line in lines]
-    output_file = f"{input_file.split('.')[0]}_formatted.txt"
+    output_file = f"{input_file.split('.')[0]}_heuristics_applied.txt"
     write_list_to_file(output_file, lines)
 
 
@@ -241,7 +241,7 @@ def get_EM_R4R(ref_file, pred_file):
     for i, (r, p) in enumerate(zip(refs, preds)):
         r, p = r.strip(), p.strip()
         if r.startswith(del_token):
-            focus_part = r[len(del_token) :]
+            focus_part = r[len(del_token):]
             if focus_part == "":
                 count += 1
                 focus_null += 1
@@ -274,7 +274,7 @@ def get_EM_R4R(ref_file, pred_file):
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
     with open(source_file_path, "r", encoding="UTF-8") as src_file, open(
-        target_file_path, "r", encoding="UTF-8"
+            target_file_path, "r", encoding="UTF-8"
     ) as tgt_file:
         source_codes = src_file.readlines()
         target_codes = tgt_file.readlines()
@@ -282,22 +282,22 @@ def read_dataset(dataset_name, source_file_path, target_file_path):
     buggy_codes = []
     code_reviews = []
     modified_target_codes = []
-    targets_modified_for_EM = []
+    # targets_modified_for_EM = []
     for code, target_code in zip(source_codes, target_codes):
         start_comment_tag = "<|startcomment|>"
         end_comment_tag = "<|endcomment|>"
         end_point = code.index(end_comment_tag) + len(end_comment_tag)
 
         code_review = code[:end_point].replace(start_comment_tag, "").replace(end_comment_tag, "")
-        buggy_code = code[end_point + 1 :].replace("\n", "")
+        buggy_code = code[end_point + 1:].replace("\n", "")
 
         code_reviews.append(code_review)
         buggy_codes.append(buggy_code)
         if dataset_name == "R4R":
             full_target_code = modify_R4R_dataset(buggy_code, target_code)
-            target_modified_for_EM = modify_R4R_for_EM(buggy_code, target_code)
+            # target_modified_for_EM = modify_R4R_for_EM(buggy_code, target_code)
             modified_target_codes.append(full_target_code)
-            targets_modified_for_EM.append(target_modified_for_EM)
+            # targets_modified_for_EM.append(target_modified_for_EM)
 
     if dataset_name == "tufano":
         return code_reviews, buggy_codes, target_codes
@@ -379,7 +379,7 @@ def get_bleu_and_codebleu(prediction_file_path, ground_truth_path):
 
 
 def get_predictions_from_openai_and_write_to_file(
-    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     if end_index is None:
         end_index = len(target_codes)
@@ -555,7 +555,7 @@ def prompt_response_edit_api(code_review, buggy_code):
 
 
 def get_predictions_from_edit_api_and_write_to_file(
-    prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
+        prediction_file_path, ground_truth_path, code_reviews, buggy_codes, target_codes, start_index=0, end_index=None
 ):
     if end_index is None:
         end_index = len(target_codes)
@@ -635,13 +635,13 @@ def load_vectorized_data(file_name):
 
 
 def get_few_shot_predictions_from_openai_and_write_to_file(
-    prediction_file_path: str,
-    ground_truth_path: str,
-    train_dataset: tuple,
-    test_dataset: tuple,
-    top_k: int,
-    start_index: int = 0,
-    end_index: int = None,
+        prediction_file_path: str,
+        ground_truth_path: str,
+        train_dataset: tuple,
+        test_dataset: tuple,
+        top_k: int,
+        start_index: int = 0,
+        end_index: int = None,
 ):
     train_code_reviews, train_buggy_codes, train_target_codes = train_dataset
     test_code_reviews, test_buggy_codes, test_target_codes = test_dataset
@@ -690,7 +690,7 @@ def get_few_shot_predictions_from_openai_and_write_to_file(
             # apply all heuristics
             # prediction = apply_heuristics(prediction)
             prediction = remove_extra_spaces(prediction)
-            prediction = heuristic_adjust_spaces(prediction)
+            # prediction = heuristic_adjust_spaces(prediction)
             prediction_list.append(prediction)
 
             SAMPLE_NO = f"sample: {i}"
@@ -700,7 +700,7 @@ def get_few_shot_predictions_from_openai_and_write_to_file(
             PREDICTION = f"response: {prediction}"
 
             print(SAMPLE_NO)
-            # print(f"user prompt: \n{user_prompt}\n\n")
+            print(f"user prompt: \n{user_prompt}\n\n")
             print(BUGGY_CODE)
             print(CODE_REVIEW)
             print(TARGET_CODE)
@@ -714,7 +714,7 @@ def get_few_shot_predictions_from_openai_and_write_to_file(
             log_file.write(PREDICTION + "\n")
             log_file.write("\n")
 
-            time.sleep(20)
+            time.sleep(17)
             i += 1
         except Exception as e:
             print(f"An Exception occurred at sample: {i}. Error details: {str(e)}")
