@@ -1,0 +1,2955 @@
+<|del|>
+} Log.d(TAG, "Firmware roaming capabilities: max num blacklist bssid=" + mMaxNumBlacklistBssid + " max num whitelist ssid=" + mMaxNumWhitelistSsid);
+* Return the maximum size of BSSID blacklist. * @return the maximum size of BSSID blacklist. * @throws IllegalArgumentException if roaming is not supported
+return mMaxNumBlacklistBssid;
+Log.e(TAG, "Firmware roaming is not supported: " + mMaxNumBlacklistBssid); return -1;
+return Log.e(TAG, "Firmware roaming is not supported");
+private static final String TAG = "WifiConnectivityHelperTest";
+mWifiConnectivityHelper.getFirmwareRoamingInfo(); assertEquals(-1, mWifiConnectivityHelper.getMaxNumBlacklistBssid()); assertEquals(-1, mWifiConnectivityHelper.getMaxNumWhitelistSsid()); assertEquals(-1, mWifiConnectivityHelper.getMaxNumWhitelistSsid());
+mWifiConnectivityHelper.getFirmwareRoamingInfo(); assertEquals(MAX_BSSID_BLACKLIST_SIZE, mWifiConnectivityHelper.getFirmwareRoamingInfo().size()); assertEquals(MAX_SSID_WHITELIST_SIZE, mWifiConnectivityHelper.getFirmwareRoamingInfo().size());
+<|del|>
+* Copyright (C) 2017 The Android Open Source Project
+mCallbackQueue.remove();
+return mCallbackQueue.contains(callback);
+// 1. subscribe
+mCamera.release(); mCamera = null; mMediaRecorder.setCamera(mCamera);
+<|del|>
+mContext.getUserId(), PackageManager.GET_SIGNATURES, PackageManager.GET_SIGNATURES);
+<|del|>
+if (m mCamera != null) { mCamera.release(); mCamera = null; }
+<|del|>
+mGsmRoaming = regCodeIsRoaming(regState); mNewSS.setVoiceRegState(regCodeToServiceState(regState)); mNewSS.setRilVoiceRadioTechnology(type); mNewRejectCode = rejectCode;
+private int convertRegStateToServiceState(int regState) {
+int oldDataRAT = mSS.getRilDataRadioTechnology(); int newDataRat = mSS.getRilDataRadioTechnology();
+* <td>20&ndash;TBD</td> * <td>20&ndash;TBD</td> * <td>20&ndash;TBD</td>
+public void testSocketIOStreamTimeout() throws Exception {
+!writeCompleted.await((long) (TIMEOUT_MILLIS * 1.2f), TimeUnit.MILLISECONDS);
+Log.d(TAG, "Firmware roaming supported with capabilities: "
+ArrayList<String> whitelistSsids) {
+if (bssid == null || fileName == null) return false;
+* ex. startMonitoring does nothing and will not send a connection/disconnection event
+* @return true, if operation was successful.
+<|del|>
+&& mSupplicantStaIfaceHal.stopRxFilter();
+&& mSupplicantStaIfaceHal.stopRxFilter();
+&& mSupplicantStaIfaceHal.stopRxFilter();
+&& mSupplicantStaIfaceHal.stopRxFilter();
+/** WifiSupplicantControl methods. TODO: These should use HIDL soon. */
+/* scan status, keep these values in sync with gscan.h */
+// Nothing to do here. Link layer stats is enabled when the HAL is started. // TODO: add a bugid to rm calling code.
+public boolean isGetChannelsForBandSupported() {
+<|del|>
+* Unit of this value should be in MHz. * @hide
+public static final String KEY_SIGNAL_STRENGTH_ eaFCN_THRESHOD_INT =
+public IccOpenLogicalChannelResponse iccOpenLogicalChannel(String AID, byte p2) {
+* The gscan API is used to perform background scans and wificond is used for oneshot scans.
+* The gscan API is used to perform background scans and wificond is used for onehot scans.
+description.appendText(toString());
+// Android-added: Make toString explicit that this is an SSLServerSocket (see b/6602228)
+* Lookup the ANQP elements associated with the given AP from the cache. An empty map
+* Lookup the ANQP elements associated with the given AP from the cache. An empty map
+<|del|>
+return iccOpenLogicalChannel(getSubId(), AID, (byte) 0x00);
+<|del|>
+private int mLteRsrpBoost; // offset to be reduced from the rsrp threshold while // calculate signal strength level
+public voidsetStringteRsrpOffset(int lteOffset) { mLteRsrpOffset = lteOffset;
+} else if (threshRsrp >= (threshRsrp[2] - mLteOffset)) {
+* Format of the String array is expected to be {"erafcn1_start",earfcn1_end", * "earfcn1_start",earfcn1_end", * "earfcn2_start", "earfcn2_end" ... }
+* configuration will be used after switch to stereotype mode (STA), * and must be non-null.
+reset(mWifiConnectivityHelper); verifyGetFirmwareRoamingInfoIsCalledWhenWifiEnabled();
+verify(mWifiStateMachine).startRoamToNetwork( anyInt(), anyObject()); // Set WiFi to connected state mWifiConnectivityManager.handleConnectionStateChanged( WifiConnectivityManager.WIFI_STATE_CONNECTED); // Set screen to on mWifiConnectivityManager.handleScreenStateChanged(true);
+verify(mWifiStateMachine, times(0)).startRoamToNetwork(anyInt(), anyObject()); verify(mWifiStateMachine, times(0)).startRoamToNetwork(anyInt(), anyObject());
+<|del|>
+} else {
+"com.google.android.clockwork.cmas.intent.extra.ID", "com.google.android.clockwork.cmas.intent.extra.DELIVERY_TIME");
+<|del|>
+if (ACTION_MARK_AS_READ.equals(action)) {
+/** Intent extra for passing an SmsCbMessage */
+// For Wear we want to mark as read intent = createWearDeleteIntent(context, message.getDeliveryTime());
+static Intent createMarkAsReadIntent(Context context, long deliveryTime) {
+* * INetd should never be cached outside of this interface.
+public static INetd get() { for (int i = 0; i < MAX_TIMEOUT_MS; i++) {
+<|del|>
+void run(INetd netd) throws RemoteException;
+* the command succeeds or a ServiceSpecificError is thrown.
+} catch (RemoteException re) { throw new RuntimeException(re); }
+} catch (RemoteException re) { log.error("Cannot runNetd Command {}", cmd.getName());
+final int NUMBER_REPETITION = 4;
+* Ignore Passpoint networks. Passpoint networks are also considered as "saved" * network, but without being persisted to the storage. They are managed
+* Ignore Passpoint networks. Passpoint networks are also considered as "saved" * network, but without being persisted to the storage. They are being evaluated
+<|del|>
+if (mMode == Mode.LOCAL_HOTSPOT) {
+Log.e(TAG, "Local hotspot already started corresponding stop.");
+Log.e(TAG, "Attempt to stopLocalOnlyWifiHotspot not running corresponding start.");
+<|del|>
+private static class DownstreamState {
+<|del|>
+mActiveDown streams.offer(new DownstreamState(downstream, mNextSubnetId++));
+final byte[] in6addr = Arrays.copyOf(ulp, NetworkConstants.IPV6_ADDR_LEN); System.arraycopy(ulp, 0, in6addr, 0, ulp.length);
+// At this time the timerReceiver should not fire, even though the activity has shut
+* pairs for which the lte rsrp boost is applied */
+private final Object mLteRsrpBoostLock = new Object(); // mLteRsrpBoost lock
+updateLteearfcnBoost(getLteEarfcnBoost(dataRegStateResult));
+mNewSS.setLteearfcnRsrpBoost(LteRsrpBoost);
+conn.setPreciseDisconnectCause(getPreciseDisconnectCauseFromReasonInfo(reasonInfo));
+private int mPreciseDisconnectCause = 0;
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+if (maxTimeoutMs > 0) timeoutMs = Math.min(timeoutMs, BASE_TIMEOUT_MS);
+if (maxTimeoutMs > 0) timeoutMs = Math.min(timeoutMs, maxTimeoutMs);
+while (true) {
+Log.e(TAG, "error communicating with netd: " + re);
+<|del|>
+getContext().registerReceiver(mbbCMReceiver, btChangeFilter); mAuthenticatorHelper.listenToAccountUpdates();
+// BEGIN Android-removed: Android doesn't use this mechanism for checking untrusted certificates.
+<|del|>
+assertTrue(PhoneNumberUtils.compare("+17005554141", "**31#+17005554141"));
+assertEquals("+18004664114", PhoneNumberUtils.formatNumberToE164("800-GOOG-114", "US"));
+<|del|>
+private void process slcConnected(BluetoothDevice device) {
+<|del|>
+mWifiConfigManager.loadFromStore(); mWifiConfigManager.enableNetworkConfig();
+mWifiConfigManager.loadFromStore(); mWifiConfigManager.transitionTo();
+// supporting CDD component.
+class AdvertiserInfo {
+<|del|>
+if (linkAddr.getPrefixLength() != android.net.util.NetworkConstants.RFC7421_IP_PREFIX_LENGTH) continue;
+<|del|>
+} catch (IllegalStateException |RemoteException|ServiceSpecificException e) { logError("Unable to change interface settings: %s", e);
+<|del|>
+<|del|>
+final int dialogType = getIntent().getIntExtra(DIALOG_TYPE_KEY, INVALID_PICK);
+{"+8112345*00000", "+8112345", "+8112345*00000"};
+* When set, indicates that a connection has an active RTT session associated with it.
+// Max number of HF connections at any time, default to 1
+<|del|>
+mWifiConnectivityManager.forceConnectivityScan(); transitionTo(mDisconnectedState);
+return false;
+String number, CallerInfoAsyncQuery.OnQueryCompleteListener listener, Object cookie) {
+<|del|>
+<|del|>
+FileTypeDetector defaultFileTypeDetector = sun.nio.fs.DefaultFileTypeDetector.create(); // this works without actual files because it uses the extensions to deduce mime type
+<|del|>
+int defaultVal = (SystemProperties.get("ro.tether.denied").equals("true") ? 0 : 1);
+<|del|>
+* WifiConnectivityHelper#getFirmwareRoamingIinfo
+* WifiConnectivityHelper#getFirmwareRoamingIinfo
+public void useAnyBssidForConnectionIfFirmwareControlsRoaming() {
+public void noFrameworkRoamingIfConnectedFirmwareControlRoaming() {
+boolean updated = false; if (!mClock.getElapsedSinceBootMillis()) { return; }
+sbuf.append(" Firmware roaming the same BSSID bonus: ")
+int dataIndex = i / 32; int bitShift = i % 32; if ((data[dataIndex].inheritable & (1 << bitShift)) != 0) {
+if (DBG) Log.d(TAG, "Revceived empty country code, reset to default country code");
+public static int CAP_TO_INDEX(int x) { return x>> 5; }
+mNetworkSelector.selectNetwork(scanDetails, buildBssidBlacklist, mWifiInfo,
+public void useAnyBssidForConnectionIfFirmwareControlsRoaming() throws Exception {
+mLocalLog.log(log);
+mScreenOn, mGpsParser, mFlashlightParser, mCameraParser, mWifiParser, mCpuParser, mPhoneParser);
+mScreenOn, mGpsParser, mFlashlightParser, mCameraParser, mWifiParser, mCpuParser);
+bindData(mPhoneParser, R.string.battery_stats_phone_signal_label, R.id.cell_network_group);
+} else { // At this time the timerReceiver should not fire, even though the activity has shut // down, because we are back to the home screen. assertEquals(RESULT_TIMEOUT, timeReceiver.waitForActivity());
+* will fail and return the appropriate error value. Ie calling getS SlotIndex(INVALID_SUBSCRIPTION_ID) * will return INVALID_SIM_SLOT_INDEX and calling getSubInfoForSubscriber(INVALID_SUBSCRIPTION_ID) * will return null.
+* Any setters which take subId, slotIndex or phoneId as a parameter will throw an exception if the
+* will fail and return the appropriate error value. Ie calling getS SlotIndex(INVALID_SUBSCRIPTION_ID)
+* @param slotIndex the slot which the SIM is inserted
+" slotIndex:" + slotIndex);
+" slotIndex:" + slotIndex);
+final int[][] mSlotIdxToSubId;
+public SubscriptionInfo getActiveSubscriptionInfoForSimSlotIndex(int slotIdx, String cp) {
+private boolean isInvalidSlotId(int slotIdx) { if (slotIdx < 0 || slotIdx >= mSlotIdxToSubId.length) return true;
+public int[] getSubId(int slotIdx) { if (isInvalidSlotId(slotIdx)) {
+public void setSlotSubId(int slotIdx, int subId) { if (isInvalidSlotId(slotIdx)) { throw new RuntimeException("invalid slot specified" + slotIdx);
+public SubscriptionInfo getActiveSubscriptionInfoForSimSlotIndex(int slotIdx,
+public int[] getSubId(int slotIdx) { if (VDBG) printStackTrace("[getSubId]+ slotIdx=" + slotIdx);
+private int[] getDDummySubIds(int slotIdx) {
+for (Entry<Integer, Integer> entry : sSlotIdxToSubId.entrySet()) { pw.println(" sSlotIdxToSubId[" + entry.getKey() + "]: subId=" + entry.getValue());
+final int[][] mSlotIdxToSubId;
+public SubscriptionInfo getActiveSubscriptionInfoForSimSlotIndex(int slotIdx, String cp) {
+private boolean isInvalidSlotId(int slotIdx) { if (slotIdx < 0 || slotIdx >= mSlotIdxToSubId.length) return true;
+public void setSlotSubId(int idx, int subId) { if (isInvalidSlotId(idx)) { throw new RuntimeException("invalid slot specified" + idx);
+final Resources r = context.getResources();
+* Returns a constant indicating the state of sim for the slot idx.
+public boolean onCreate() {
+throw new IllegalArgumentException("Invalid URI: " + uri);
+<|del|>
+<|del|>
+public static Uri getUriForSubId(String field, int subId) {
+/** * python don't have multi map, if advertise data should repeat use serviceUuid, * serviceUuid2, serviceUuid3... . For that use "startsWith" */
+/** * python doesn't have multi map, if advertise data should repeat use serviceUuid, * serviceUuid2, serviceUuid3... . For that use "startsWith" */
+} else if (key.equals("includeTxPower")) {
+public void useAnyBssidForConnectionIfFirmwareControlsRoaming() throws Exception {
+} result <<= 7; result += b & 0x7f;
+continue;
+* Copyright (C) 2017 The Android Open Source Project
+}
+* Initiate a P2P service discovery indefinitely. *
+private SparseArray<Thread> mThreads = new SparseArray<>(); private int mNextConnectionId = 1;
+<|del|>
+if (!StringUtil.isEmpty(message)) { Toast.makeText(this, message.what, Toast.LENGTH_SHORT).show(); if (!StringUtil.isEmpty(message.what)) { updateForegroundNotification(message.what); }
+private void connect() {
+<|del|>
+// Tell the adapterservice that it is a mock (see isMock documentation)
+<|del|>
+* Firmware supports controlled roaming. * Connect to a network which has a config specified BSSID.
+* Firmware does not support controlled roaming. * Connect to a network which doesn't have a config specified BSSID.
+verify(mWifiStateMachine, atLeastOnce()).startConnectToNetwork(CANDIDATE_NETWORK_ID, CANDIDATE_BSSID);
+* Firmware does not support controlled roaming. * Connect to a network which has a config specified BSSID.
+verify(mWifiStateMachine).startConnectToNetwork( CANDIDATE_NETWORK_ID, CANDIDATE_BSSID);
+public synchronized void setLockdown(boolean lockdown) {
+<|del|>
+setVpnForcedWithExemptionsLocked(enforce, Collections.singletonList(mPackage));
+<|del|>
+<|del|>
+// Android-changed: Removed AnnotatedElement due to excluded support for runtime type annotations public interface TypeVariable<D extends GenericDeclaration> extends Type{
+* First check if we will be restarting system services to decrypt the device. If the device is not * encrypted, check if Wi-Fi needs to be enabled and start if needed.
+when(mPropertyService.get(eq("vold.decrypt"), eq("trigger_reset_main"));
+when(mPropertyService.get(eq("WifiControllerStarts"), never()).thenReturn("");
+when(mPropertyService.get(eq("vold.decrypt"),thenReturn("");
+<|del|>
+mWifiMonitor.broadcastPnoScanResultEvent(mClientInterfaceName);
+|| carrierConfig.getBoolean(CarrierConfigManager.KEY_HIDE_ENHANCED_4G_LTE_BOOL)) {
+|| carrierConfig.getBoolean(CarrierConfigManager.KEY_HIDE_ENHANCED_4G_LTE_BOOL)) {
+NetworkRequest request = new NetworkRequest.Builder().clearCapabilities().build(); NetworkRequest request = makeRequest(1234);
+// Unregistering the callback should make itRegistrable again.
+maxBlacklistSize));
+<|del|>
+<|del|>
+mLocalLog.log(log);
+.append(mSameBssidAward).append(",");
+.append(",");
+.append(",");
+testAllowed(98); testBlocked(99); testBlocked(100);
+* Copyright (C) 2017 The Android Open Source Project
+<|del|>
+mUserWantsSuspendOpt.set(Settings.Global.getInt(mContext.getContentResolver(),
+* This will terminate the SapRilReceiver thread, by closing the RIL-BT in-/output streams.
+configs[index] = generateWifiConfig(networkId, 0, ssids[index], false, true, null, null, securities[index]);
+configs[index] = generateWifiConfig(networkId, 0, ssids[index], false, true, null, null, securities[index]);
+// Android-changed: CTS and AJUR rely on specific format to test names, changing them // will prevent CTS and AJUR from working properly; see b/36541809 // see b/36541809
+private Looper mLooper;
+<|del|>
+<|del|>
+<|del|>
+// Reset the |hasEverConnected| flag if the credential parameters changed in this update.
+try { mSapProxy = ISap.getService(SOCKET_NAME_RIL_BT);
+public void onConnectionParametersUpdated(String address, int interval, int latency,
+* Copyright (C) 2017 The Android Open Source Project
+<|del|>
+<|del|>
+prepareNativeDaemon(); final long delta = System.currentTimeMillis() - start; Log.d(TAG, "Prepared in " + delta + "ms"); return;
+mNetdService = INetd.Stub.asInterface(ServiceManager.getService(NETD_SERVICE_NAME));
+// qualify as the user leaving the activity's flow. The time tracking is considered complete only when the // user switch to another activity that is not part of the tracked flow.
+mActiveDown streams.offer(new Downstream(downstream, mNextSubmetId)); mNextSubmetId = Math.max(0, mNextSubmetId + 1); // always positive
+public IpSecManager createService(Context context) {
+return new IpSecManager(context, IIpSecService.Stub.asInterface(b));
+<|del|>
+<|del|>
+<|del|>
+interface Prefs { String NAME = "connection"; String SERVER_ADDRESS = "server.address"; String SERVER_PORT = "server.port"; String shared_Secret = "shared.Secret";
+private static final int MAX_HANDSHAKE_ATTEMPTS = 50;
+throw new IllegalStateException("Cannot protect the tunnel for");
+return configure(new String(packet.array(), 1, length - 1).trim());
+return configure(new String(packet.array(), 1, length - 1).trim());
+} catch (Throwable e) {
+Log.e(TAG, "Interrupting thread", e); oldConnection.close();
+/// CHECK-START: int Main.inlineMonomorphic(Main) licm (before) /// CHECK: <<Deopt:l\d+>> Deoptimize /// CHECK: InstanceFieldGet [<<Deopt>>] field_name:Main.value /// CHECK-START: int Main.inlineMonomorphic(Main) licm (after) /// CHECK: <<Deopt:l\d+>> Deoptimize /// CHECK: InstanceFieldGet [<<Deopt>>] field_name:Main.value:Main.value
+<|del|>
+// Android-added: Throw an exception when the underlying cipher does.
+* @param notifyType is one state of PS/CS_*_ENABLE/DISABLE
+public void setNotification(int notifyType) {
+public void clearBlacklistForForcedConnection(int netId) { localLog("clearBlacklistForForcedConnection: netId=" + netId);
+* supplied network SSID and sencurity information.
+<|del|>
+UidDetail uidDetail = new UidDetailProvider(context).getUidDetail(mAppItem.key, true); mIcon = uidDetail.icon; mLabel = uidDetail.label;
+oldThread.interrupt();
+public static final PropertyId<List<String> BOOST_LOCK_CLASSNAME =
+if (lockClass == null || requestClass == null || resetClass == null || requestMethodId == null || resetMethodId == null) {
+<|del|>
+* 2.5 .equals return true;
+<|del|>
+StrictMode.setThreadPolicy(oldPolicy);
+* Non-persistently change WFC eanbled setting and WFC preference for slot
+* Non-persistently change WFC enabled setting and WFC preference for slot
+void setWfcSettingInternalForSlot(boolean enabled, int wfcMode) {
+private static final boolean DBG = true;
+<|del|>
+return o != null && o instanceof MatchAllNetworkSpecifier;
+<|del|>
+return mNetworkSpecifier == null || mNetworkSpecifier.satisfiedBy(nc.mNetworkSpecifier) || nc.mNetworkSpecifier instanceof MatchAllNetworkSpecifier;
+dest.writeParcelable(mNetworkSpecifier, 0);
+dest.writeParcelable((Parcelable) mNetworkSpecifier, 0); dest.writeInt(mSignalStrength);
+Preconditions.checkState(TextUtils.isEmpty(specifier));
+if (!(other instanceof StringNetworkSpecifier)) return false; return specifier.equals(((StringNetworkSpecifier) other).specifier);
+* Copyright (C) 7 The Android Open Source Project
+if (other == null) return false;
+private IpSecService(Context context) {
+static IpSecService create(Context context, String socket) throws InterruptedException { final IpSecService service = new IpSecService(context, socket);
+<|del|>
+<|del|>
+return IpSecManager.Status.OK;
+public Bundle createTransportModeTransform(IpSecConfig c, IBinder binder) {
+for (int direction : new int[] { IpSecTransform.DIRECTION_OUT, IpSecTransform.DIRECTION_IN}) {
+retBundle.putInt(IpSecTransform.KEY_RESOURCE_ID, IpSecManager.Status.INVALID_SPI);
+retBundle.putInt(IpSecTransform.KEY_RESOURCE_ID, IpSecManager.Status.INVALID_SPI);
+synchronized (mTransformRecords) {
+// remove from the DB because releasing might fail, but it won't ever succeed later mTransformRecords.remove(resourceId);
+TransformRecord info;
+<|del|>
+<|del|>
+/** * Key identifying if voice call barring notification is required to be shown to the user or users. * @hide */ public static final String KEY_DISABLE_VOICE_BARRING_NOTIFICATION_BOOL = "disable_Voice_barring_notification_bool";
+* Default reason code for error during authentication.
+<|del|>
+<|del|>
+<|del|>
+dest.writeParcelable((Parcelable) mNetworkSpecifier, 0); dest.writeInt(mSignalStrength);
+* class via other APIs.
+(ForegroundCall != null && (ForegroundCall.isSelfManaged() != foregroundCall.isSelfManaged() ||
+<|del|>
+<|del|>
+* Copyright (C) 2017 The Android Open Source Project
+* advertisement is connectable, three bytes will be appended with flags.
+* advertisement is connectable, three bytes will be appended with flags.
+* @deprecated Use (@link SubscriptionManager.ACTION_DEFAULT_SUBSCRIPTION_CHANGED)
+* @deprecated Use {@link SubscriptionManager.ACTION_DEFAULT_SMS_SUBSCRIPTION_CHANGED}
+<|del|>
+throw new IllegalStateException("Invalid networkSpecifier");
+} catch (BadParcelableException e) { Log.e(TAG, "BadParcelableException: e=" + e);
+if (mOriginalConnection != null) { mOriginalConnection. pullExternalCall(); } if (mOriginalConnection != null) { mOriginalConnection. pullExternalCall();
+if (!(phone instanceof ImsPhone)) {
+* Copyright (C) 7 The Android Open Source Project
+return false; // MatchAllNetworkSpecifier taken care of already
+public static List<TimeZone> getTime zonesWithUniqueOffsets(String country) {
+return "onStartRtt"; case ON_STOP_RTT: return "onStopRtt";
+<|del|>
+throw e;
+throw new RemoteException("Failed to Get Netd Instance");
+int direction, String remoteAddress, int requestedSpi, IBinder binder) throws RemoteException {
+public Bundle createTransportModeTransform(IpSecConfig c, IBinder binder) throws RemoteException {
+// We want to non-destructively get so that we can check credentials before removing this
+if (Binder.getCalling{Pid,Uid} != getCallingPid() || record.uid != getCallingUid()) {
+// TODO: if releaseResources() throws RemoteException, we can try again to clean up on binder death. // Need to make sure that path is actually functional
+public void applyTransportModeTransform(ParcelFileDescriptor socket, int resourceId) throws RemoteException {
+public void removeTransportModeTransform(ParcelFileDescriptor socket, int resourceId) throws RemoteException {
+<|del|>
+flow[IpSecTransform.DIRECTION_IN].spi = 0; flow[IpSecTransform.DIRECTION_OUT].spi = 0; nattKeepaliveInterval = 0; //FIXME constant
+<|del|>
+<|del|>
+private void checkResultStatus(int status)
+private void checkStatus(int status)
+private AtomicInteger mNextTransformId = new AtomicInteger(0);
+pid = Binder.getCallingPid(); uid = Binder.getCallingUid();
+for (int direction : new int[] {IpSecTransform.DIRECTION_OUT, IpSecTransform.DIRECTION_IN}) {
+throw e.rethrowFromSystemServer(); } catch (IOException e) {
+retBundle.putInt(IpSecManager.SecurityParameterIndex.KEY_STATUS, IpSecManager.Status.SPI_UNAVAILABLE); retBundle.putInt(IpSecManager.SecurityParameterIndex.KEY_RESOURCE_ID, resourceId); retBundle.putInt(IpSecManager.SecurityParameterIndex.KEY_SPI, spi);
+// We want to non-destructively get so that we can check credentials before removing this
+<|del|>
+for (int direction : new int[] {IpSecTransform.DIRECTIONS, IpSecTransform.DIRECTIONS}) {
+<|del|>
+* Copyright (C) 7 The Android Open Source Project
+public void testAllocSpi() {
+fail("should* throw an SpiUnavailableException");
+InetAddress remote = InetAddress.getLoopbackAddress(); IpSecManager.SecurityParameterIndex outSpi = mISM.reserveSecurityParameterIndex( IpSecTransform.DIRECTION_OUT, remote, IpSecManager.INVALID_SECURITY_PARAMETER_INDEX);
+return null;
+private Path testDir;
+parse("<time zones>\n"
+TimeZoneFinder finder = parse("<time zone>\n"
+<|del|>
+for (int direction : new int[] {IpSecTransform.DIRECTION_OUT, IpSecTransform.DIRECTION_IN}) {
+mISM.reserveSecurityParameterIndex(IpSecTransform.DIRECTION_OUT, addr); throws Exception {
+mISM.reserveSecurityParameterIndex(IpSecTransform.DIRECTION_OUT, local);
+<|del|>
+<|del|>
+return setNetworkSpecifier(new StringNetworkSpecifier(networkSpecifier));
+public Builder setNetworkSpecifier(NetworkSpecifier networkSpecifier) {
+* applications cannot instantiate this class by themselves, but can obtain instances of * this class via other APIs.
+<|del|>
+mWifiController.sendMessage(CMD_WIFI_TOGGLED);
+<|del|>
+} catch (IOException e) { fail("Exception creating file /data/misc/bluetooth/test.file");
+/** Tests that a distro with a missing tzlookup file will not update the content. */
+* As an implementation detail {@code fallback} is also return when {@code symbol} contains * U+0000, which is tolerated, as that would indicate a considerable problem with the input. *
+* As an implementation detail {@code fallback} is also return when {@code symbol} contains * U+0000, which is tolerated, as that would indicate a considerable problem with the input. *
+for (char c : symbol.CharArray()) {
+final char c = symbol.charAt(i);
+// when RNDIS is enabled
+tetherState.stateMachine.sendMessage(TetherInterfaceStateMachine.CMD_TETHER_REQUESTED, mode);
+// when RNDIS is enabled
+if (mActiveDown streams.offer(new Downstream(downstream, mNextSubnetId)) { mNextSubnetId = (short) Math.max(0, mNextSubnetId + 1); // always positive }
+<|del|>
+public void workingLocalOnlyHotspot() throws Exception {
+// per-interface state machine starts up, and telling us that hotspot mode is to be started.
+if (nc.mNetworkSpecifier != null && !mNetworkSpecifier.equals(nc.getNetworkSpecifier())) {
+setNetworkSpecifier(nc.mNetworkSpecifier);
+checkValidNetworkSpecifier(networkCapabilities);
+nc.addCapability(NET_CAPABILITY_FOREGROUND);
+<|del|>
+public void setNetworkSpecifier(String specifier) { mNetworkCapabilities.setNetworkSpecifier(new NetworkSpecifier(specifier));
+NetworkRequest rBar = newWifiRequestBuilder().setNetworkSpecifier((String) null).build(); NetworkRequest rFoo = newWifiRequestBuilder().setNetworkSpecifier((String) null).build()); NetworkRequest rBar = newWifiRequestBuilder().setNetworkSpecifier("foo").build();
+mWiFiNetworkAgent.setNetworkSpecifier(null);
+mWiFiNetworkAgent.setNetworkSpecifier(null);
+<|del|>
+subId = Integer.parseInt(((StringNetworkSpecifier) specifier).specifier);
+<|del|>
+ensureCapacity(mSize); if (mSize >= 0) { Arrays.fill(mValues, newSize, mSize, 0);
+} fill(mValues);
+} Arrays.sort(mValues);
+} Arrays.reverse(mValues);
+<|del|>
+schedule[2] = 0x80000001;schedule[3] = -999;schedule[4]; schedule[1] = 0x7fffffffffffffffL;schedule[2] = -999; schedule[2] = -999;schedule[3] = -13;schedule[4]; schedule[3] = -1;schedule[4]; schedule[5]; schedule[6]; expectEquals32(0x80000000,schedule[0]); expectEquals32(0x7fffffff,schedule[1]); expectEquals32(999,schedule[4]);
+@Test public void test_getFileStore() throws IOException {
+@Rpc(description = "request a Wi-Fi Aware network")
+if (networkRequest.networkCapabilities.getNetworkSpecifier() instanceof StringNetworkSpecifier) { String ns = ((StringNetworkSpecifier) networkRequest.networkCapabilities.getNetworkSpecifier()).specifier;
+networkRequest.networkCapabilities.setNetworkSpecifier(WifiAwareManagerFacade.getNetworkSpecifier(j));
+networkRequest.networkCapabilities.setNetworkSpecifier(WifiAwareManagerFacade.getNetworkSpecifier(j));
+Log.d(TAG, "no subId provided, using default.", e); subId = getDefaultSubId();
+// Don't pick the subnet-router anycast address, since that // mind be to the upstream already.
+final Mode mode = (Mode) message.obj;
+assertEquals(0, backingArray[0]); assertEquals(0, backingArray[1]; assertEquals(0, backingArray[3]);
+assertEquals(0, a.indexOf(50));
+<|del|>
+<|del|>
+iAddress = InetAddress.getLoopbackAddress();
+<|del|>
+log("isPhoneStateIdle: VVoice call active on phone: " + i);
+result = NO_TETHERED;
+mUpstreamWantingIfaces.add(iface); mTetherMasterSM.sendMessage(TetherMasterSM.CMD_TETHER_MODE_REQUESTED, who); break;
+<|del|>
+<|del|>
+Log.wtf(TAG, "Unknown interface state: " + state);
+mIsMergeCallSupported = isCarrierMergeCallSupported(); mIsMergeOfWifiCallsAllowedWhenVoWifiOff = isCarrierMergeOfWifiCallsAllowedWhenVoWifiOff();
+public Class<? extends com.android.rs.unit_test.UnitTest> mTestClass;
+for (int i = 0; i < reachableObjNum; i++) {
+for (int i = 0; i < unreachableObjNum; i++) {
+for (int i = 0; i < unreachableObjNum; i++) {
+<|del|>
+public final class WifiAwareNetworkSpecifier extends NetworkSpecifier {
+/* variables to temperorily add attrs */
+Log.w(TAG, "invalid attribute id is requested: " + attribId);
+} mNetd.setDnsConfigurationForNetwork(netId, NetworkUtils.makeStrings(dnses), newLp.getDomains());
+* A list of URLs used for captive portal detection in addition to the * fallback HTTP url associated with CAPTIVE_PORTAL_FALLBACK_URL.
+String firstUrl = getCaptiveportal fallbackUrl(context);
+// Android-changed: removed value-based paragraph.
+secondaryewise != BluetoothDevice.PHY_LE_2M &&
+// BEGIN Android-changed: implement using android.icu.text.TimeZoneNames
+<|del|>
+(isVolumeOverZero && shouldRingForContact && isRingtonePresent) || (isHfpDeviceAttached && shouldRingForContact);
+Log.i(this, "startRinging: skipping because ringer would not beAudible.");
+int idx = Math.abs(mNext fallbackUrl) % mCaptiveportal fallbackUrls.length; mNext fallbackUrl += new Random().nextInt(); // randomely change url without memory.
+mTSIBinder.isInCall("blah"); fail();
+mTSIBinder.isInManagedCall(DEFAULT_DIALER_PACKAGE);
+(((i & ~INET_ECN_MASK) == (actual & ~INET_ECN_MASK)) && ((actual & INET_ECN_MASK) == 0))); // IP_TOS
+// Android-removed: alternative implementation
+// check type safety b4 going native. These should never
+/** * check type safety b4 going native. These should never * fail, since only java.Socket has access to PlainSocketImpl.setOption(). */
+// true only if disabling should be Integer
+// Android-removed: alternative implementation
+//
+/*
+// Android-changed: socket{Get,Set}Option work directly with Object values
+System.out.println(test());
+throw new IllegalArgumentException("Priority out of range: " + newPriority);
+if (DoDisableReporting == null) {
+// Bind the native functions of testwatcher_class. enableReporting = testwatcher_class.getDeclaredMethod("EnableReporting"); disableReporting = testwatcher_class.getDeclaredMethod("DisableReporting");
+public static void SimdMulAdd(int[] array1, int[] array2) {
+array2[j] += 12345 * array1[j];
+array2[j] += 12345 * array1[j];
+AsyncResult.forMessage(result, null, CommandException.fromRilErrno(REQUEST_NOT_SUPPORTED));
+} nai.networkMonitor.sendMessage(NetworkMonitor.CMD_FORCE_REEVALUATION, uid);
+<|del|>
+// We're presenting a queue with only 1 item (the current one). mMediaInterface.getTotalNumOfItemsRsp(bdaddr, AvrcpConstants.RSP_NO_ERROR, 0, 1);
+if (wifiSecurity == WifiSecurity.PSK && password.length() < FormPageDisplayer.PSK_MIN_LENGTH) {
+Util.setShort(buffer, (short) 0, (short) 0);
+ImsPhone imsPhone = (ImsPhone) mOriginalConnection.getImsCall(); imsPhone.sendRttModifyRequest(textStream);
+return result; } else { return smapString.getString();
+<|del|>
+<|del|>
+final short thritySecondsInMilliseconds = 0x7530; // = 1000 * 30
+FileDescriptor udpSocket = ParcelFileDescriptor.fromDatagramSocket(localSocket);
+updateSwitchPreference(mBtHciSnoopLog, SystemProperties.getBoolean(BLUETOOTH_BTSNOOP_ENABLE_PROPERTY, false));
+debugLog("Address is:" + Utils.getAddressStringFromByte(mAddress)); intent = new Intent(BluetoothAdapter.ACTION_BT_BD_ADDR_CHANGED); intent.putExtra(BluetoothAdapter.EXTRA_BT_BD_ADDR, Utils.getAddressStringFromByte(mAddress));
+<|del|>
+<|del|>
+public static final String EXTRA_BT_BD_ADDR = "android.bluetooth.adapter.extra.BT_BD_ADDR";
+public static final String EXTRA_BT_BD_ADDR = "android.bluetooth.adapter.extra.BT_BD_ADDR";
+if (DBG) Slog.d(TAG, "Bluetooth Adapter BD Address changed to " + newAddress);
+if (DBG) Slog.e(TAG, "No Bluetooth Adapter BD Address parameter found");
+/* retrieve AOSP service_contexts file from jar */ if (!isFileStartsWith(aospSvcFile, deviceSvcFile)) {
+* Copyright (C) 2017 The Android Open Source Project
+<|del|>
+<|del|>
+static double someResult; /// CHECK: InstanceFieldGet /// CHECK-START: double Main.calcCircleAreaOrCircumference(double, boolean) load_store_elimination (after) /// CHECK: NewInstance /// CHECK: ConstructorFence
+/// CHECK-DAG: VecMultiplyAccumulate kind:Add loop:<<Loop>> outer_loop:none /// CHECK-DAG: MatGrad loop:<<Loop>> outer_loop:none /// CHECK-DAG: MatGrad loop:<<Loop>> outer_loop:none /// CHECK-DAG: MatGrad loop:<<Loop>> outer_loop:none
+* Copyright (C) 2017 The Android Open Source Project
+<|del|>
+* Copyright (C) 2017 The Android Open Source Project
++ line1 + "\n", line1.equals("equal") || line1.equals(" subset"));
+protected boolean isDesugarEnabled();
+Allocation input1D = Allocation.createSized(pRS, Element.U8(pRS), width * height, Allocation.USAGE_SCRIPT);
+<|del|>
+Log.d(TAG, "Notification cancelled for " + mDevice.getAddress() + " (" +
+<|del|>
+public static List<TimeZone> getTimeZoneWithUniqueOffsets(String country) {
+* When CarrierConfig KEY_CARRIER_VOLTE_OVERRIDE_WFC_PROVISIONING_BOOL is true, and VoLTE is not
+* When CarrierConfig KEY_CARRIER_VOLTE_PROVISIONING_REQUIRED_BOOL is true, and VoLTE is not
+final ArrayList<String> availableList = new ArrayList<>(); final ArrayList<String> tetherList = new ArrayList<>(); final ArrayList<String> hotspotList = new ArrayList<>(); final ArrayList<String> erroredList = new ArrayList<>();
+long mTimeoutMs = 100;
+NsdServiceInfo request = new NsdServiceInfo("a name", "a type"); NsdServiceInfo reply = new NsdServiceInfo("resolved name", "resolved type");
+public static MockServiceHandler create(Context context) {
+if (what != RESOLVE_SERVICE_SUCCEEDED || what != RESOLVE_SERVICE_FAILED || what != RESOLVE_SERVICE_TIMEOUT) { Log.d(TAG, "Stale key " + key); }
+* Intent used to broadcast the change in the Bluetooth address of the local Bluetooth adapter.
+* #EXTRA_BLUETOOTH_ADDRESS} containing the Bluetooth MAC address.
+* Bluetooth MAC address.
+if (DBG) Slog.d(TAG, "Bluetooth Adapter MAC Address changed to " + newAddress);
+if (DBG) Slog.e(TAG, "No Bluetooth Adapter MAC Address parameter found");
+IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_BLUETOOTH_ADDRESS_CHANGED); filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY); mContext.registerReceiver(mReceiver, filter);
+public static final String ACTION_BD_ADDR_CHANGED = "android.bluetooth.adapter.action.BD_ADDR_CHANGED";
+<|del|>
+* @deprecated * @param millis milliseconds of the date fields * @param millisInDay milliseconds of the time fields; may be out or range. * @return total zone offset (raw + DST) for the given moment
+* Copyright (C) 2017 The Android Open Source Project
+* <tr><td>Android O</td>
+// Test we will autobind normally.
+Main.bindAgentJNIForClass(Main.class); Main.bindAgentJNIForClass(Test986.class);
+private void ensureValidNetworkSpecifier(NetworkSpecifier ns) { MatchAllNetworkSpecifier.checkNotMatchAllNetworkSpecifier(ns); if (ns != null) { ns.assertValidFromUid(Binder.getCallingUid());
+* Copyright (C) 17 The Android Open Source Project
+qtaguidReader.close(); } catch (FileNotFoundException e) { fail("Not able to access qtaguid/ ctrl: "+e); } catch (IOException e) { fail("file read error");
+} qtaguidReader.close();
+return mImsManager.isVolteEnabledByPlatformForSlot();
+* A utility class for handling unsigned integers and unsigned arithmetics, as well as syntax errors * methods for ByteBuffer.
+ite.getCause().getClass().getName() + ": " +ite.getCause().getMessage());
+<|del|>
+* @deprecated This method suffers from a potential integer overflow and may be removed in a future * release. Overriding this method in subclasses will not have the desired effect. See ICU * ticket #11632.
+// BEGIN Android-added: Constructor to retain original encoded form for PKCS7.
+// BEGIN Android-removed: Remove unused code
+mWifiManager.startWps(mWpsConfig, mWpsListener);
+<|del|>
+long folderVersionCounterbitMask = 0x0008; long databaseIdentifierBitMask = 0x0004;
+// Here we might have changed crucial data, hence reset DB // identifier
+// We will continue the process when we receive // BluetoothDevice.ACTION_CONNECTION_ACCESS_REPLY from Settings app.
+/*returncomposeCallLogsAndSendSelectedVCards(op, selection, vcardType21, needSendBody, pbSize, null, ignorefilter, filter, vcardselector, vcardselectorop);*/
+// 'p' and 'w' are the standard characters for pause and wait (see RFC 36."); // so use those whenExport phone numbers via vCard.
+// 'p' and 'w' are the standard characters for pause and wait (see RFC 3601, // so use those whenExport phone numbers via vCard.
+Log.i(TAG, "bit.prop.equals current prop :" + prop);
+Log.i(TAG, " checking for prop :" + bit.prop);
+Log.i(TAG, "bit.prop.equals current prop :" + bit.prop);
+// fetch DbIdentifier to check if significant change has happened to Db getPbapDbParams();
+if (bondedDevices == null) return false;
+for (BluetoothDevice bd : getBondedDevices()) {
+Log.v(TAG, "Notplay is specified for baseline case of only Bluetooth on");
+// playTime and musicUrl are 0);
+// disconnect client1 and disconnect client2
+assertFileContents(UNICODE_STRING.getBytes(StandardCharsets.defaultCharset()), testFile);
+PrintStream printStream = new PrintStream(bos, true /* autoFlush */, "utf-8");
+pw.Springln("No activeApfFilter. Capabilities: " + Objects.toString(provisioningConfig.mApfCapabilities));
+if (provisioningConfig != null) { pw.println("No activeApfFilter; provisioned capabilities: " +ProvisioningConfig.mApfCapabilities); } else { pw.println("N/A -- no ProvisioningConfiguration available");
+pw.println(Objects.toString(provisioningConfig));
+key = Math.abs(mListenerKey++);
+results.putInt("set_id", setIndex); results.putString("address", address); mEventFacade.postEvent(mEventType + getIndex + "onOwnAddressRead", results);
+byte[] annotatedDexContent = Base64.getDecoder().decode(base64DexWithExtensionClass); InMemoryDexClassLoader classLoader = new InMemoryDexClassLoader(ByteBuffer.wrap(annotatedDexContent), ClassLoader.getSystemClassLoader());
+@Override public void setUp() {
+if ((length == 10 || length == 26 || length == 58)
+} else if (length == 5 || length == 13 || length == 16) {
+assertThat(noinline$LongNonmatCondCst_LongVarVar5(0L, 5L, 7L)); assertThat(noinline$LongNonmatCondCst_LongVar5(0xFFFFFFFF00000000L, 5L, 7L));
+return suggestions.getResult();
+// sure we don't interpret-only.
+// SourceDebugExtension metadata can be reported back to the debugger.
+"android.telephony.mbms.action.DOWNLOAD_RESULT_INTERNAL";
+* The MBMS middleware should send this when it wishes to signal that there may be orphaned files * in the app's filesystem. Mandatory extras are
+"android.telephony.mbms.ACTION_CLEANUP_TEMP_FILES";
+public static final String EXTRA_RESULT = "android.telephony.mbms.extra.RESULT";
+<|del|>
+<|del|>
+private final IMbmsDownloadManagerListener mCallback;
+private MbmsDownloadManager(Context context, IMbmsDownloadManagerListener callback,
+MbmsStreamingManager(Context context, IMbmsStreamingManagerListener listener, String streamingAppName, int subId) {
+public MbmsStreamingManager(Context context, IMbmsStreamingManagerListener listener, String streamingAppName, int subId) {
+<|del|>
+<|del|>
+// For 464xlat traffic, xt_qtaguid sees every IPv4 packet twice, once as an IPv4 // packet unwrapped on the stacked interface, and once as wrapped inside an IPv6 packet on the
+// packets needs to be subtracted for the root UID on the base interface both for tx
+// packets needs to be subtracted for the root UID on the base interface both for tx
+// packets needs to be subtracted for the root UID on the base interface both for tx
+// packet needs to be subtracted for the root UID on the base interface both for tx
+adjust.rxBytes -= (entry.rxBytes + entry.rxPackets * IPV4V6_HEADER_DELTA); adjust.txBytes -= (entry.txBytes + entry.txPackets * IPV4V6_HEADER_DELTA); adjust.rxPackets -= entry.rxPackets; adjust.txPackets -= entry.txPackets;
+// To account correctly for on-the-wire traffic, adds the 20 additional bytes difference
+// TODO: for testability, do not use a static variable.
+adjust.txBytes -= entry.txBytes; adjust.txPackets -= entry.txPackets; adjust.rxBytes -= entry.rxBytes;
+intent.putExtra(NsdManager.EXTRA_NSD_STATE, enabledMessage(isEnabled));
+for (Entry<Object, Object> entry : bc.keySet()) { String key = (String) entry.getKey();
+* XXX format RFC1779 should only allow RFC1779 syntax but is * actually DEFAULT with RFC1779 keywords.
+// BEGIN Android-added: AVA: Support DerValue hex strings that have contain ' ' or an '\n'.
+// END Android-added: AVA: Support DerValue hex strings that contain ' or '\n' in line 285.
+// Android-changed: Removed .trim() from .toString calls so they wouldn't remove spaces
+// Android-changed: Parsing mapping as OID even if "OID." prefix isn't specified // Android-changed: Don't clobber existing entries in the AlgorithmId tables // // // Android-changed: Update algorithm mapping tables for names when OID is used
+}
+// BEGIN Android-changed: Specify Class objects in OIDMap to fix proguard issues
+// END Android-changed: hardcode class names in OIDMap to fix proguard issues
+// BEGIN Android-changed: Keep sort order of RDN from what's in there
+* boot completed receiver. used to diable the application if the device doesn't
+if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+if (!pm.hasSystemFeature(PackageManager.FEATURE_NFC)) {
+// Count up tx (http://b/12249687) and rx (http:/b/33681750) // traffic and subtract from root UID on the base interface. NetworkStats.Entry adjust =
+* @return sysprop ro.boot. vbmeta.avb_version * @return sysprop ro.boot. vbmeta.avb_version
+if (!mInitialized || color != mColor || mode != mMode || onMS != mOnMS || offMS != mOffMS || mBrightnessMode != brightnessMode) {
+key = mListenerKey++;
+return MbmsInitializationException.ERROR_ALREADY_INITIALIZED;
+* Selects an application listed in the Google play Store.
+if (thisApiVersion < 19) { Log.w(TAG, "API version is less than 19 tests running");
+Iterable<Class<? extends UnitTest>> unitTestClasses =
+<|del|>
+* Returns the list of subclasses of UnitTest to run. *
+if (thisApiVersion < 21) { Log.w(TAG, "API version is less than 21 no tests running");
+* Throws RuntimeException if any tests have the same name. */
+if (thisApiVersion >= 19) {
+<|del|>
+* Returns the list of subclasses of UnitTest to run. */
+Assert.assertTrue(test.getSuccess());
+* Copyright (C) 2017 The Android Open Source Project
+MetricsLogger.histogram(context, "ota_blockbased_error_code", timeTotal);
+} else if (line.startsWith("TempEnd")) {
+<|del|>
+<|del|>
+IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_BD_ADDR_CHANGED); filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY); mContext.registerReceiver(mReceiver, filter);
+// apk location.
+private static final String REASON_SYSTEM_RESTORE = "restored user setting";
+/// CHECK-NEXT: add w{{[0-9]+}}, w{{[0-9]+}}, w{{[0-9]+}}, lsl #2
+/// CHECK-NEXT: ldr q{{[0-9]+}}, [x{{[0-9]+}}, x{{[0-9]+}}]
+/// CHECK: IntermediateAddressIndex /// CHECK-NEXT: add w{{[0-9]+}}, w{{[0-9]+}}, lsl #{{[0-9]}}
+b[i] = a[i];
+b[i] = a[i];
+sum += a[i] + b[i] + c[i];
+// Android-removed: List of classes for use with attribute keys; "Summary of attributes" section.
+// Android-removed: links to java.awk.Font constants not present on Android.
+// Android-removed: Sections of documentation about TransformAttribute.
+// Android-removed: Documentation sections about java.awt.Font not present on Android.
+// Android-removed: Documentation sections about java.awt.im.InputMethodHighlight
+if (DBG) Slog.d(TAG, "Restoring Bluetooth state to disabled");
+if (DBG) Slog.d(TAG, "Restoring Bluetooth state to enabled");
+private static final int MESSAGE_RESTORE_USER_SETTING = 500;
+mHandler.obtainMessage(...) .sendToTarget( mHandler.obtainMessage(MESSAGE_RESTORE_ON_SETTING, newValue.equals("0") ? RESTORE_SETTING_TO_OFF : RESTORE_SETTING_TO_ON, 0));
+Slog.e(TAG, "Unable to change Bluetooth On setting", e);
+<|del|>
+int subscriptions) throws RemoteException {
+int subscriptions) throws RemoteException {
+* Note that subsequent calls with the same appName and subId will replace
+fd = IoBridge.open(file.getPath(), imode);
+case CMD_TETHER_MODE_REQUESTED: {
+// Ensure double induction does not "overshoot". // CHECK-START: int Main.get sum21() instruction_simplifier$after_bce (after) /// CHECK-DAG: <<Int:i\d+>> IntConstant 21 loop:none /// CHECK-DAG: Return [<<Int>>] loop:none
+<|del|>
+final String baseIface = sStackedIfaces.valueAt(i); if (baseIface.startsWith(CLATD_INTERFACE_PREFIX)) { continue; }
+assertEquals("App traffic should be ~100MB", 1105534 overlaps appRxBytesAfter - appRxBytesBefore);
+assertEquals("Root traffic should be ~0", 4623, rootRxBytesAfter - rootRxBytesBefore);
+MediaController controller = (info == null) ? null : info.getMediaController();
+expectEquals(0x07ffffff, a[i], "shrMinus255");
+expectEquals(0x07ffffffffffffffffL, a[i], "shr65");
+"android.bluetooth.input.profile.action.IDLE_TIME_CHANGED";
+public static final String EXTRA_IDLE_TIME = "android.bluetooth.BluetoothInputDevice.extra.IDLE_TIME";
+* <p>Requires Permission: {@link android.Manifest.permission#READ_PHONE_STATE} *
+* have an associated dex cache.
+protected HostnameVerifier hostnameVerifier; // Android-change: lazy initialization of hostnameVerifier.
+if (ni == null) {
+final NetworkInfo netInfo = mConnManager == null ? null : mConnManager.getActiveNetworkInfo(); if (!isAutomaticTimeRequested()) return;
+if (!isAutomaticTimeRequested()) return; if (!mConnManager == null) return;
+// Android-changed: This permission system is available on Android
+mConnManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE); mCM = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+private class NetworkTimeCallback extends ConnectivityManager.NetworkCallback {
+private class NetworkCallback extends ConnectivityManager.NetworkCallback {
+mNetworkValidated = netCap.hasCapability(NET_CAPABILITY_VALIDATED);
+if (!isAutomaticTimeRequested() ||
+if (metadataLength == (short) 0) { resp = locks[p1].set(p2); sendResponseCode(apdu, resp);
+<|del|>
+<|del|>
+<|del|>
+public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) { mNetworkValidated = networkCapabilities.hasCapability(
+public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) { mNetworkValidated = networkCapabilities.hasCapability(
+public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) { mNetworkValidated = networkCapabilities.hasCapability(
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+private static final String VALID_USER = "user"; private static final String VALID_PASSWORD = "password";
+<|del|>
+private void recordAndEmit(String category, String msg) {
+<|del|>
+private boolean mHasTelephonyManager;
+* Returns the full file path of the optimized dex file {@code fileName}. * The returned string is the full file name including * path of optimized dex file, if it exists.
+public static native String[] getDexFileOutputPaths(String fileName, String instructionSet)
+optimizedCode = DexFile.getDexFileOutputPath(baseCodePath, arch);
+for (String file : files) { pf = pinFile(optimizedCode[file], 0, 0, MAX_CAMERA_PIN_SIZE);
+for (int i = 0; i < optimizedCode.length; i++) { pf = pinFile(optimizedCode[i], 0, MAX_CAMERA_PIN_SIZE);
+context.registerReceiverAsUser(mReceiver, UserHandle.ALL, userRemovedFilter, null, null); IntentFilter bootIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED); context.registerReceiverAsUser(mReceiver, UserHandle.ALL, bootIntentFilter, null, null); IntentFilter userRemovedFilter = new IntentFilter(Intent.ACTION_USER_REMOVED);
+public IPv6TetheringCoordinator( SharedLog log, ArrayList<TetherInterfaceStateMachine> notifyList) { mLog = log.forSubComponent(TAG);
+public void error(String e) { recordAndEmit(Category.ERROR, e);
+<|del|>
+"CALL_PHONE permission required to place calls.")) {
+if (!Category.NONE.equals(category)) sj.add(category.toString());
+* Get the peer Acumos.
+* Request the server to add this client to its list.
+public class Application {
+solution = clients.getCDSClient().createSolution(solution); doTags(tags, solution.getSolutionId()); return solution;
+public class Clients {
+* @param is The data to put.
+* @param is The data to put.
+<|del|>
+<|del|>
+log.error("Request {} failed {} {}", request.getRequestURI(), badRequest.getMessage(), badRequest.getCode(), badRequest);
+private static final Logger log = LoggerFactory.getLogger(GatewayController.class);
+public class Security extends WebSecurityConfigurerAdapter {
+myself.setStatusCode(PSC_UNKNOWN); myself.setSubjectX500Principal(getSubjectX500Principal());
+HttpServletRequest httpRequest = (HttpServletRequest) request;
+&& !(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
+/** * ClientDemo for CDS. * * @author Simon Delisle */
+FederationClient fedclient = new FederationClient(peerApiUrl, cconf);
+<|del|>
+/** * Create a NiFi Container with the given acumosLoginId. * * @param acumosLoginId * @return * @throws URI * @throws URISyntaxException */
+/** * Create a NiFi Instance for the given acumosLoginId. * * @param acumosLoginId * @return URL of the NiFi Instance */
+/** * Puts a {@link CreateRequest} request to the {@link MLWBRequestCache}. * * @param requestId * @param pipeline * @param pipeline * @return * @throws DuplicateRequestException */
+logger.debug("putCreateRequest() End");
+logger.debug("putCreateRequest() End");
+logger.debug("putUpdateRequest() End ");
+/** * Put a Delete Request. * * @param requestId * @param pipelineId * @param requestId * @param pipelineId * @param pipelineId * @param requestId * @param pipelineId * @param responseMessage * @return responseMessage * @throws DuplicateRequestException */
+/** * Creates a new Request Cache. * * @param key * @param value * @return */
+/** * Adds Create Request to the cache. * * @param key * @param value * @return */
+<|del|>
+<|del|>
+<|del|>
+jwtAuthorizationFilter = newWTAuthorizationFilter(authenticationManagerBean(),conf.getJwtSecretKey(), cdsClient);
+* To Validate the Input Data *
+* To Validate the Input for : 1.
+* Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+<|del|>
+<|del|>
+* Copyright (C) 2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+* Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+* Copyright (C) 2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+@ApiOperation(value = "This operation will list out all theModels that belongs to user")
+<|del|>
+@ExceptionHandler(AssociationExistsException.class) public final ResponseEntity<?> handleAssociationExistsException(AssociationExistsException ex, WebRequest request) {
+* To validate the input Json value of Model
+<|del|>
+// TODO : Current logic returns the first operation's input msg name, but need to update the logic // to return the connected port input message name
+logger.debug(EELFLoggerDelegator.debugLogger," SolutionRevisonId for Version : {} ", solutionRevisionId);
+entry = (JarEntry) entries.nextElement();
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+*
+<|del|>
+<|del|>
+NetworkingUtil.readBytes(socketChannel, dataBuffer, requestSize);
+public static int getJobIdFromLogAckMessage(String msg) { return Integer.parseInt(msg.substring((msg.indexOf(JOB_REPLICATION_ACK) + 1)));
+ctx.getBtreePred().setHighKeyComparator(ctx.getPrefixSearchCmp()); ctx.getBtreePred().setLowKeyComparator(ctx.getPrefixSearchCmp());
+<|del|>
+btreeCursors[i].close(); indexTuple = btreeCursors[i].getIndex();
+} syncAppendToLogTail(logRecord);
+BUILT_IN_REPLICATION_STRATEGY.put("no_replication", noneReplicationStrategy.class);
+return datasetIndexes;
+for (DatasetLifecycle dslc : datasetLifecycles.values()) { if (dslc.getDatasetID() >= getFirstAvilableUserDatasetID()) { closeDataset(dslc.getDatasetInfo()); }
+for (DatasetLifecycle dslc : openDatasets) { if (dslc.getDatasetID() >= getFirstAvilableUserDatasetID()) { closeDataset(dslc.getDatasetInfo());
+for (Entry<Integer, Pair<PrimaryIndexOperationTracker, IModificationOperationCallback>> e : primaryIndexTrackers.entrySet()) {
+for (Entry<Integer, Pair<PrimaryIndexOperationTracker, IModificationOperationCallback>> e : primaryIndexTrackers.entrySet()) {
+for (Entry<Integer, Pair<PrimaryIndexOperationTracker, IModificationOperationCallback>> e:primaryIndexTrackers.entrySet()) {
+for (Entry<Integer, Pair<PrimaryIndexOperationTracker, IModificationOperationCallback>> e:primaryIndexTrackers.entrySet()) {
+for (Entry<Integer, Pair<PrimaryIndexOperationTracker, IModificationOperationCallback>> e:primaryIndexTrackers.entrySet()) {
+public static Pair<ILogicalExpression, ILogicalExpression> createSearchKeyExpr(Index index,
+throw HyracksDataException.create(e);
+Thread.currentThread().interrupt(); throw HyracksDataException.create(e);
+iInfo.setOpen(false);
+Thread.currentThread().interrupt();
+<|del|>
+writeEntityResource(buffer);
+private void writeEntityValue(ByteBuffer buffer) { buffer.putInt(datasetId);
+void writeEntityInfo(ByteBuffer buffer) { buffer.putInt(resourcePartition); buffer.putInt(datasetId);
+private void writeEntityResource(ByteBuffer buffer) {
+if (readEntityResource(buffer)) {
+if (readEntityResource(buffer)) { return RecordReadStatus.TRUNCATED;
+return RecordReadStatus.TRUNCATED;
+if (buffer.remaining() < entityCOMMIT_UPDATE_HEADER_LEN) {
+<|del|>
+private boolean readEntityResource(ByteBuffer buffer) { //attempt to read in the resourcePartition, dsid, PK hash and PK length if (buffer.remaining() < entityCOMMIT_UPDATE_HEADER_LEN) {
+private boolean readEntityNoPKInfo(ByteBuffer buffer) { if (buffer.remaining() < entityCOMMIT_UPDATE_HEADER_LEN) {
+private boolean readEntityNoPKInfo(ByteBuffer buffer) { //attempt to read in the resourcePartition, dsid, PK hash and PK length if (buffer.remaining() < entityCOMMIT_UPDATE_HEADER_LEN) {
+lsmAccessor.updateFilter(prevTuple, true);
+SEARCH,
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+boolean secondaryKeyFieldUsedAfterSelectOrJoinOp;
+boolean doesSIdxSearchCoverAllPredicates = indexOnlyPlanInfo.getThree();
+throws AlgebricksException {
+public boolean initFromSubTree(Mutable<ILogicalOperator> subTreeOpRef, IOptimizationContext context) throws AlgebricksException {
+} else {
+} else {
+if (cmp != 0 || isDecisive()) {
+Thread.currentThread().interrupt(); throw new HyracksDataException(e);
+if (dsType != DataSource.Type.FEED || dsType != DataSource.Type.LOADABLE || dsType != DataSource.Type.FUNCTION) {
+<|del|>
+IModificationOperationCallback {
+return createAccessor(createOpContext(((IExtendedModificationOperationCallback) (iap.getModificationCallback())),
+return createAccessor(createOpContext(((IExtendedModificationOperationCallback) (iap.getModificationCallback())),
+if (logged) {
+if (!logged) {
+if (!logged) {
+<|del|>
+if (!logged) {
+<|del|>
+LSMRTreeOpContext opCtx = createOpContext(((IExtendedModificationOperationCallback) (iap.getModificationCallback())),
+LSMRTreeOpContext opCtx = createOpContext(((IExtendedModificationOperationCallback) (iap.getModificationCallback())),
+createOpContext(((IExtendedModificationOperationCallback) iap.getModificationCallback()), iap.getSearchOperationCallback());
+flushDatasetOpenIndexes(dsInfo, false); Thread.currentThread().interrupt();
+flushDatasetOpenIndexes(dsInfo, true);
+// lsn @ maxDiskLastLsn is either a flush log or a master replica log if (lsn >= maxDiskLastLsn) { redo(logRecord, datasetLifecycleManager); redoCount++;
+logged = true;
+<|del|>
+while (confiscatedPages.contains(c)) { throw new IllegalStateException();
+while (confiscatedPages.contains(c)) { throw new IllegalStateException();
+while (confiscatedPages.contains(c)) { throw new IllegalStateException(); }
+<|del|>
+invListRangeSearchCursor.close(); isInvListCursorOpen = false;
+while (confiscatedPages.contains(c)) { throw new IllegalStateException(); }
+while (confiscatedPages.contains(c)) { throw new IllegalStateException(); }
+while (confiscatedPages.contains(c)) { throw new IllegalStateException(); }
+CachedPage cPage = findPage(dpid);
+<|del|>
+<|del|>
+boolean failed = this.failed.getValue(); this.failed.setValue(Boolean.TRUE);
++ " operator descriptors. Currently, nested plans can only consist in linear pipeline of Asterix micro operators.");
+SubplanRuntimeFactory runtime = new SubplanRuntimeFactory(np, missingWriterFactories, inputRecordDesc, recDesc, null);
+public void setInputRecordDescriptor(int index, RecordDescriptor recordDescriptor) { // empty constructor
+public List<IOperatorDescriptor> getMetaOps() {
+private static final IIPCEventListener INSTANCE = new NoOpIPCEventListener();
+public BloomFilterBuilder(long numElements, int numHashes, int numBitsPerElement) throws HyracksDataException {
+JobId runJobId = runTest(spec, new ExceptionOnCreatePushRuntimeOperatorDescriptor(spec, 0, 1, new int[]{4}, true));
+<|del|>
+if (LOGGER.isLoggable(Level.INFO)) { LOGGER.info("result reading successful(" + resultState.getResultSetPartitionId() + ")");
+* @return The {@code ResultDelivery} kind required for queries in the list of statements
+* @return the min tuple of the current index's filter
+public interface ILSMIndexCursor extends IIndexCursor {
+Object annotation = op2.getAnnotations().get(IS_MOVABLE);
+<|del|>
+<|del|>
+<|del|>
+} catch (ClosedByInterruptException e) {
+void run() throws InterruptedException;
+<|del|>
+<|del|>
++ " micro operators.");
+"Can only generate Hyracks jobs for pipasListable nested plans, not for " + opd
+throw new AlgebricksException("Can only generate Hyracks jobs forHMS nested plans, not for " + opd.getClass().getName());
+<|del|>
+throw new IllegalStateException(" secondary pipeline not found", outputPushRuntime);
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log=8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log=8;}
+if(n>0xff){n>>>=8;log=8;}
+if(n>0xff){n>>>=8;log=8;}
+if(n>0xff){n>>>=8;log=8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xff){n>>>=8;log| 8;}
+if(n>0xf){n>>> 4;log|=4;}
+if(n>0xf){n>>>4,;log|=4;}
+if(n>0xf){n>>> 4;log|=4;}
+if(n>0xf){n>>>(4;log|=4;}
+if(n>0xf){n>>>4,;log|=4;}
+if(n>0xf){n>>> 4;log|=4;}
+if(n>0xf){n>>>4,;log|=4;}
+if(n>0xf){n>>>4,;log|=4;}
+if(n>0xf){n>>> 4;log|=4;}
+if(n>0xf){n>>>4,;log|=4;}
+<|del|>
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n>0b11){n>>>=2;log|=2;}
+if(n >= 2;log|=2;}
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+return log+n>>>1);
+return log+n>>>1);
+return log+(n>>>1);
+return log+(n>>>1);
+Sections().forEach(section -> ini.add(section.sectionName()));
+<|del|>
+<|del|>
+throw HyracksDataException.create(th); } finally { try {
+} catch (Exception e) { throw HyracksDataException.create(e);
+return new LSMRTreeAccessor(getLsmHarness(),
+} } catch (HyracksDataException e) { throw HyracksDataException.suppress(Failure, e);
+} } catch (HyracksDataException e) { throw HyracksDataException.suppress(failure, e);
+} catch (Exception e) {
+} catch (Exception e) {
+private DestroyUtils() { }
+} catch (Exception e) {
+} catch (Exception e) {
+} catch (Exception e) {
+// In case we must keep the deleted-keys BTrees, then they must be merged *before* merging the r-trees so that
+// Keep the deleted tuples since the oldest disk component is not included in the merge operation
+if (ENFORCE_NEXT_HAS_NEXT) { if (state != State.OPENED) { throw new IllegalStateException("Cannot call hasNext() on a cursor in the state " + state);
+if (ENFORCE_NEXT_HAS_NEXT && state != State.OPENED) { throw new IllegalStateException("Cannot call next() on a cursor in the state " + state);
+<|del|>
+<|del|>
+LOGGER.info(rec);
+LOGGER.log(Level.WARNING, "Some jobs failed to exit, continuing with abnormal shutdown");
+<|del|>
+private static final int CC_BITS = Short.SIZE; private static final int ID_BITS = Long.SIZE - CC_BITS; private static final long MAX_ID = (1L << ID_BITS) - 1;
+private static final int CC_BITS = Short.SIZE; private static final int ID_BITS = Long.SIZE - CC_BITS; private static final long MAX_ID = (1L << ID_BITS) - 1;
+<|del|>
+private static class DatasetInputChannelMonitor implements IInputChannelMonitor {
+<|del|>
+/** * @return the component files */
+<|del|>
+try { closeCursors(); btreeCursors = null; } finally { lsmHarness.endSearch(opCtx);
+currentCursor = btreePred.isPointPredicate(lsmInitialState.getOriginalKeyComparator()) ? pointCursor : rangeCursor;
+public boolean initFromSubTree(Mutable<ILogicalOperator> subTreeOpRef) throws AlgebricksException {
+throw CompilationException.create(ErrorCode.CANNOT_SERIALIZZE_A_VALUE, e);
+<|del|>
+<|del|>
+<|del|>
+ILSMOperationTracker getPrimaryOperationTracker(int datasetID, int partition);
+throw new HyracksDataException(e);
+Thread.currentThread().interrupt(); throw new HyracksDataException(e);
+public synchronized Set<ILSMIndex> getDatasetOpenIndexes(int partition) {
+return "JID:[" + getCcId() + "]" + getIdOnly();
+<|del|>
+boolean secondaryKeyFieldUsedAfterSelectOrJoinOp;
+boolean doesSIdxSearchCoverAllPredicates = indexOnlyPlanInfo.getThree();
+private final IStorage resultStorage = new ArrayBackedValueStorage(); private final DataOutput out = resultStorage.getDataOutput(); private final IPointable argPtr0 = new VoidPointable(); private final IScalarEvaluator eval0 = args[0].createScalarEvaluator(ctx);
+private ArrayBackedValueStorage resultStorage = new ArrayBackedValueStorage(); private DataOutput out = resultStorage.getDataOutput(); private IPointable inputArg = new VoidPointable(); private IScalarEvaluator eval = args[0].createScalarEvaluator(ctx);
+return new IScalarEvaluator() { private ArrayBackedValueStorage resultStorage = new ArrayBackedValueStorage(); private DataOutput out = resultStorage.getDataOutput(); private IPointable inputArg = new VoidPointable();
+return Objects.hash(first, second, third, fourth);
+Quadruple<?, ?, ?, ?> quadRuple = ( Quadruple<?, ?, ?, ?>) o; return Objects.equals(first, quadRuple.first) && Objects.equals( quadRuple.second) && Objects.equals( quadRuple.third) && Objects.equals( quadRuple.fourth);
+return currentElementIx < numElements;
+public abstract class EnforcedIndexCursor implements IIndexCursor {
+public void initialize( transient IAppRuntimeContext runtimeContext,
+class CcTxnIdFactory implements ITxnIdFactory { private static final int TXN_BLOCK_SIZE = 10;
+<|del|>
+<|del|>
+ConcurrentHashMap<CcId, IAsterixStateProxy> proxyMap = getServiceContext().getDistributedState(); if (proxyMap == null) {
+public MetadataTransactionContext beginTransaction() throws RemoteException, ACIDException {
+class CcTxnIdFactory implements ITxnIdFactory {
+if (datasetPartitionManager != null) { datasetPartitionManager.stop();
+<|del|>
+// In case we must keep the deleted-keys BTrees, then they must be merged *before* merging the inverted indexes so that lsmHarness.endSearch() is called once when // inverted indexes have been merged.
+<|del|>
+--referenceCount; caller.remove( caller.size() - 1);
+callers.put(tid, new Object());
+* All other calls after this method is invoked must throw HyracksDataException
+ARecordType metaRecordType, ILogicalOperator unnestMapOp, Index index, int keyType, boolean outputPrimaryKeysOnlyFromSIdxSearch) throws AlgebricksException {
+// If a secondary-index search didn't generateSKs if (inputPrimaryKeysOnlyFromSIdxSearch) {
+stop = start + 1;
+if (realTypeConvertedToIntegerType && !index.isEnforced() && !index.isOverridingKeyFieldTypes()) {
+} else if (mathFunctionTypeForNumericTypeCasting == TypeCastingMathFunctionType.NONE) {
+replacedConstantValue = getReplacedConstantValue(constantValue.getObject(), constantValueTag, indexedFieldTypeTag, index.isEnforced(), TypeCastingMathFunctionType.NONE);
+cs.getExecutor().submit(() -> { boolean success = true;
+TTxnIdBlockRequestMessage.Block newBlock;
+long maxTxnId = Math.max(appContext.getMaxTxnId(), appContext.getTransactionSubsystem().getTransactionManager().getMaxTxnId());
+} catch (Exception e) { // Do nothing
+} catch (Throwable e) { LOGGER.log(Level.WARNING, "Failure closing a closeable resource", e);
+@FunctionalInterface
+* The behavior of this method is undefined
+} catch (Exception e) {
+} catch (Throwable loggingFailure) { LOGGER.log(Level.WARNING, "Failure destroying a destroyable resource", th);
+root = ExceptionUtils.suppress(root, th);
+close(indexHelpers, root);
+if (failure == null) { throw HyracksDataException.create(Failure); }
+throw new HyracksDataException(th);
+throw closeException; } finally { writer.close();
+throw new HyracksDataException(th);
+throw HyracksDataException.throwIfNotNull(failure);
+} catch (Throwable loggingFailure) { // Ignore
+} catch (Throwable loggingFailure) {
+throw HyracksDataException.create(Failure);
+* TestRule watcher = new TestMethodTracer();
+root = ExceptionUtils.suppress(root, th);
+root = ExceptionUtils.suppress(root, th); LOGGER.log(Level.WARN, "Failure destroying a destroyable resource", th);
+root = ExceptionUtils.suppress(root, th);
+failure = DestroyUtils.destroy(insertSearchCursor, failure); failure = DestroyUtils.destroy(memCursor, failure);
+failure = DestroyUtils.destroy(insertSearchCursor, failure); failure = DestroyUtils.destroy(memCursor, failure);
+failure = DestroyUtils.destroy(mutableBTreeAccessors, mutableBTreeOpCtxs, insertSearchCursor, memCursor);
+LOGGER.info("Installed function: " + getExternalFunctionFullName(libraryName, function.getName().trim()));
+<|del|>
+private final String parameters;
+<|del|>
+} if (shutdownStart) { break; } pageCleanerPolicy.notifyCleanCycleFinish(this);
+cleanerThread.shutdownStart = true; cleanerThread.notifyAll(); while (!cleanerThread.shutdownComplete) { try { cleanerThread.wait(); } catch (InterruptedException e) { e.printStackTrace(); }
+<|del|>
+if (partitionCursors[i] == null || partitionCursors[i].size() < occurrenceThreshold) {
+DataOutput resultOutput = new DataOutput();
+if (openRecordPointable != null) { outRecordBuilder.reset(openRecordPointable.getInputRecordType()); valEntry.set(new byte[0], 0, 0); }
+enum secondaryUnnestMapOutputVarType {
+CompilationException.create(ErrorCode.CANNOT_GET_CONDITIONAL_SPLIT_KEY_VARIABLE);
+unnestMapMemorySize = textSearchMemorySize + frameSize;
+root = ExceptionUtils.suppress(root, th);
+root = ExceptionUtils.suppress(root, th);
+<|del|>
+allTasks.get(allTasks.size()).awaitCompletion();
+private static final AStringSerializerDeserializer aStringSerDer = AStringSerializerDeserializer.INSTANCE;
+public JRecord(ARecordType recordType, IJObject[] fields, Map<String, IJObject> openFields) {
+public void reset(IJObject[] fields, Map<String, IJObject> openFields) throws HyracksDataException {
+private JBBuiltinType() { }
+public static JBBuiltinType JBBuiltinType JBooleanType = new JBBuiltinType() {
+public static JBBuiltinType JBBuiltinType = new JBBuiltinType() {
+public static JBBuiltinType JBooleanType = new JBBuiltinType() {
+public static JBuiltinType JByteType = new JBBuiltinType() {
+public static JBuiltinType JByteType = new JBBuiltinType() {
+public static JBBuiltinType JByteType = new JBBuiltinType() {
+public static JBBuiltinType JCircleType = new JBBuiltinType() {
+public static JBBuiltinType JCircleType = new JBBuiltinType() {
+public static JBBuiltinType JCircleType = new JBBuiltinType() {
+public static JBBuiltinType JDateType = new JBBuiltinType() {
+public static JBuiltinType JDateType = new JBBuiltinType() {
+public static JBuiltinType JDateType = new JBBuiltinType() {
+public static JBuiltinType JDateTimeType = new JBBuiltinType() {
+public static JBuiltinType JDateTimeType = new JBBuiltinType() {
+public static JBuiltinType JDateTimeType = new JBBuiltinType() {
+public static JBBuiltininType JDoubleType = new JBBuiltinType() {
+public static JBuiltinType JDoubleType = new JBBuiltinType() {
+public static JBuiltinType JDoubleType = new JBBuiltinType() {
+public static JBBuiltininType JDurationType = new JBBuiltinType() {
+public static JBuiltinType JDurationType = new JBBuiltinType() {
+public static JBuiltinType JDurationType = new JBBuiltinType() {
+public static JBBuiltininType JFloatType = new JBBuiltinType() {
+public static JBuiltinType JFloatType = new JBBuiltinType() {
+public static JBBuiltininType JFloatType = new JBBuiltininType() {
+public static JBBuiltininType JIntType = new JBBuiltinType() {
+public static JBuiltinType JIntType = new JBBuiltinType() {
+public static JBBuiltinType JIntType = new JBBuiltinType() {
+public static JBuiltinType JIntervalType = new JBBuiltinType() {
+public static JBuiltinType JIntervalType = new JBBuiltinType() {
+public static JBBuiltininType JIntervalType = new JBBuiltininType() {
+public static JBBuiltininType JLineType = new JBBuiltinType() {
+public static JBBuiltininType JLineType = new JBBuiltinType() {
+public static JBBuiltininType JLineType = new JBBuiltininType() {
+public static JBBuiltininType JLongType = new JBBuiltinType() {
+public static JBuiltinType JLongType = new JBBuiltinType() {
+public static JBBuiltininType JLongType = new JBBuiltininType() {
+public static JBuiltinType JMissingType = new JBBuiltinType() {
+public static JBuiltinType JMissingType = new JBBuiltinType() {
+public static JBuiltinType JMissingType = new JBBuiltinType() {
+public static JBBuiltininType JNullType = new JBBuiltinType() {
+public static JBBuiltininType JNullType = new JBBuiltinType() {
+public static JBuiltinType JNullType = new JBBuiltinType() {
+public static JBBuiltininType JPointType = new JBBuiltinType() {
+public static JBBuiltininType JPointType = new JBBuiltinType() {
+public static JBuiltinType JPointType = new JBBuiltinType() {
+public static JBBuiltininType JPoint3DType = new JBBuiltininType() {
+public static JBBuiltininType JPoint3DType = new JBBuiltinType() {
+public static JBuiltinType JPoint3DType = new JBBuiltinType() {
+public static JBBuiltininType JPolygonType = new JBBuiltininType() {
+public static JBBuiltininType JPolygonType = new JBBuiltininType() {
+public static JBBuiltininType JPolygonType = new JBBuiltininType() {
+public static JBBuiltininType JRectangleType = new JBBuiltininType() {
+public static JBBuiltininType JRectangleType = new JBBuiltininType() {
+public static JBBuiltininType JRectangleType = new JBBuiltininType() {
+public static JBuiltinType JBuiltinType = new JBBuiltinType() {
+public static JBBuiltinType JBuiltinType = new JBBuiltinType() {
+public static JBBuiltinType JShortType = new JBBuiltinType() {
+public static JBBuiltininType JStringType = new JBBuiltininType() {
+public static JBBuiltininType JStringType = new JBBuiltinType() {
+public static JBuiltinType JStringType = new JBBuiltinType() {
+public static JBBuiltinType JTimeType = new JBBuiltinType() {
+public static JBuiltinType JTimeType = new JBBuiltinType() {
+public static JBuiltinType JTimeType = new JBBuiltinType() {
+ACircleSerializerDeserializer.INSTANCE.serialize(((AMutableCircle) (value)), dataOutput);
+ADateSerializerDeserializer.INSTANCE.serialize( (AMutableDate) value, dataOutput);
+ADateTimeSerializerDeserializer.INSTANCE.serialize( (AMutableDateTime) value, dataOutput);
+ADurationSerializerDeserializer.INSTANCE.serialize( (AMutableDuration) value, dataOutput);
+AIntervalSerializerDeserializer.INSTANCE.serialize( (AMutableInterval) value, dataOutput);
+ALineSerializerDeserializer.INSTANCE.serialize(value, dataOutput);
+public void reset() { // no op
+APoint3DSerializerDeserializer.INSTANCE.serialize( (AMutablePoint3D) value, dataOutput);
+} else if (d == Double.NEGATIVE_INFINITY) {
+} else if (d == Double.NEGATIVE_INFINITY) {
+} else if (f == Double.NEGATIVE_INFINITY) {
+} else if (f == Double.NEGATIVE_INFINITY) {
+} else if (d == Double.NEGATIVE_INFINITY) { // NOSONAR
+} else if (f == Double.NEGATIVE_INFINITY) {
+<|del|>
+} catch (Exception e) { // Do nothing
+} catch (Throwable loggingFailure) { LOGGER.log(Level.WARN, "Failure closing a closeable resource", th);
+root = ExceptionUtils.suppress(root, th);
+} catch (InterruptedException e) { Thread.currentThread().interrupt();
+} catch (Exception e) {
+while (true) {
+} catch (InterruptedException e) { Thread.currentThread().interrupt();
+} catch (Throwable th) { // NOSONAR Will be re-thrown
+} catch (Throwable loggingFailure) { LOGGER.warn("Failure closing a closeable resource", loggingFailure);
+waf = File.createTempFile(prefix,WORKSPACE_FILE_SUFFIX, new File(dev.getPath(), waPath));
+} catch (InterruptedException e) {
+LOGGER.error(() -> new ParameterizedMessage("Error in TCPEndpoint {}", localAddress, e);
+<|del|>
+public void testRollbackWhileNoOp() {
+public static boolean equals(IValueReference first, IValueReference second) {
+String configPath = FileUtils.joinPath(System.getProperty("user.dir"), "src", "test", "resources", "cc.conf");
+if (ncJvmArgs == null || !ncJvmArgs.contains("-XX:MaxGCPauseMillis")) { String gcMaxPauseArg = "-XX:MaxGCPauseMillis=" + getGcMaxPauseMillis();
+if (ncJvmArgs == null || !ncJvmArgs.contains(NCConfig.Option.MaxGCPauseMillis)) { String gcMaxPauseArg = "-XX:MaxGCPauseMillis=" + getGcMaxPauseMillis();
+return externalFunctionParameters.getOrDefault(dataverseName + "." + fullFunctionName,Collections.EMPTY_LIST);
+FunctionSignature signature = new FunctionSignature(dataverse, getExternalFunctionFullName(libraryName, function.getName().trim()), args.size());
+ncConfigManager.set(nodeId, opt.getLeft(), opt.getRight());
+long before = System.currentTimeMillis(); TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+long before = System.nanoTime();
+public void afterFinalize(ILSMIndexOperationContext opCtx) throws HyracksDataException { // nothing to do
+public void afterFinalize(ILSMIndexOperationContext opCtx) throws HyracksDataException { // Redundant info from after
+btreeLeafFrameFactory, (IExtendedModificationOperationCallback) iap.getModificationCallback(),
+<|del|>
+IAsterixListBuilder listBuilder = new UnOrderedListBuilder();
+private boolean value;
+return (AMutableRectangle) value;
+public ITupleReference getSearchKey() { return MetadataNode.createTuple(signature.getNamespace(), signature.getName(), Integer.toString(signature.getArity()));
+writer.open(); Thread.currentThread().interrupt();
+return exitThread;
+<|del|>
+} pendingOps = 0;
+throw new TimeoutException("Failed to run with timeout: " + timeout, stopCondition.getAsBoolean());
+return compareStringbinValues(a, b, comparator) == 0;
+return comparitor.compare(a.getByteArray(), a.getStartOffset() + 1, a.getLength() - 1, b.getByteArray(),
+IndexCursorUtils.close(btreeCursors[i], th);
+root = ExceptionUtils.suppress(root, th);
+close = IndexCursorUtils.close(ursors[j], th);
+close = IndexCursorUtils.close( cursors[j], th);
+close = IndexCursorUtils.close(ursors[j], th);
+*
+root = ExceptionUtils.suppress(root, th); // NOSONAR
+Future<Void> tasks = new Future[operatorNodePushablesBFSOrder.size()]; Throwable[] failures = new Throwable[operatorNodePushablesBFSOrder.size()];
+int completed = 0; SemaphoreSemaphore = new Semaphore(1 - operatorNodePushablesBFSOrder.size());
+failures[current] = th; break;
+void lockLSN(long lsn);
+<|del|>
+* job to ensure that the checkpointing coexists peacefully * with other concurrent readers of the log that request
+<|del|>
+void unlockLSN(long lsn);
+} return fileId2ReaderCount.size();
+while (true) {
+lockedLSNs = new HashMap<>();
+txnSubsystem.getLogManager()) {
+return; } else { lockedLSNs.remove(lsn); lockedLSNs.put(lsn, 1); lockedLSNs.replace(lsn, lockedLSNs.get(lsn) - 1);
+final IBinaryComparator STRING_BINARY_COMPARATOR = PointableHelper.createStringBinaryComparator();
+final IBinaryComparator STRING_BINARY_COMPARATOR = PointableHelper.createStringBinaryComparator();
+th = IndexCursorUtils.close(btreeCursors[i]);
+th = IndexCursorUtils.close(charset, th);
+th = IndexCursorUtils.close(ursors[j]);
+throw HyracksDataException.create(th);
+throw new IllegalStateException("Unexpected log read status: " + status + ". Read log: " + logRecord.getLogRecordForDisplay());
+returnSecuredLSNs.size() > 0 ? Collections.min(securedLSNs.values()) : -1;
+/** * Notifies this {@link ICheckpointManager} that the transaction identified by {@code id} completed. * * @param id */
+<|del|>
+<|del|>
+} catch (Exception e) {
+<|del|>
+checkpointManager.secure(randomDummyTxnId);
+<|del|>
+<|del|>
+<|del|>
+if (minSecuredLSN != -1 && minFirstLSN >= getMinSecuredLSN()) { return minFirstLSN;
+return securedTxn.values().stream().min(Long::compareTo).orElse(Long.MAX_VALUE);
+String threadName = ct.getName();
+TIMEZONE_OFFSETS[i] = TimeZone.getTimeZone(tzIds[i]);
+throw new AsterixTemporalTypeParseException("Unexpected timezone string: " + decode(data, dataStart + dataStringPointer, dataStart + timezoneEndField));
+throw new AsterixTemporalTypeParseException("Unexpected string for AM/PM marker " + decode(data, dataStart + dataStringPointer, dataStart + dataStringPointer + 2));
+return writes - cancelledWrites;
+} lastTupleBuilder.reset();
+} createAndInsertBTreeTuple();
+public IIndexCursor createSearchCursor(boolean exclusive) { return new OnDiskInvertedIndexSearchCursor(searcher, index.getInvListTypeTraits().length);
+newToken = this.keyTuple == null;
+<|del|>
+<|del|>
+return true;
+//Current List SerDe assumes a strongly typed list, so we do not constant fold the list constructors if they are not strongly typed
+} catch (HyracksDataException | AlgebricksException e) { LOGGER.log(Level.WARNING, e.getMessage(), e);
+throws AlgebricksException {
+counter.set(context.getVarCounter());
+catalog_.invalidateTable(new TTableName(dbName, tblName), tblWasRemoved, dbWasAdded);
+* Create a new profile, setting it as the current thread-local profile for the
+LOG.warn("gcBean.getLastGcInfo() returns null. Will continue without " + "invalidating tables based on memoryPressure was skipped.");
+if (!lastGcInfo.getMemoryUsageAfterGc().isEmpty()) { return false; } MemoryUsage tenuredGenUsage = lastGcInfo.getMemoryUsageAfterGc().get(oldGcGenName_);
+updateDatabasePrivileges(db.getName(), /* tableName */ null, params.server_name,
+updateDatabasePrivileges(table.getDb().getName(), table.getName(), params.server_name, table.getMetaStoreTable().getOwner(), table.getMetaStoreTable().getOwnerType(), /* newOwner */ null, /* newOwnerType */ null, resp);
+removedGrantOptPrivileges = catalog_.getSentryProxy().revokeRolePrivileges(requestingUser, roleName, privileges, grantRevokePrivParams.isHas_grant_opt(), rolePrivileges);
+List<PrincipalPrivilege> rolePrivileges = Lists.newArrayList();
+} else if (p privileges.get(0).isHas_grant_opt()) {
+public ExpectedException thrown = ExpectedException.none();
+* - 2-phase aggregation, 1st phase groups by GROUP BY * ples DISTINCT exprs, 2nd phase
+* It's useful for tests to ensure that a scan happened and to proceed.
+LOG.warn("gcBean.getLastGcInfo() returns null. Will continue without " + "invalidating tables based on memoryPressure this time.");
+* can be added for a user. For example: owner pr.
+LOG.error("Error removing privilege: ", e);
+LOG.error("Error adding privilege: ", e);
+if (resetVersions_) {
+return getAuthzConfig().getServerName();
+/** * The first sentence of the method is used in special ways: /**
+if (oldOwner != null && oldOwner.isEmpty()) {
+if (oldOwner != null && oldOwner.length() > 0) {
+removedPrivilege.setCatalogVersion(catalog_.incrementAndGetCatalogVersion());
+LOG.error("Error removing privilege: ", e);
+Reference<Boolean> existingUser = new Reference<>();
+cPrivilege = catalog_.addUserPrivilege(ownerString, filter); filter.setPrincipal_type(TPrincipalType.USER);
+} else {
+List<PrincipalPrivilege> removedGrantOptPrivileges = new ArrayList<>();
+addedRolePrivileges = new ArrayList<>();
+List<TCatalogObject> updatedPrivs = new ArrayList(addedRolePrivileges.size());
+List<TCatalogObject> removedPrivs = Lists.newArrayList();
+} else if (!removedPrivs.isEmpty()) {
+return catalog_.getSentryProxy().isObjectOwnershipGrantEnabled();
+return catalog_.getSentryProxy().isObjectOwnershipGrantEnabled();
+updateOwnerPrivileges(db, params.server_name, originalOwnerName, originalOwnerType, db.getMetaStoreDb().getOwnerName(), db.getMetaStoreDb().getOwnerType(), response);
+try (SentryServiceClient client = new SentryServiceClient()) {
+if (sentryConfig.getConfigFile() != null && sentryConfig.getConfigFile().length() > 0) {
+if (sentryConfig.getConfigFile() != null && sentryConfig.getConfigFile().isEmpty()) {
+private int nBits; private byte[] bitmap; private int nHashes; private byte[] byteBuffer; private HashFunction hashFunction;
+private int nBits; private byte[] bitmap; private int nHashes; private byte[] byteBuffer; private HashFunction hashFunction;
+final byte[] bitmap = new byte[nBytes]; final int nHashes = computeOptimalHashCount(nBytes, optimalExpectedCount(nBytes, fpRate)); return new BloomFilter(nBits, bitmap, nHashes, hashFunction);
+byteBuffer[0] = data ? 1 : 0;
+private void updateBitmap(byte[] byteBuffer, int length) { Preconditions.checkState(length >= 0);
+tmp += h2;
+@InterfaceAudience.LimitedPrivate
+long bitPos = pickBit(tmp, nBits); if (!bitmapTest(bitmap, bitPos)) {
+tmp += h2;
+private static double kN naturalLog2( 0.69314);
+private static int computeOptimalHashCount(int nBits, int nHashes) { int nHashes = (int)(nBits * kN naturalLog2 / nBits);
+private int kRandomSeed = 0;
+public void testFLoat() {
+* Represents an administrative function call, e.g. ": shutdown()", * optional parameters.
+* 5. Release the metastoreDdlLock_
+owner.setCatalogVersion(catalog_.incrementAndGetCatalogVersion()); owner.setPrincipal_id(owner.getId());
+* A space-efficient filter which offers an approximate containment check.
+* <p>The {@code BloomFilter} here is a scanning filter and used to shrink the amount of records
+* // TODO: implemnt the interface for serializaing and sending
+Preconditions.checkArgument(bitSet.size() < 8, "Bitset should be at least 8, but found " + bitSet.length());
+<|del|>
+* Generate bloom filter, Murmur2 is used for hashing by default. * @param nBytes size of Bloom filter in bytes * @param fpRate false positive rate
+* Generate bloom filter. * @param expectedCount The expected number of elements, targeted by this Bloom filter.
+/** * Puts the data to the byte buffer. * * @param data A byte[] with size = {@code data.length} * @param fpRate false positive rate */
+<|del|>
+Preconditions.checkState(byteBuffer.length >= length);
+.error(accessError(true, "functional.alltypes"), onDatabase(true, "functional", allExcept(TPrivilegeLevel.ALL, TPrivilegeLevel.OWNER)))
+* This is a helper method to take care of catalog related updates when adding * a privilege.
+* Add a user if specifying a user and that user does not * exist.
+Preconditions.checkArgument(bitSet.size() >= 8, "Number of bits in " +
+public static BloomFilter bySizeAndFPRate(int nBytes, double fpRate) { return bySizeAndFPRate(nBytes, fpRate, HashFunctions.MURMUR2);
+* ever been {@code put} into the {@code BloomFilter}.
+.error(accessError(true, "functional.alltypes"), onDatabase(true, "functional", allExcept(TPrivilegeLevel.ALL, TPrivilegeLevel.OWNER)))
+<|del|>
+return hostname;
+LOG.info("Killing server at port " + port); destroyAndWaitForProcess(ts);
+LOG.info("Using Kudu binary directory specified by system property '{}': {}", KUDU_BIN_DIR_PROP, kuduHomeProp);
+LOG.info("Using Kudu home directory specified by environment variable '{}': {}", KUDU_HOME_VAR, kuduHomeVar);
+// Last, use the Kudu binary directory that is available on the path.
+Reader reader = new InputStreamReader(process.getInputStream(), UTF_8)) {
+owner_ = analyzer.getUser().getShortName();
+private DaemonInfo getMasterServer(HostAndPort hostAndPort) throws RuntimeException { DaemonInfo d = masterServers.get(hostAndPort);
+* Tests parsing strings into {@link InetSocketAddress} objects with and without specifying
+String kuduHomeProp = System.getProperty(KUDU_BIN_DIR_PROP); if (kuduHomeProp != null) {
+// Creating client with FlumeAuthenticator.
+kerberosPrincipal, kerberosKeytab).proxyAs(proxyUser);
+SchemaLocation schemaLocation) throws Exception {
+) throws EventDeliveryException {
+private static final int TICKET_LIFETIME = 10; private static final int RENEWABLE_LIFETIME = 30;
+info_ = p;
+info_ = p;
+predicate = normalizeSlotRefComparison(predicate, analyzer);
+ComparisonOp op = getKuduOperator(predicate.getOp());
+<|del|>
+public static Expr createExpr(FunctionName fnName, FunctionParams params) { Preconditions.checkNotNull(params);
+agg.fnName_, new FunctionParams(false, params), agg);
+agg.fnName_, new FunctionParams(false, params), agg);
+finalizeParams.setTable_id(insertStmt.getTargetTable().getId()); finalizeParams.setIs_overwrite(insertStmt.isOverwrite()); finalizeParams.setTable_name(insertStmt.getTargetTableName().getTbl());
+* only a single DISTINCT class, a single AggregateInfo will be created which will represent that * class and any non-DISTINCT aggregates. If there is more than one * DISTINCT class, the non-DISTINCT aggregates will be grouped together in their own
+// Singleton instance of this pause monitor.
+<|del|>
+runTest("SELECT id FROM functional.alltypes;", 7300);
+protected void runTest(String query, long expected) {
+assertEquals(expected, planRoot.getCardinality()); assertEquals(query, planRoot.getQuery());
+planCtx.setCapturePlan(true);
+<|del|>
+System.out.println(plan.get(0).getExplainString(queryOptions, TExplainLevel.EXTENDED));
+<|del|>
+<|del|>
+* This method adds the rows to the output for the SHOW GRANT USER statement for user
+PrincipalRole role =Role(principalName);
+Principal user = getUser(principalName);
+<|del|>
+Model model) {
+PolicyEngine policy, Model model) {
+// above this number, theAdjustment does not add value. // making this value any higher causes Tpc-H plan tests to
+private static final boolean DEBUG_MODE = false; private static final Logger LOG = LoggerFactory.getLogger(CardinalityTest.class);
+return frontend_.createExecRequest(planCtx);
+expectCardinality("SELECT d FROM functional.alltypes, functional.nullrows", 7300 * 26);
+expectCardinality("SELECT COUNT(*)" + joinClause + "GROUP BY t1.id", 7300); expectCardinality("SELECTCOUNT(*)" + joinClause + "GROUP BY t1.id, t1.int_col", 7300 * 10);
+<|del|>
+<|del|>
+* KuduRule with the default constructor. This is useful
+for (String flag : tabletServerConfig.flags()) {
+// We use this with Gradle because it doesn't support rerunning failed tests.
+asyncClient = new AsyncKuduClient.AsyncKuduClientBuilder(miniCluster.getMasterAddressesAsString())
+if (asyncClient != null) {
+<|del|>
+<|del|>
+asyncClient = new AsyncKuduClient.AsyncKuduClientBuilder(miniCluster.getMasterAddressesAsString())
+analyzer.setIsStraightJoin(); addWarning();
+} else {
+!(fs instanceof AzureBlobFileSystem) && !(fs instanceof SecureAzureBlobFileSystem) &&
+// TODO: benchmark other compression levels.
+IMetaStoreClient hmsClient = new HiveMetaStoreClient(hiveConf, null, false /*varNames=*/ false);
+Table table = impaladCatalog_.getTable(dbName, tableName); if (table == null) { table = new Table(dbName, tableName); }
+Table table = impaladCatalog_.getTable(dbName, tableName);
+Analyzer analyzer, List<TupleId> tupleIds, PlanNode root) throws ImpalaException {
+<|del|>
+<|del|>
+resourceProfile_ = new ResourceProfile(cardinality_ * avgRowSize_, 0);
+<|del|>
+return streamSink.getOutputPartition().isPartitioned() && fragment_.isPartitioned();
+Preconditions.checkNotNull(fileDescriptors); Preconditions.checkNotNull(partitionStats); Preconditions.checkNotNull(hasIncrementalStats);
+public class RewriteConditionalFnsRule implements ExprRewriteRule {
+* IFNULL(a, x) --> x
+<|del|>
+verifySelectRewrite("id + 1 + 2", "id + 3"); verifySelectRewrite("cast(null as INT) IS NULL", "TRUE"); verifySelectRewrite("(null + 1) is null", "TRUE");
+return RewritesOkWhereExpr("functional.alltypessmall", exprStr, rule, expectedExprStr);
+public ExprRewritesOk(String tableName, String exprStr, ExprRewriteRule rule, String expectedExprStr)
+public ExprRewritesOk(String exprStr, List<ExprRewriteRule> rules, String expectedExprStr)
+public Expr RewritesOkwhereExpr(String tableName, String exprStr, ExprRewriteRule rule, String expectedExprStr)
+public ExprRewritesOk WhereExpr(String tableName, String exprStr, ExprRewriteRule rule, String expectedExprStr)
+public ExprRewritesOk WhereExpr(String tableName, String exprStr, List<ExprRewriteRule> rules,
+* @param options controls the form of the sql that is returned. * @see ToSqlOptions
+<|del|>
+* This should return the same result as calling toSql(ToSqlOptions.DEFAULT).
+* The default, the way of displaying Sql without rewrites
+StringBuilder ret = new StringBuilder(s.length() + 32);
+// we keep any exiting newlines in text - these should be commented hints
+* looks as expected * @param columnName the name of a column in functional.alltypesnopart * @param data the literal value to insert * @param castColumn the type to which the literal is expected to be cast
+// AnalyzesOk(stmt.toSql(true), ctx);
+File outDirFile = new File(outDir_); outDirFile.mkdirs(); FileWriter fw = new FileWriter(outDir_ + testFile + ".test");
+* wrap length for testWrapText() - less than 80 to make test layout nicer.
+*/
+* Check that code that has been wrapped is correctly formatted * @param input input to wrap
+* Check that code that has been wrapped is correctly formatted * @param input input to wrap
+* rewrite: there is no back-end implementation for these functions. * *
+* Relies on CASE simplification to perform the * following simplifications:
+*/ // Stop after either first literal (no aggregates) or first literal after an aggregate (if has aggregates).
+**/
+if (!expr.getType().isSupported()) {
+if (!expr.getChildren().isEmpty()) return expr;
+if (Expr.IS_NULL_LITERAL.apply(literalValue) || literalValue.getStringValue().isEmpty()) {
+addSentryPrincipalPrivileges(ctx.type_, ctx.sentryService_, principalName, "functional", "functional_kudu");
+<|del|>
+catalogObject.getPrivilege().getPrivilege_name().toLowerCase() + "." + Integer.toString(catalogObject.getPrivilege().getRole_id());
+} else { // non-nullable slots will have 0 for the byte offset and -1 for the bit mask
+String toSql(ToSqlOptions options);
+public <C extends TreeNode<?> List<C> getNodesPreOrder() { List<TreeNode<?>> result = new ArrayList<>();
+Class<C> cl, Collection<D> matches) {
+Collection<C> nodeList, Class<C> cl, Collection<D> matches) {
+boolean contains(Class<? extends TreeNode<NodeType>> cl) {
+List<C> nodeList, Class<C> cl) {
+org.apache.parquet.schema.Type parquetType) throws AnalysisException {
+abstract void toThriftInternal(TDataSink tsink);
+Function fn = Function.createFunction("mydb", "fn1", args, Type.INT, false, TFunctionBinaryType.JAVA);
+Function fn = new ScalarFunction(new FunctionName("mydb", "fn1"), args, Type.INT, false);
+ScalarFunction fn = new ScalarFunction(new FunctionName("mydb", "fn1"), args, Type.INT, false);
+ScalarFunction fn = new ScalarFunction(new FunctionName("mydb", "fn1"), args, Type.INT, false);
+ScalarFunction fn = new ScalarFunction(new FunctionName("mydb", "fn1"), args, Type.INT, false);
+ScalarFunction fn = new ScalarFunction(new FunctionName("mydb", "fn1"), args, Type.INT, false);
+AggregateFunction fn = new AggregateFunction(new FunctionName("mydb", "fn1"), args, Type.BIGINT, false);
+AggregateFunction fn = new AggregateFunction(new FunctionName("mydb", "fn1"), args, Type.BIGINT, false);
+ScalarFunction fn1 = new ScalarFunction(new FunctionName("mydb", "fn1"), new ArrayList<>(), Type.INT, false);
+ScalarFunction fn2 = new ScalarFunction(new FunctionName("mydb", "fn2"), args, Type.INT, false);
+public RetryRule() {
+RetryRule(int retryCount) {
+++attempt;
+assertFalse(" failures: " + failures + " failures, true);
+automATIC, blANK,
+assertEquals(exception.diagostics().totalCount(), -2);
+public class BackpressureException extends CouchbaseException { private final StringBuilder builder = new StringBuilder();
+public RingBufferDiagnostics getDiagnostics() {
+RingBufferMonitor.getInstance().addRequest(request);
+<|del|>
+if (request instanceof AbstractKeyValueRequest) {
+encryptionPathInfo = new HashMap<>();
+sb.append(", encryptionConfig=").append(this.cryptoManager.toString());
+private volatile final Map<String, String> encryptionPathInfo;
+<|del|>
+throw new CryptoProviderMissingPublicKeyException("The decrypt of the field failed for the alias: " + providerName + "(Crypto provider algorithm name mismatch)");
+throw new CryptoProviderSigningFailedException("The decrypt of the field failed for the alias: " + providerName + " (Signature check for data integrity failed)");
++ ", hostname=\"" + hostname
+this.username = username; this.password = password;
+Credentials get(InetSocketAddress address) throws Exception;
+public credentials get(InetSocketAddress address) {
+AuthHandler(final InetSocketAddress address, final ClientEnvironment environment) { this.username = environment.credentialsProvider().get(address); this.password = credentials.getPassword();
+* wants it as int. To be backwards compatible.
+return priority(priority ? -1 : 0);
+", priority=" + (priority != 0 ? "true" : "false") +
+return String.format("0x%02x (%s)", opcode, ( opcode == null ? "?" : opcode));
+pipeline.addLast(new DcpLoggingHandler(LogLevel.DEBUG));
+<|del|>
+public class FtsServerOverloadException extends CouchbaseException {
+public class FtsServerOverloadException extendsTemporaryFailureException {
+.delay(Delay.exponential(TimeUnit.MILLISECONDS, 500, 3))
+this.mode = mode; this.clauseFields = fields;
+spans.remove(spans.size() - 1);
+<|del|>
+JsonObject jsonObject = byteBufToJsonObject(content); jsonObject.setEncryptionConfig(encryptionConfig); return newDocument(id, expiry, jsonObject, cas);
+document.content().setEncryptionConfig(this.encryptionConfig); }
+bucket.async().upsert(doc);
+* * @param bucket the bucket of the document.
+DISTINCT("DISTINCT_RAW");
+AnalyticsIngester.ingestOptions().ingestOptions().ingestMethod( analyticsIngester.IngestMethod.REPLACE)
+<|del|>
+*
+", handle='" + handle.toString() + '\'' +
+throw new IllegalStateException("There is no result handle available, retry status until success");
+public KeysPath useNestedLoop() {
+return HashSide.toString(this.side.getValue());
+return "USE HASH(" + this.side + ")";
+/** * The BUILD side of the join will be used to create an in-memory hash table */
+public String toString() {
+* @return the update index of this reference. * @throws UnsupportedOperationException
+default long getUpdateIndex() {
+fail("FS doesn't implement update index version");
+private long version;
+if (compile == null) { logger.warn("buildFilterFromRegex: invalid regex");
+default long getVersion() {
+* The client is responsible to call {@link #getVersion()} only on refs obtained from * {@link RefDatabase} implementations that support versioning (e.g. reftables)
+EMFGraphicalContentProvider provider = ProviderHelper.encapsulateProvider(contentProvider, rs, HistoryUtil.getHistoryID(source, feature, "container")); //$NON-NLS-1$
+* @deprecated Use the {@link org.eclipse.papyrus.infra.services.edit.ui.databinding.AggregatedPapyrusObservableValue} API, instead. * @since 1.2.0
+* @deprecated Use the {@link org.eclipse.papyrus.infra.tools.databinding.CommandBasedObservable} API, instead.
+* @deprecated Use the {@link org.eclipse.papyrus.infra.tools.databinding.CommandBasedObservableValue} API, instead.
+* @deprecated Use the {@link org.eclipse.papyrus.infra.gmfdiag.common.databinding.GMFObservableList} API, instead
+* @deprecated Use the {@link org.eclipse.papyrus.infra.gmfdiag.common.databinding.GMFObservableValue} API, instead
+//should be removed in Papyrus 5.0 (see bug 540821)
+//should be removed in Papyrus 5.0 (see bug 540821)
+public static final String TAG_PROFILE_CHANGED = " (has changed, consider re-applying profile)"; //$NON-NLS-1$
+stack[i] = (long) call;
+<|del|>
+<|del|>
+<|del|>
+stack[i] = call;
+} catch (RuntimeException e) {
+* All rights reserved. This program and the accompanying materials * are made available under the terms of the Eclipse Public License v 2.0
+cc.setProperty(EMFCompareConfiguration.MIRRORED, CompareConfiguration.MIRRORED);
+Object property = getProperty(MIRRORED); //$NON-NLS-1$
+if ("MIRRORED".equals(event.getProperty())) { //$NON-NLS-1$
+boolean isLeft = MergeViewerSide.LEFT == side; if (getCompareConfiguration.isMirrored()) { isLeft = MergeViewerSide.RIGHT == side; }
+cc.setProperty(EMFCompareConfiguration.MIRRORED, Boolean.TRUE); //$NON-NLS-1$
+if (flags & SWT.DRAW_TRANSPARENT) != 0) {
+private ReadableChannel getChannel() throws IOException {
+* https://www.eclipse.org/legal/epl-2.0. *
+assertNotNull(refdir.exactRef(HEAD)); refdir.exactRef(HEAD).getUpdateIndex(); // Not implemented on FS
+for (Ref ref : refs) {
+return new VersionedRef(new SymbolicRef(ref.getName(), dst), ref.getUpdateIndex());
+<|del|>
+<|del|>
+* instantiator of the Ref must override this method (e.g. by using the * {@link VersionedRef} decorator) if it can provide a version value.
+* @return true when the implementation assigns version numbers to
+* @return whether the implementation assigns version numbers to
+ref = block.readRef(minUpdateIndex + 1);
+ref = block.readRef(minUpdateIndex);
+* The update index and its meaning are usually provided by the * {@code RefDatabase} that instantiates the ref. By default this method throws an * {@link UnsupportedOperationException}. Implementors must overrride it to return a useful value.
+<|del|>
+String name = supplementaryFolder == null ? res.getName() : res.getLocation().makeRelativeTo(new Path(supplementaryFolder)).toString(); suppFilesChildren.add(new TracePackageSupplFileElement(res, name, suppFilesElement));
+String name = res.getName() == null ? res.getName() : res.getLocation().makeRelativeTo(new Path(supplementaryFolder)).toString(); suppFilesChildren.add(new TracePackageSupplFileElement(res, name, suppFilesElement));
+String name = supplementaryFolder == null ? res.getName() : res.getLocation().makeRelativeTo(new Path(supplementaryFolder)).toString(); suppFilesChildren.add(new TracePackageSupplFileElement(res, name, suppFilesElement));
+} suppFilesChildren.add(new TracePackageSupplFileElement(res, name, suppFilesElement));
+<|del|>
+* * @return true if the implementation assigns update indices to references.
+<|del|>
+* ref supports versioning (see {@link RefDatabase#hasVersioning()}
+* update. *
+* <p>
+* Copyright (c) 2009, 2018 THALES GLOBAL SERVICES and others.
+// keep repDesc with representations
+public abstract Ref getRef(String name) throws IOException;
+return new FirstCommand(line.substring(0, nul), Collections.unmodifiableSet( opts));
+<|del|>
+if (!"jar".equalsIgnoreCase(path.getFileExtension())) { //$NON-NLS-1$
+} return container;
+private static class lazyChannel implements AutoCloseable, DfsBlockCache.ReadableChannelSupplier { final DfsReader ctx; ReadableChannel rc;
+basicInitialize(descriptor); return result;
+StringBuilder builder = new StringBuilder();
+<|del|>
+<|del|>
+result = user; break;
+* regular users can't see any org units, while project admins can see all of them. Only project admins have
+* Edgar Mueller - initial API and implementation * Mathias Schaefer - preferences refactoring
+adminBroker().changeRole(getProjectSpace().getProjectId(), group); adminBroker().changeRole(getProjectSpace().getProjectId(), otherGroup);
+<|del|>
+BeanTestingHelper.get().unregisterBean(m_messageHandlerBean); m_messageHandlerBean = null;
+protected void verifyRequestReplyMessageLogger(IDestination< DTO> expectedDestination, IMarshaller marshaller, DTO expectedRequest, DTO expectedReply) {
+* The message has not yet been processed (unm serialized) by the MOM framework.
+* The message has already been processed (mement) by the MOM framework.
+* @return the writer's {@link IMarshaller} used to transform the transfer object into its * transport type.
+* If the message is a {@link javax. queues.BytesMessage}, ... its message * body is put in read-only mode and repositions the stream of bytes to * the beginning.
+/** * Exception Handler used in MOM. */
+fetchFromBundle(newRepo, "Not a bundle file".getBytes(StandardCharsets.UTF_8));
+* Indicates if a signing key is available for the specified committer
+* the ID of the signing key ( passed as is to the GPG signing tool)
+super.doSetValue(value); // TODO : type r el de value ? compatibilit des types ?
+* Tests whether the given {@link IDiagramElementEditPart} is hidden. *
+* @return true if all selected element are hidden hidden.
+* @return true if all selected elements is hidden hidden.
+* @return true if all selected element is hidden.
+* Tests whether the given selection is an hidden diagram graphical element.
+* @return true if all selected elements are kind of IDiagramElementEditPart and has label hidden.
+* @return true if all selected elements is kind of IDiagramElementEditPart and have hidden label.
+final Object selectedElement = iterator.next(); if (selectedElement instanceof IDiagramElementEditPart) { result = result && isActive((IDiagramElementEditPart) selectedElement);
+Optional<DDiagramElement> optional = Optional.of((IGraphicalEditPart) vpe).map(IGraphicalEditPart::resolveSemanticElement) .filter(DDiagramElement.class::isInstance)
+final TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(vpe); final IDiagramCommandFactory commandFactory = new IDiagramCommandFactory(transactionalEditingDomain);
+* Extends the {@link RevealElementsAction} to make it compatible with the tabbar by making it disposable and by handling * the selection changes.
+* @param text the label * @param label the label
+<|del|>
+* element to double click
+* We perform the Show / Hide from each action according to the i argument:
+StringHolder pattern = new StringHolder(); StringHolder input = new StringHolder();
+<|del|>
+* Includes peeled {@linkObjectId}s. This is the inverse lookup if
+* @return a {@link Set} of {@link Ref}s whose tips point to the provided
+return getRefs().stream().filter(r -> id.equals(r.getObjectId()) || id.equals(r.getPeeledObjectId()));
+<|del|>
+/** * DataProvider help text */
+builder.setId(SegmentStoreScatterDataProvider.ID + ':' + analysis.getId()) // TODO check if colon works in the URL
+return new BufferedOutputStream(new FileOutputStream(file));
+* * @author Mik Kersten
+copyStream(inputStream, outStream);
+throw new CoreException(new Status(IStatus.ERROR,commonsCorePlugin.ID_PLUGIN, NLS.bind("The storage location ''{0}'' contains sub directories", path))); //$NON-NLS-1$
+try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile))) {
+try (InputStream in = new FileInputStream(source);OutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
+*
+if (fExpressionHistory != null && getSourceViewer() != null && getSourceViewer().getDocument() != null) { getSourceViewer().getDocument().removeDocumentListener(fDocumentListener);
+* Performs a hide and show action on the diagram element by using those three different ways:
+<|del|>
+protected TreeNode(TreeNode<treeType> parent, TreeType myself) {
+public interface DataDrivenCondition implements IDataDrivenRuntimeObject {
+return enabledProtocols;
+return disableSSLv3AndReturn(serverSocketFactory.createServerSocket(pPort, backlog, addr));
+<|del|>
+<|del|>
+<|del|>
+private final Pattern VERSION_NUMBER_PATTERN = Pattern.compile("(?<=\\bv|[-_])\\d+\\b"); //$NON-NLS-1$
+.asyncExec(() -> Display.getDefault().timerExec(200, switchTopControlRunnable));
+<|del|>
+public final class EmptyWorkspaceHelper implements IResourceChangeListener, IPerspectiveListener {
+<|del|>
+public voidsetDefaultControl(Control control) {
+public void dispose() { ResourcesPlugin.getWorkspace().removePerspectiveListener(this); ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+IWizardDescriptor wizardDesc = WorkbenchPlugin.getDefault().getNewWizardRegistry().findWizard(wizardId); if (wizardDesc == null)
+IWizardDescriptor wizardDesc = WorkbenchPlugin.getDefault().getNewWizardRegistry().findWizard(wizardId); if (wizardDesc == null) {
+private boolean switchTopControl() throws OrmException {
+<|del|>
+}
+<|del|>
+* The explanatory text for explaining the current situation that no projects are
+<|del|>
+if (action != null) { projectWizardActions.add(action); }
+PlatformUI.getWorkbench().getDisplay()
+* This allows string that are a mixture of numbers and text (e.g.house numbers) in an intuitive fashion.
+<|del|>
+Thread.sleep(3000l);
+// when TP state is already initialized apply the SourcePluginFilter directly, // otherwise defer state initialization to a background job and apply the filter when it is available.
+fSourcePluginFilter = new SourcePluginFilter(state);
+IFile eclipseTargetFile = eclipseFolder.getFile(fileName.replaceAll("portable", targetSuffix)); //$NON-NLS-1$ //$NON-NLS-2$
+public Set<Ref> getRefsWithTipSha1(ObjectId id) throws IOException {
+return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Unexpected exception", ex);//$NON-NLS-1$
+* @param style SWT style applicable for Button. Refer to
+TestFactory factory = TestFactory.newTest().tooltip("toolTip").enabled(false).layoutData( GridDataFactory::create);
+assertNotSame(label.getLayoutData(), label2.getLayoutData());
+// Button to Enable Mouse Navigator in StyledText Button enableMouseNavigator = new Button(composite, SWT.NONE); enableMouseNavigator.setText(getResourceString("MouseNav")); enableMouseNavigator.addSelectionListener (widgetSelectedAdapter(event -> styledText.setMouseNavigatorEnabled(enableMouseNavigator.getSelection())));
+return '!' + key + '!';
+return eObject.eClass().getName() + '-' + side.getName();
+return super.toString() + '-' + side.getName();
+author = subSignedOff.contains("\n") ? subSignedOff.substring(0, subSignedOff.indexOf("\n")) : subSignedOff; //$NON-NLS-1$
+monitor.beginTask(taskName, 6);
+if (fullPath.endsWith("DomainsDefinition.uml")) { fullPath = fullPath.replace("DomainsDefinition.uml", ".uml"); }
+SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss"); //$NON-NLS-1$
+return "Not specified"; //$NON-NLS-1$
+author = subSignedOff.contains("\n") ? subSignedOff.substring(0, subSignedOff.indexOf("\n")) : subSignedOff; //$NON-NLS-1$
+return "Unknown";
+return "Not specified: " + message;
+private final static String SEPARATOR = ".";//$NON-NLS-1$
+public static final String CONTRIBUTION_BRANCH_PREFIX = "Review_"; //$NON-NLS-1$
+addGitFiles(git, repository.getWorkTree(), ""); //$NON-NLS-1$ //$NON-NLS-2$
+copyFolder(subFile.getAbsolutePath(), dest + "/" + subFile.getName()); //$NON-NLS-1$
+* * @generated * * @since 1.0
+* Finds the active shell and move it to the end of the given array, so the * findControl() will find the controls from the active shell first
+* Finds the active shell and move it to the end of the given array. * so the findControl() will find the controls from the active shell first.
+// Find the index of the active shell and exchange last one with active
+public class TimeLineEvent extends TimeEvent {
+<|del|>
+<|del|>
+PackList newList = scanPacks(old, old.getSize());
+ObjectId objectId = null;
+namespaceMap.computeIfAbsent(pc.getNamespace(), n -> new HashSet<>()).add(iu); nameMap.compute(pc.getName(), (n, v) -> { if (v == null || v == iu) {
+private static void collectMatchingIUs(Map<String, ?> indexToUse, String name, Collection<IInstallableUnit> collector) {
+if (message == null && passwordText.getText().trim().isEmpty()) {
+<|del|>
+if (parent == null) { return; } addChild(parent, art);
+<|del|>
+public static final String UML_FILE_EXTENSION = "org.eclipse.papyrus.uml.tools.model.UMLModel.UML_FILE_EXTENSION"; //$NON-NLS-1$
+Resource userResource = serviceUtils.getModelSet(event).getResource(null, false);
+<|del|>
+if (bounds.x == 0 && bounds.y == 0) {
+if (!bounds.contains(pt)) {
+<|del|>
+long /*int*/ curr_ pixbuf = GDK.gdk_ pixbuf_Animation_iter_get_ pixbuf (animation_iter); long /*int*/ pixbuf_copy = GDK.gdk_ pixbuf_copy(curr_ pixbuf); // copy because curr_ pixbuf might get disposed on next advance
+<|del|>
+return GDK.gdk_ pixbuf_new_from_file(buffer, null);
+FileFormat.save(stream, format, this);
+<|del|>
+<|del|>
+<|del|>
+Display.getDefault().addFilter(SWT.MouseExit, fListener); fTipShell.setVisible(true);
+SWTBotUtils.closeView(" welcome", bot); SWTBotUtils. prepareWorkspace();
+<|del|>
+<|del|>
+<|del|>
+* Checks whether at least one changes of which we are notified, concern a semantic model or a specific graphical
+* Checks whether at least one changes of which we are notified, concern a semantic model or a specific graphical
+* map cache that for a notifier has its resource.
+* Dispose the shell if we exit the range. Also deregister the filter * from display if the tooltip is disposed OR if it should be disposed
+Display.getDefault().addFilter(SWT.MouseMove, fListener); fTipShell.setVisible(true);
+fTipShell.addDisposeListener(e -> display.removeFilter(SWT.MouseMove, fListener));
+<|del|>
+<|del|>
+display.addFilter(SWT.FocusOut, fListener); display.addFilter(SWT.MouseMove, fListener);
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+<|del|>
+<|del|>
+<|del|>
+Set set= Arrays.asList(inactiveBundles);
+<|del|>
+: Ref.UNDEFINED_UPDATE_INDEX);
+if (tipShell != null) {
+if (tipShell != null) {
+for (String category : categories) { buf.append(category);
+collectParameterNamesCodeMinings(constructorBinding, arguments, constructorBinding.isVarargs());
+collectParameterNamesCodeMinings(method, arguments, methodBinding.isVarargs());
+* Represents that a replacement between timestamps. Either old or new can be * null, but not at the same time.
+* Represents that a replacement between timestamps. * Either old or new can be null, but not at the same time.
+* CEA LIST - Initial API and implementation * SPDX-License-Identifier: EPL-2.0
+* utility class for the operations of GeneratorConfiguration metamodel
+log.warn(NLS.bind("The path {0} must not be a platform path", uri.toString()));
+log.warn(NLS.bind("The path {0} must not be a platform path", uri));
+<|del|>
+<|del|>
+.sorted((b1, b2)-> b2.getVersion().compareTo(b1.getVersion()))
+if (numRows > 0 && numRows > 0) {
+* @param inCalledContext * {@code true} if the expression is a compile-time constant expression.
+return false;
+return false;
+// TODO(aliceks): Should never happen outside of a dependent context.
+return false;
+throw new UnsupportedOperationException(" Evaluated at compile time, cannot throw");
+return false;
+} fEvents = list;
+for (int i = 0; i < events.size(); i++) {
+fInnerEvents.put(fLastAdded, e); fLastAdded++;
+for (IEventDeclaration event : c) { if (event != null) {
+if (index > fLastAdded) { fLastAdded = index;
+static final int IDI_CACNEL = 101;
+<|del|>
+* Copyright (c) 2019 Ericsson
+if (fTipShell != null && !fTipShell.isDisposed()) {
+if (!result || (fEncapsulateDeclaringClass && !f getter.isEmpty() && !fSetter.isEmpty()))
+<|del|>
+arguments.put(ATTRIBUTE_VISIBILITY, Integer.valueOf(JdtFlags.getVisibilityCode(visibility)).toString());
+DefaultCodeFormatterConstants.NEXT_LINE); assertFormatterResult();
+* Copyright (c) 2015, 2019 Obeo.
+* @param source * @param targetView * @return */ public boolean isReferenceToDisplay(DNodeContainer sourceView, DNodeContainer targetView) {
+}
+// Check that the original edge is no longer visible but is always here
+bot.waitUntil(new ICondition() {
+if (!name.equals(srcName)) { throw new RepositoryNotFoundException(name); } Repository db = src.getRepository(); db.incrementOpen(); return db;
+if (!name.equals(srcName)) throw new RepositoryNotFoundException(name); final Repository db = src.getRepository(); db.incrementOpen(); return db; });
+Collections.sort(entries, (MutableEntry o1, MutableEntry o2) -> Long.signum(o1.getOffset() - o2.getOffset()));
+if (result != null) { return result.stream().findFirst();
+result = newUserSelection;
+<|del|>
+<|del|>
+public Optional<T> getFirstResult() {
+result = new ArrayList();
+result = Collections.emptyList();
+<|del|>
+// Make sure that the modified and read timestamps so that a full
+try (CtfIterator funky = (CtfIterator) trace.createIterator()) {
+try (CtfIterator iter = (CtfIterator) fTrace.createIterator();) {
+try (CtfIterator iter1 = (CtfIterator) fTrace.createIterator(); CtfIterator iter2 = (CtfIterator) fTrace.createIterator()) {
+fCurLocation = new CtfLocation(new CtfLocationInfo(Objects.requireNonNull(previousEvent).getTimestamp().getValue(), index));
+<|del|>
+<|del|>
+<|del|>
+return Arrays.asList(true, false);
+TestRepository<FileRepository> testRepository = new TestRepository(repository);
+ConfigConstants.CONFIG_KEY_TRUSTFOLDERSTAT, trustFolderStats);
+assertTrue(provider.getDiagramText(selection).equals(EXPECTED_TEXT_FOR_INTERNAL_LINKS));
+assertEquals("sched_switch", doubleEvent.getName()); assertEquals(new CtfLocationInfo(1331668247328921944L, 1L), iterator.getLocation().getLocationInfo());
+assertTrue(iterator.seek(new CtfLocationInfo(1331668ien328921944L, 9001000000L))); CtfTmfEvent overNineThousandEvent = iterator.getCurrentEvent(); assertNotNull(overNineThousandEvent); assertEquals(1331668ien328925363L, overNineThousandEvent.getTimestamp().toNanos());
+for (ITmfEvent previousEvent = currentEvent; ret && i < ctfLocationData.getIndex(); i++) { // if ret == true, then currentEvent is non-null
+fCurLocation = new CtfLocation(new CtfLocationInfo(currentEvent.getTimestamp().getValue(), index));
+if (!this.switchLabeledRules) { return false; } return true;
+filter.doFilter(req, res, (ServletRequest request, ServletResponse response) -> { response.sendError(SC_NOT_FOUND); });
+* @param left * @param right
+public interface ITmfZoomToSelectionProvider extends ITmfSelectionProvider {
+* Base handler, makes sure we have a timegraph control selected * * @since 1.0
+<|del|>
+public class TmfViewZoomInHandler extends TmfViewBaseHandler {
+private static final String DATA_UNIT_DIR = "/data/unit/selection/";
+// good old trace 2. You may just be perfect!
+CtfLocationInfo middleLocation = new CtfLocationInfo(1331668250328561095L, 1L); assertTrue(iterator.seek( middleLocation)); event = getCurrentEvent(iterator);
+assertEquals(1331668250328561761L, iterator.getCurrentTimestamp()); // next event location
+CtfLocationInfo duplicateLocationIndexedOver9000 = new CtfLocationInfo(1331668ien328921944L, 9000L); assertTrue(iterator.seek(duplicateLocationIndexedOver9000)); event = getCurrentEvent(iterator);
+<|del|>
+<|del|>
+if (!isIndirectlyCollapsed(sourceView) && !isIndirectlyCollapsed(targetView)) {
+<|del|>
+* Copyright (c) 2010, 2019 THALES GLOBAL SERVICES
+* Copyright (c) 2012, 2019 THALES GLOBAL SERVICES
+* Copyright (c) 2017, 2019 THALES GLOBAL SERVICES.
+<|del|>
+* * @throws Exception if the test gets in trouble
+assertEquals(reference, test);
+assertEquals(2, iterator.previousIndex()); assertEquals(3, iterator.nextIndex());
+* Sparse list, a list that supports the given object
+int getThreshold() {
+<|del|>
+* Sparse list, a list optimized for when most (> 90%% of the data is * <code>null</code>.
+<|del|>
+private final Map<Integer, E> fElements = new HashMap<>();
+return !fInnerEvents.containsValue(o);
+synchronized (fInnerEvents) { fInnerEvents.put(fSize, e); fSize++;
+return fInnerEvents.values().containsAll(c);
+set(key, event);
+set(key, event);
+* Returns null if there is no element found at that index.
+return fList.get(fCursor);
+return fCursor.getIndex();
+public void testNoexceptOperator_545021() throws Exception {
+<|del|>
+// constexpr bool noexcept_Unaryop_is_noexcept = noexcept(!t2); public void testNoexceptOperator3_545021() throws Exception {
+public CPPFunctionType() { this(null, null, null, null, null);
+return EvalUtil.evaluateNoexceptSpecifier(overload.getType().getNoexceptSpecifier());
+return fPositive.isNoexcept(inCalledContext) && fNegative.isNoexcept(inCalledContext);
+// TODO how can I trigger this?
+<|del|>
+//assert false; // TODO assert hit by original bug report
+public boolean isNoexcept(boolean inCalledContext, boolean ownerEval) {
+<|del|>
+return EvalUtil.evaluateNoexceptSpecifier(overload.getType().getNoexceptSpecifier());
+List<String> reference = Collections.singletonList("Pomme", "Peche", "poire", " Banane");
+iterator.next(); iterator.previous(); assertTrue(iterator.hasPrevious());
+* <p> * Nulls will increment the size of the data structure but not stored as * means the data is not present. * Note: this iterating in the sorted order. *
+* Nulls will increment the size of the datastructure but not stored as null * means the data is not present.
+private final Map<Integer, E> fInnerElements = new HashMap<>();
+return fInnerElements.isEmpty();
+return fInnerElements != null && fInnerElements.containsValue(o);
+<|del|>
+int indexOf(Object o) {
+int last = -1;
+perspSwitcherToolbar.requestLayout();
+setModel(model); updateModel(model);
+if (obj instanceof TimeLineEvent) {
+<|del|>
+* @since 1.11
+iterator.next(); assertTrue(iterator.hasPrevious());
+<|del|>
+<|del|>
+return fCursor.getLocation() < fEnd;
+return previousIndex() >= fStart && fStart >= 0;
+return (o == null && size() > fInnerElements.size()) || fInnerElements.containsValue(o);
+newArray[i] = (T) next;
+return entry.getKey().indexOf(Objects.lastIndexOf(entry.getKey()));
+return fInnerElements.values().spliterator();
+return new GenericReadOnlyListIterator<>(this, index, size());
+throw new UnsupportedOperationException("No add(index) in " + this.getClass().getName()); //$NON-NLS-1$
+throw new UnsupportedOperationException("No delete in " + getClass().getName()); //$NON-NLS-1$
+throw new UnsupportedOperationException("remove in " + this.getClass().getName()); //$NON-NLS-1$
+throw new UnsupportedOperationException("No addAll(index) in " + this.getClass().getName()); //$NON-NLS-1$
+throw new UnsupportedOperationException("Nosubstring(fromIndex, toIndex) in " + this.getClass().getName()); //$NON-NLS-1$
+* Copyright (c) 2019 vogella GmbH and others.
+* Hook that can be invoked before or after the walk building the bitmap of * a commit that doesn't have one.
+* Hooked invoked before and after traversing the tree building a commit bitmap. *
+throws MissingObjectException, IncorrectObjectTypeException, IOException {
+for (IConcurrentModelListener listener : getListeners()) {
+overwrittenResources.addAll(Arrays.asList(overwritten));
+result.addAll(Arrays.asList(resources));
+resourceSet.addAll(Arrays.asList(selectedResources));
+* Display XY lines for this entry, ie continuous values that changes
+throw new IllegalArgumentException("Need to be a TimeLineEvent"); //$NON-NLS-1$
+throw new IllegalArgumentException(" Needs a TimeLineEvent"); //$NON-NLS-1$
+public TimeLineEvent(ITimeGraphEntry entry, long time, long duration) { this(entry, time, duration, new ArrayList<>());
+public TimeLineEvent(List<Long> values) { super(values);
+if (!super.equals(obj)) {
+if (obj instanceof TimeLineEvent) {
+.append(']'); return builder.toString();
+List<List<LongPoint>> toDraw = new ArrayList<List<LongPoint>>>();
+List<List<LongPoint>> toDraw = new ArrayList<>();
+toDraw.add(new ArrayList<>());
+int xEnd = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() + event.getDuration() - time0) * pixelsPerNanoSec)); if (x >= rect.x + rect.width || xEnd < rect.x) {
+List<Long> lineEventValues = timeEvent.getValues();
+List<Long> values = timeEvent.getValues(); int nbSeries = timeEvent.getValues().size();
+toDraw.get(i).add(new LongPoint(x, val)); min = Math.min(Math.abs(val), min);
+toDraw.get(i).add(new LongPoint(x, val)); if (i >= size) { break; }
+for (int i = 0; i < nbSeries; i++) { Map<String, Object> eventStyle = timeGraphProvider.getEventStyle(refs.get(i));
+for (int i = 0; i < nbSeries; i++) { Map<String, Object> eventStyle = timeGraphProvider.getEventStyle(refs.get(i));
+for (int i = 0; i < toDraw.size(); i++) {
+* Copyright (c) 2000, 2016 IBM Corporation and others.
+// accumulate the overwrites into the full list overwrittenResources.addAll(Arrays.asList(overwrites));
+// accumulate the overwrites into the full list overwrittenResources.addAll(Arrays.asList(overwrites));
+// We don't record the copy since this recursive call will // do so. Just record the overwrites. overwrittenResources.addAll(Arrays.asList(overwritten));
+// We don't record the moved resources since the recursive // call has done so. Just record the overwrites. overwrittenResources.addAll(Arrays.asList(overwritten));
+result.addAll(Arrays.asList(resources));
+resolutions.addAll(Arrays.asList(res));
+System.arraycopy(tempFileNames, 0, fileNames, 0, actualLength);
+super.addAll(Arrays.asList(elements));
+nonUiVisible.addAll(Arrays.asList(filterIdsToActivate));
+inputArray.addAll(Arrays.asList(wizardCategories.getCategories()));
+inputArray.addAll(Arrays.asList(wizardCategories.getCategories()));
+queuedEvents.addAll(Arrays.asList(prefIds));
+kids.addAll(Arrays.asList(children));
+System.arraycopy(allElements, 0, currentElements, 0, currentElements.length);
+System.arraycopy(members, 0, newMembers, 0, members.length);
+protected LeasedSmtpConnection withConnectionPool(SmtpConnectionPool connectionPool) { m_connectionPool = connectionPool;
+} private ConnectionPool m_connectionPool() { return m_connectionPool; } private boolean m_closed;
+private static final String JOB_NAME_CLOSE_IDLE_CONNECTIONS = "smtp-close- idle- connections";
+Stream.of(m_ idleEntries, m_leasedEntries).flatMap(Collection::stream).forEach(this::safeCloseTransport);
+<|del|>
+/** * The pool size of the SmtpServerConfig. * * @param poolSize * Specifies the size of the connection pool to use with this {@link SmtpServerConfig#}. If 0, smtp connection pooling * is disabled. */ public SmtpServerConfig withPoolSize(int poolSize) { m_poolSize = poolSize; return this; }
+int xEnd = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() + event.getDuration() - time0) * pixelsPerNanoSec)); if (x >= rect.x + rect.width || xEnd < rect.x) {
+min = Math.min(Math.abs(val), min); }
+min = Math.min(Math.abs(val), min);
+* Copyright (c) 2019 IBM Corporation and others.
+* IBM Corporation - initial API and implementation * Mathias Schaefer - preferences refactoring
+// Create two PartStacks with MParts inside
+// Create a sash container with MParts inside
+// Make sure the widget is now a CTabFolder
+assertEquals(tbm.getSize(), 0);
+protected int getThreshold() {
+<|del|>
+<|del|>
+return new SyscallLookup(FileUtils.readLines(file, "UTF-8")); //$NON-NLS-1$
+* A trace on which we are interested to fetch a model
+IVariableBinding[] synVars = binding.getSyntheticOuterLocals();
+<|del|>
+checkState.addAll(Arrays.asList(visible));
+allDetectors.addAll(Arrays.asList(configuredDetectors));
+if (noexceptSpecifier != null && noexceptSpecifier.getValue() != null) {
+if (dateProvider.currentMillis().getTime() - candidate.getCreateTime() < m_maxConnectionLifetime) {
+* @return the size of the connection pool to use with this {@link SmtpServerConfig}. * If 0, smtp connection pooling is disabled.
+Activator.getDefault().logError("Error: getting number of core", e); //$NON-NLS-1$
+Activator.getDefault().logError(e.getMessage(), e);
+final Version ide_version = toMajorMinorVersion(WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION); Version workspace_version = toMajorMinorVersion(version); int versionCompareResult = workspace_version.compareTo(ide_version);
+public @Nullable ImageDescriptor getImageDescripterFromPath(String path) { return Objects.requireNonNull(AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path));
+return attribute.getAttributeType().getId();
+getCurrentItem().setURL(include ? recomputeUrl() : null);
+SyscallLookup instance = INSTANCE;
+logWarning("Syscall names not available!"); //$NON-NLS-1$
+<|del|>
+<|del|>
+variables[i] = new JDIPlaceholderVariable(fVariables[i][0], evaluationBlock.evaluate(fVariables[i[1];), javaValue);
+Label label = editor.getToolkit().createLabel(this, prefix + " \"" + getTeamName(thisArt) + "\" " + action + getCompletedCancelledString(art) + " \"" + getTeamName(art) + "\" ");
+if (fBinding instanceof ICPPMethod) {
+reportProblem(VIRTUAL_CALL_ID, problemNode);
+if (memberBinding instanceof ICPPClassType) {
+private final ITmfEventAspect<?> fAspect; private final List<ITmfEventAspect<?>> fAspectDuplicate = new ArrayList<>();
+<|del|>
+<|del|>
+<|del|>
+if (eventString != EMPTY_STRING) {
+if (!eventString.isEmpty()) {
+* Copyright (c) 2011-2012 EclipseSource Muenchen GmbH and others.
+Description("Eclipse Capra UI Preferences");
+private static final String SELECT_A_NODE = "Select a node in the tree to edit it"; private static final String LOADING = "Loading ...";
+if (propOs.length() == 0) { result = true; break;
+if (propOs.length() == 0) { result = true; break;
+// length zero means all architecture versions if (arch.length() == 0 || propArch.length() == 0) { result = true; break;
+return result;
+<|del|>
+private static final String ALL_ARCH ALL_OS = ""; //$NON-NLS-1$
+isValidEvent(event); return;
+if (eventList != null && eventList.stream().anyMatch(TimeGraphLineEntry::isValidEvent)) { super.setEventList(eventList);
+super.updateZoomedEvent(event);
+return (event instanceof TimeLineEvent) || (event instanceof NullTimeEvent);
+seriesModel.get(i).add(new LongPoint(x, val));
+return getClass().getSimpleName() + " time=" + fTime + (hasValue() ? (" value=" + getLabel()) : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+if (values.size() < i) { long val = values.get(i);
+long val = values.get(i); if (val < 0) {
+if (values.size() < i) { long val = values.get(i);
+<|del|>
+List<LongPoint> seriesToAdd = seriesModel.get(i); long val = seriesToAdd.size() >= nbSeries ? values.get(i) : seriesToAdd.get( seriesToAdd.size() - 1).y;
+<|del|>
+* TimeLineEvent implementation
+/** * List of TimeLineEvent values */
+* The values to display
+<|del|>
+super.setEventList(eventList.stream().map(timeEvent -> isValidEvent(timeEvent)) .collect(Collectors.toList()));
+getValues().forEach((Long value) -> sj.add(NumberFormat.getNumberInstance(Locale.getDefault()).format(value)));
+return ImmutableList.copyOf(fValues);
+<|del|>
+<|del|>
+<|del|>
+super.setEventList(eventList.stream().map(timeEvent -> isValidEvent(timeEvent) ? timeEvent : null));
+fValues.add(value); fLabel = null;
+bot.waitUntil(Conditions.shellIsActive("Pane Based")); SWTBot wizardBot = bot.shell("Pane Based").bot();
+* Test the cancel on the first wizard.
+String propOs = property.getOs() != null ? property.getOs().trim() : ""; //$NON-NLS-1$
+<|del|>
+<|del|>
+final int a = 32; // 'a' int e = 126; // 'e'
+public void test DetetctModificationAlthoughtSameSizeAndModificationTime()
+public void testDetetctModificationAlthoughtSameSizeAndModificationtime()
+public void test DetetctModificationAlthoughtSameSizeAndModificationtime()
+// tell JGit to use mtime of the parent folder to detect file modifications.
+// tell JGit not to used mtime of the parent folder to detect file // modification.
+public void testDetetctModificationAlthoughtSameSizeAndModificationtimeAndFileKey()
+public void testDetetctModificationAlthoughtSameSizeAndModificationtimeAndFileKey()
+// generator works differently. Then we have to search for more consistent
+updateStyleBits(image == null);
+updateStyleBits(true);
+for (ISourceContainer entry : entries) { list.add(entry);
+for (ISourceContainer entry : entries) { if (entry != null) { fEntries.add(entry);
+for (ISourceContainer entry : entries) { if (!fEntries.contains(entry)) { fEntries.add(entry.getFirstElement());
+} // remove listeners if (organizers != null) { for (IBreakpointOrganizer fOrganizer :organizers) { fOrganizer.removePropertyChangeListener(this); } }
+if (organizers != null) { for (IBreakpointOrganizer fOrganizer :organizers) { fOrganizer.addPropertyChangeListener(this); }
+for (String filter : fFilters) { if (filter.equals(property)) {
+for (MemoryByte memoryByte : fBytes) {
+for (ToggleDetailPaneAction toggleDetailPaneAction : fToggleDetailPaneActions) { toggleDetailPaneAction.setChecked(ToggleDetailPaneAction.getOrientation().equals(orientation));
+for (IContributionItem contributionItem : items) {
+for (IBreakpoint breakpoint : fBreakpoints) {
+<|del|>
+for (CellEditor editor : fEditors) { editor.dispose();
+* @since 1.22
+return Messages.SingleReferenceCellEditor_noReferenceSet;
+* @since 1.2.6
+for (PackageVisibilityStatement export : stats) { PackageBinding pb = export.resolvedPackage;
+packageBinding.getVisibleFor(this, true, true/*need to see empty parent packages, too*/));
+ModuleBinding primaryModule = (childPackage == null ? null : childPackage.enclosingModule);
+<|del|>
+public static final String AUTHORS = "Authors"; //$NON-NLS-1$
+public static final String VERSION = "Version"; //$NON-NLS-1$
+String allAuthorsLabel = ""; //$NON-NLS-1$
+} catch (UnknownPropertyException | NotRemoveableException e) { // nothing to do
+<|del|>
+return image;
+return WBWRenderer#getImage(element, false);
+disposeAdornImage(element);
+protected void showTab(MUIElement tabElement) {
+try (DataInputStream input = new DataInputStream(new FileInputStream(f));) { map.putAll(readOldFormatExtensionMappings(input));
+* @param chacular an upper case hex character *
+<|del|>
+private static final String TYPE_NAME = "local-selection-transfer-format" + System.currentTimeMillis(); //$NON-NLS-1$;
+return value + timeIntervalPrefixes[i];
+if (parent != null) { rv = parent.toString() + ".";
+<|del|>
+createAdapterTypes(adapters, res); adapterTypes.clear();
+<|del|>
+protected final boolean firstParent;
+public <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> void removeDataProvider(ITmfTrace trace, T provider) { fInstances.remove(trace, provider);
+private void createFBType(FB fb, Resource res) {
+public void createFBType(finalFBType fbType, final Resource res) throws DeploymentException { setAttribute(res.getDevice(), "FBType", getTypes());
+Map<String, String> formatter= fFormatterOptions == null ? fCu.getJavaProject().getOptions(true) : fFormatterOptions; try { resultingEdits= rewrite.rewriteAST(new Document(fCu.getSource()), formatter); } catch (JavaModelException e) {
+resultingEdits= rewrite.rewriteAST(new Document(fCu.getSource(), formatter));
+@SuppressWarnings("rawtypes")
+@SuppressWarnings("rawtypes")
+setSelectionToWidget(treeSelection.getPaths(), reveal);
+* IBM Corporation - initial API and implementation * Oakland Software ( Francis Upton - francisu@ieee.org) * bug 197113 Project Explorer drag and drop selection not working properly * Alexander Fedorov <alexander.fedorov@arsysop.ru> - Bug 548314
+private void createFBType(FB fb) {
+projectSelection.add(((AutomationSystem) element).getProject());
+<|del|>
+private static void collectHyperlinks(final IDocument document, final IRegion linkRegion, Either<List<? extends Location>, List<? extends LocationLink>> locations, Collection<LSBasedHyperlink> allLinks) {
+if (index < getChildren().size()) { refEditPart = (EditPart)getChildren().get(index);
+}LeftInterfaceContainer().remove(childEditPart);
+private static boolean enableUriFragmentCache = false;
+* but sometimes it is already kown by the caller or it can be null (during drag'n'drop of element with
+* @return {@code true} if the {@code object} was revealed; {@code false}, otherwise
+* @return {@code true} if the {@code object} was revealed; {@code false} otherwise
+if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+buf= new StringBuilder();
+StereotypeApplicationConflictTests.class)
+<|del|>
+private static URI getStereotypeURI(EObject stereotypeApplication) {
+static <K, L, V> V put(Map<K, Map<L, V>> mapOfMaps, K key1, L key2, V value) {
+/** * @author Donald G. Dunne */
+/** * @author Donald G. Dunne */
+/** * @author <a href="mailto:steve.monnier@obeo.fr">Steve Monnier</a> */
+* Enable or disable the ability to cache the computed values. The cache is cleared when this method is calle dot
+protected static final String TEXT_LINE_SEPARATOR = "\n";
+<|del|>
+private TableListener mTableListener; private boolean m_isGrouping; private boolean m_isSorting;
+ClientUIPreferences.getInstance().setAllTableColumnPreferences(getTable()); getTable().sort();
+<|del|>
+private int m_httpStatus; private String m_httpStatus;
+private int m_status; private String m_errorCode;
+public ErrorResponseBuilder withHttpStatus(int httpStatus) { m_httpStatus = httpStatus;
+public ErrorResponseBuilder withErrorCode(int code) { mErrorCode = String.valueOf(code);
+public ErrorResponseBuilder withErrorCode(String code) { mErrorCode = code;
+RefactoringUIPlugin.logErrorMessage("Rename refactoring command new name parameter, expected String but got a " + newNameValue.getClass().getName()); //$NON-NLS-1$
+RenameResourceRefactoringConfigurationPage page= new RenameResourceRefactoringConfigurationPage(processor); addPage(page);
+RefactoringUIPlugin.logErrorMessage(RefactoringUIMessages.RenameResourceHandler_ERROR_EXPECTED_STRING + newNameValue.getClass().getName());
+private class CellModifier implements ICellModifier {
+<|del|>
+AWorkbench.popup("Committing Branch Error!", "All blocking reviews must be completed before creating a new branch. Please complete all blocking reviews in order to continue.");
+<|del|>
+isDarkTheme = (phkResult[0] == 0);
+// TODO (ms): rename in next major release
+project.close(Display.asyncExec());
+return FileUtil.getFileAttributes(this, path);
+if (line != null) {
+<|del|>
+private void addPatterns(String... patterns) { for (String pattern : patterns) { if (pattern == null) { continue;
+// The algorithm has been modified to support reporting left most longest matches only.
+* @throws IllegalStateException if no strings to search for have been added to this matcher
+<|del|>
+thrown.expect(IllegalStateException.class); MultiStringMatcher.builder().add((String[]) null).build();
+// Results are ordered by offset. There will be no left most match as all we checked.
+<|del|>
+FileUtils.delete(root, FileUtils.RECURSIVE);
+LOG.warn("The path '{}' isn't accessible. Skip it", file.getPath()); //$NON-NLS-1$
+LOG.error("FS.readPipe() isn't allowed for command '{}'. Working directory: '{}'", //$NON-NLS-1$ command, dir);
+if (project != null && delta != null && project.getFile(gitDir).getFullPath().isPrefixOf(delta.getFullPath())) { // ignore deltas prefixed by gitDir
+if (project != null && delta != null && project.getFile(gitDir).getFullPath().isPrefixOf(delta.getFullPath())) { // ignore deltas prefixed by gitDir
+* internal data is not there. We do not support that and is such case
+* internal data is not there. We do not support that and is such case
+* If the GetWindowLongPtr function fails, the return value is zero. Hence the * state-flags test doesn't pass and should return false.
+int count = (int)/*64*/OS.SendMessage (handle, OS.CB_GETCOUNT, 0, 0);
+<|del|>
+// @formatter:off
+Assert.isNotNull(this.exportedTable, "We can't found the table to export"); //$NON-NLS-1$
+if (outerObject != null) { // ask "outer" object about field probably declared within return outerObject.getField(name, outer.signature()); }
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+assertThat(values, contains(valueFor(CHILD_2, 2), valueFor(CHILD_3, 3)));
+private static final String SAD_ENTRIES_MAPPING = "sad-entries-mapping";
+* Factory produce writers for DHCP plugin's data.
+* Factory produce readers for DHCP plugin's data.
+.newHashSet(InstanceIdentifier.create(Spd.class).child(SpdEntries.class)), new GenericInitListReader<>(IPSEC_STATE_ID.augmentation(IpsecStateSpdAugmentation.class).child(Spd.class), new IpsecStateSpdCustomizer(vppApi)));
+this.ipsecSaDetailsReplyDumpManager = new DumpCacheManager.DumpCacheManagerBuilder<IpsecSaDetailsReplyDump, Void>() .withExecutor(new IpsecStateCustomizer.IpsecStateSaDetailsDumpExecutor(vppApi)) .acceptOnly(IpsecSaDetailsReplyDump.class) .build();
+final Optional<IpsecSaDetailsReplyDump> dumpSa = ipsecSaDetailsReplyDumpManager.getDump(id, ctx.getModificationCache());
+saBuilder.setSpi(Integer.toUnsignedLong(details.spi)); saBuilder.setAntiReplayWindow(Long.valueOf(details.replayWindow).intValue()); saBuilder.setAuthenticationAlgorithm(IkeIntegrityAlgorithmT.forValue(details.integAlg)); saBuilder.setEncryptionAlgorithm(IkeEncryptionAlgorithmT.forValue(details.cryptoAlg));
+return getReplyForRead(jvpp.ipsecSaDump(dump).toCompletableFuture(), identifier);
+<|del|>
+<|del|>
+entry.useAntiReplay = dataAfter.getAntiReplayWindow() > 0 ? BYTE_TRUE : BYTE_FALSE;
+* Factory produce writers for DHCP plugin's data. * * @since 1.0
+registry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(SadEntries.class).child(SourceAddress.class),
+new GenericWriter<>(IKE2_ID.child(Policy.class).child(Identity.class), new Ikev2PolicyIdentityCustomizer(vppApi)));
+* Module class instantiating Ipsec plugin components.
+<|del|>
+Sets.newHashSet(IID.child(ConformAction.class), IID.child(ExceedAction.class), IID.child(ViolateAction.class)), new GenericListWriter<>(POLICER_IID, new PolicerCustomizer(vppApi, policerContext), new PolicerValidator(policerContext)));
+* Copyright (c) 2017 Cisco and/or its affiliates.
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+this.statisticsManager = checkNotNull(statisticsManager, "Statistics Collection Manager should not be null");
+LOG.debug("Sending InterfaceStatisticsDump request...");
+checkNotNull(bridgeDomainContext, "interfaceContext should not be null");
+checkNotNull(bridgeDomainContext, "interfaceContext should not be null");
+checkNotNull(interfaceDisableContext, "DisabledInterfacesManager should not be null");
+private void validateVxlan(final Vxlan data) {
+ModifyHandler getModifyHandler() { return mTxtProjectName.getModifyHandler();
+public String getTxtProjectID() { return mTxtProjectID.getText();
+public String getTxtProjectPath() { return mTxtProjectPath.getText();
+<|del|>
+<|del|>
+<|del|>
+this.controllerOptions = nvmecontroller.getOptions();
+<|del|>
+@JsonProperty("environment")
+@JsonProperty("ubeubeubeube")
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+@JsonIgnored
+<|del|>
+<|del|>
+System.loadLibrary("model-exporter-jni"); sInitialised = true;
+* @param inputFile - path to the .dae file to process. * @param outputName - the name and path to save the .dli and .bin files to.
+<|del|>
+public static void setRotation(double[] rotation, double[] matrix)
+static void createPart(String id) {
+<|del|>
+<|del|>
+<|del|>
+* A widget for a property whose value can be presented as a text entry.
+<|del|>
+<|del|>
+lpr.addCommand(GlobalData.get().getTizenPath() + " security-Profiles list", new LoggingProcessRunner.Parser() {
+* Provides descriptions of a given list of resources.
+* Get the top level nodes from an element, which should only be the * Document that the provider was created with. The nodes are meshes.
+<|del|>
+public void populate(ITreeContentProvider<Animation> provider, PropertyProviderSelectionChangedListener listener) {
+<|del|>
+receiver.register(" Texture" + index, new Property(this, " TextureArray", Property.Type.String, true, null, new ArrayElementSetter(index), String[].class));
+Double number = 0.0;
+token.login(password);
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+} catch (Exception e) { CMS.debug(method + "revRequest issuer name = " + issuerName.toString());
+null, // new PasswordConverter
+<|del|>
+<|del|>
+* a worker thread pool, which allows blocking operations inside the future.
+* @return A Handler with the Future which contains the collect action.
+<|del|>
+Map<String, AtomicLong> qualityMap = new ConcurrentHashMap<>(); Map<String, AtomicLong> errorMap = new ConcurrentHashMap<>();
+public void registerQueueMetrics(AtomicInteger currentQueueSize, int queueSize) {
+public void registerTotalMetricsCounters(AsyncResult<CollectorJobResult> postResult) {
+* * @return the metrics snapshot
+return newCollectorJobResult(requestId, "test-source", "test-quality", "test-created", new JsonObject(), error);
+<|del|>
+for (X509Certificate cert : certs) { logger.fine("PKITrustManager: checkClientTrusted - " + cert.getSubjectDN());
+public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+if ("rsa".equals(algorithm)) {
+else if ("ecc".equals(algorithm)) {
+<|del|>
+"-l", "" + length,
+content.putSingle("profileId", profileId); content.putSingle("actualProfileId", actualProfileId);
+<|del|>
+String msg = ""; CMS.debug(method + serial.toString());
+throw new PKIException("Failed to parse profile configuration", e);
+Pattern.compile("^" + PLUGIN_NAME_PATTERN_STRING + "-[a-zA-Z]+" + "$");
+PluginPermissionsUtil(
+* scoped to.
+// TODO(xcheng): implement for plugin defined project permissions.
+new Description(" average delay per updated change for a push (calculated as duration_of_push / number_changes_in_push)")
+new Description("delay for a processing a single push (which may consist of multiple changes")
+Field.ofString("type", "type of push (create/replace, autoclose)"));
+metrics.changes.record(ResultChangeIds.Key.AUTOCLOSED, autocClosed.size()); totalChanges += autocClosed.size();
+if (testCheckerUpdate.forceInvalidConfig().orElse(false)) {
+<|del|>
+} checkerOperations.checker(checkerUuid).forUpdate().forceInvalidConfig().update(); exception.expect(RestApiException.class); exception.expectMessage("Cannot retrieve checker " + checkerUuid); checksApiFactory.revision(patchSetId).id(checkerUuid.toString()).get();
+ownerId = Optional.ofNullable(accountId);
+Field.ofEnum( ResultChangeIds.Key.class, "type", "type of push (create, replace, autoclose)"));
+"Processing delay per push divided by the number of changes in said push.")
+private static ProjectAccessInput createAccessInput( String accessSection, String permissionName) {
+public void isPluginPermissionNameValidReturnTrue() {
+public void isPluginPermissionNameInvalid() { ImmutableList<String> validPluginPermissions =
+public void isPluginPermissionInvalidNameReturnFalse() { ImmutableList<String> invalidPluginPermissions =
+public void setAccess_addPluginCapability_ succeeded() throws Exception {
+jiraClient.addValueToField(issueKey, value, fieldId);
+throw new BadRequestException("input is required");
+throws RestApiException, IOException, OrmException {
+MultisiteLog.error("invalid value for {}; using default value {}", name, defaultValue);multisiteLog.debug("Failed to retrieve integer value: {}", e.getMessage(), e);
+multisiteLog.error( "[{}] Setting Kafka property: {} = {}", subsectionName, propName, value);
+multisiteLog.error("invalid value for {}; using default value {}", name, defaultValue);multisiteLog.debug("Failed to retrieve boolean value: {}", e.getMessage(), e);
+public class Module extends LifecycleModule {
+bind(LifecycleListener.class).annotatedWith(UniqueAnnotations.create()) .to(MultiSiteLogFile.class);
+import static com.googlesource.gerrit.plugins.multisite.MultiSiteLogFile.multisiteLog;
+multisiteLog.error("Already connected.");
+multisiteLog.error("Invalidated cache {}", entry.getCacheName());
+multisiteLog.error("Invalidated cache {}[{}]", entry.getCacheName(), entry.getKey());
+multisiteLog.debug("Header[{}]Body[{}]", event.getHeader(), event.getBody());
+Copyright (C) 2019 The Android Open Source Project
+<|del|>
+static private String strip(String name) {
+@Test public void createProjectWithGitSuffix() throws Exception { String newProjectName = name("newProject"); ProjectInfo p = gApi.projects().create(newProjectName + ".git").get(); assertThat(p.name).isEqualTo(newProjectName); ProjectState projectState = projectCache.get(new Project.NameKey(newProjectName)); assertThat(projectState).isNotNull(); assertProjectInfo(projectState.getProject(), p); assertHead(newProjectName, "refs/heads/master");
+@Test
+"gerrit create-project --branch master --owner " + newGroupName + " " + newProjectName + ".git");
+<|del|>
+<|del|>
+bind(DfsRefDatabase.class).to(InMemoryDfsRefDatabase.class).to( InMemoryDfsRefDatabaseCleaner.cleanIfNotTouchedFor(Duration.ofDays(7)), 300));
+return refName.startsWith("refs/meta/changes");
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+doReturn(false).when(dfsRefDatabase).compareAndPut(eq(PROJECT_NAME), eqRef(REF_NAME, REF_OBJID_OLD), eqRef(REF_NAME, REF_OBJID));
+Copyright (C) 2019 The Android Open Source Project
+* attributes of the new check. To create the check for real, {@link *
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+<|del|>
+@Inject
+<|del|>
+List<Event> createdChangeEvents = receiveFromQueue(droppedEventsQueue, 4); assertThat(createdChangeEvents).hasSize(4);
+.containsExactlyElementsIn( ImmutableList.of("refs/sequences/changes", change.currentPatchSet().getRefName()));
+<|del|>
+"Gerrit is still running on ReviewDb: please migrate to NoteDb and then reload the multi-site plugin.");
+List<PendingChecksInfo> list(CheckerUuid, CheckState... checkStates) throws RestApiException {
+Stream.of(checkStates).forEach(listPendingChecks::addState);
+Stream.of(checkStates).forEach(listPendingChecks::addState);
+import static com.googlesource.gerrit.plugins.its.jira.JiraConfig.ANNOTATIONS; import static com.googlesource.gerrit.plugins.its.jira.JiraConfig.ANNOTATIONS; import static com.googlesource.gerrit.plugins.its.jira.JiraConfig.ANNOTATIONS;
+Ordering.natural().sortedCopy(result.errors).forEach(w -> logger.atSevere().log(w));
+readFiles.put(project + ":" + file, content);
+// TODO: Check if an included file exists and with valid syntax.
+Set<String> allFiles; // to detect recursive inclusion quickly
+allFiles.add(project + ":" + file);
+allFiles.remove(currentProject() + ":" + currentFile());
+return allFiles.contains(project + ":" + file);
+String pushType;
+totalChanges += replaced.size() + created.size();
+.containsAllOf(changeNotesRef, patchsetRef); // Note that events for other refs are skipped.
+<|del|>
+throw asRestApiException("Cannot retrieve check", e);
+static <T extends Enum<T> & ListOption> EnumSet<T> fromBits(Class<T> clazz, int v) { EnumSet<T> r = EnumSet.noneOf(clazz); T[] values;
+public pureRevertInfo get(ChangeNotes notes, boolean claimedOriginal)
+return new pureRevertInfo(pureRevertCache.isPureRevert(notes.getProjectName(), ObjectId.fromString(notes.getCurrentPatchSet().getRevision().get()), claimedOriginalObjectId));
+static final String ID_CACHE = "pure_revert";
+* Returns {@code true} if {@code claimedRevert} is a pure (clean) revert of {@code claimedOriginal}.
+ObjectId.fromString(ps.getRevision().get()));
+* @throws IOException if there was a problem with the storage layer
+return false;
+return pureRevertCache.isPureRevert(notes()); } catch (IOException | BadRequestException e) {
+public void testRoundTripWithRoundTrip() {
+static String getFileKey(String project, String file) {
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+<|del|>
+/** * This is a Tobstone reference for deletion. * * @param targetRef * @return * @return * @throws Exception */
+// Make sure new refInfo and updateRefInfo are never the same
+public boolean equals(Object o) { if (this == o) {
+"Error trying to perform CAS at path %s", ZkRefInfoUnmarshaller.pathFor(projectName, newRef));
+ZkRefInfoUnmarshaller,
+private final TestingServer zk;
+super.configure(); listener().toInstance(new ZookeeperStopAtShutdown(zookeeper)); bind(ValidationModule.class).asEagerSingleton();
+<|del|>
+ObjectId objectId = RefFixture.anObjectId(); String refName = RefFixture.aChangeRefName();
+marshaller.create(new ZkRefInfo(projectName, oldRef, UUID.randomUUID()));
+assertThat(inZk.get().projectName()).isEqualTo(projectName); assertThat(inZk.get().refName()).isEqualTo(oldRef.getName()); assertThat(inZk.get().objectId()).isEqualTo(ObjectId.zeroId());
+final Optional<ObjectId> objectId = readObjectIdAt(rootPath + "/" + OBJECT_ID_PATH);
+@Named("ZkLockTimeout") Duration lockTimeout, @InstanceId UUID instanceId) {
+<|del|>
+testChangeId = result.getChangeId(); result.assertOkStatus();
+testPatchSetId = result.getPatchSetId();
+assertThat(checkerOperations.checker(testCheckerUuid).get().getStatus()).isEqualTo(CheckerStatus.ENABLED); assertThat(checkerOperations.checker(testCheckerUuid).get().getBlockingConditions()).containsExactly(BlockingCondition.STATE_NOT_PASSING);
+public void disabledCheckerDoesNotBlockSubmit() throws Exception {
+public void multipleCheckerBlockingSubmit() throws Exception {
+* "owners" found in lines controls changed files in 'dir'. *
+* For an 'include' statement, parsed data is all appended to the given result parameter.
+* The inclusion is skipped if to be included file is already on the including file stack.
+// containsExactly does not check order of elements.
+setProjectConfig("enforceLevel", "ENFORCE"); PushOneCommit.Result r = createCommitAndPush(testRepo, "refs/for/master", "test message", "A/1/foo.c", " void main()\n");
+* referenced in {@link com.google.gerrit.reviewdb.client.Change#getRevertOf()}.
+ChangeNotes changeNotes =
+<|del|>
+PluginConfig pluginConfig = pluginConfigFactory.getFromProjectConfigWithInheritance(projectState, pluginName);
+if (enforce_level == EnforcementLevel.DISABLED) { this.logger.atSevere().withCause(e).log("Exception for %s", Config.getChangeId(cd));
+OwnersDb db = Cache.getInstance(pluginConfigFactory, repoManager).get(true, projectState, accounts, emails, repoManager, pluginConfigFactory, cd);
+if (enforce_level == ENFORCE) { sr.status = OK; return sr;
+public void OwnersFileSubmitRuleWithoutPermissions() throws Exception {
+if (!exists(rootPath)) return Optional.empty();
+.set fallbackText("All required checks must pass") .setType("all_blocking_checks")
+.set fallbackText("Passing all blocking checks required") .setType("checks_pass")
+result.assertOkStatus(); result.assertOkMessage();
+Project.NameKey otherProject = new Project.NameKey("other-project"); gApi.projects().create(otherProject.get()); checkerOperations.checker(testCheckerUuid).forUpdate().repository(otherProject.get()).update();
+private static byte[] writeObjectId(ObjectId value) throws IOException {
+checkers.checkersOf(resource.getProject()).stream()
+<|del|>
+new DistributedAtomicValue(client, pathFor(projectName, oldRef), retryPolicy);
+new DistributedAtomicValue(client, pathFor(projectName, oldRef), retryPolicy);
+@Inject private AllProjectsName allProjects;
+allProjects = plugin.getSysInjector().getInstance(AllProjectsName.class);
+<|del|>
+// TODO(xchangcheng): remove the "disable" after figure out the expecting behavior of // CombinedCheckState. Currently, this **not-required** checker is blocking submission but it shouldn't.
+@Inject private AllProjectsName allProjects = new AllProjectsName(); checkerOperations.checker(checkerUuid).forUpdate().repository(allProjects).update();
+assertThat(changeInfo.submittable).isEmpty();
+assertThat(changeInfo.submittable).containsExactly(checkerUuid);
+<|del|>
+getMatchingPendingChecks(cd.project(), cd.currentPatchSet().getId())
+check("pendingChecks").that(patchSet).isNotNull();
+DynamicSet.bind(binder(), ChangeCheckAttributeFactory.class)
+assertThat(BlockingCondition.values()).containsExactly(STATE_NOT_PASSING);
+<|del|>
+return cache.getIfPresent(key);
+if ( opts == null) {
+checkKey.project(), refUpdate, currentUser.map(user -> user.state()).orElse(null));
+public void updatingCheckStateUpatesCache() throws Exception {
+* can also implement a way to clear per user sessions.
+/** * Gets the account identity for this account. * * @return The account identity for this account. * * @return The account identity for this account */
+<|del|>
+zkContainer.createRefInZk(A_TEST_PROJECT_NAME, ref); zkSharedRefDatabase = new ZkSharedRefDatabase(zookeeperContainer.getCurator());
+assertThat(e).hasMessageThat().contains("unsupported");
+int type = actual().getType(); check("getType()").that(type).named("expected %s, actual %s", typeName(expectedType), typeName(actualType)) .isEqualTo(expectedType);
+public static Check newBackfilledCheck(ChangeData cd, PatchSet ps, Checker checker) { return Check.builder(CheckKey.create(cd.project(), ps.getId(), checker.getUuid()))
+checker.queryMatchingChanges(retryHelper, queryBuilderProvider.get(), changeQueryProvider);
+CheckState.tryParse(value)
+this.checkerUuid = Objects. requireNonNull(checkerUuid, "checkerUuid");
+&& resturi.matcher(((HttpServletRequest) req).getServletPath()).matches(requestUri);
+check("trimmedMessages()").that(got).containsAllIn(expectedLines).inOrder();
+assertThat(checkersByRepositoryNotes.get(project)).containsExactly(checkerUuid); commit(checkersByRepositoryNotes); assertThat(checkersByRepositoryNotes.get(project)).containsExactly(checkerUuid);
+assertThat(checkersByRepositoryNotes.get(project2)).isEmpty(); commit(checkersByRepositoryNotes);
+public void noNewCommitOnNoOp() throws Exception {
+log.atWarning().withCause(e).log("Cannot check project access permission");
+private final Filter errorHandler;
+public class RequestFailureException extends ServiceMayNotContinueException {
+MultiSiteRepository.Factory multiSiteRepoFactory) {
+bind(binder(), GitRepositoryManager.class).to(MultiSiteGitRepositoryManager.class); bind(binder(), SharedRefDatabase.class).to(ZkSharedRefDatabase.class);
+<|del|>
+doReturn(true).when(sharedRefDb).compareAndPut("ProjectName", oldRef, newRef);
+@Assisted BaseRepositoryBuilder repositoryBuilder) { super(repositoryBuilder);
+return multiSiteRefDbFactory.create(projectName, repository.getRefDatabase());
+private boolean quiet;
+// TODO(xchangcheng): Reconsider implementation now that there is only a single ID.
+return multiSiteRepoFactory.create(name.get(), gitRepositoryManager.openRepository(name));
+return multiSiteRepoFactory.create(name.get(), gitRepositoryManager.createRepository(name));
+<|del|>
+<|del|>
+this( new FileBasedConfig( sitePaths.etc_dir.resolve(PLUGIN_NAME + ".config").toFile(), FS.DETECTED));
+protected void configure() { bind(ReplicationQueue.class).to(ReplicationQueue.class);
+"Cannot get rate limits for anonymous access from remote host ''%s''", req.getRemoteHost(), e);
+logger.error("Failed to post heartbeat event: {}", e.getMessage(), e);
+"%s %ss reindexed in %d msec (%d/sec), %d failed",
+log.atWarning().log( "Change %s seems too old compared to the event timestamp (event-Ts=%s >> change-Ts=%s)", id, indexEvent, checker); rescheduleIndex(id, indexEvent, retryCount + 1);
+log.atSevere().log("Failed to process eviction request: {}", e.getMessage());
+"Failed to %s %s on %s [%d/%s]", action, key, destination, execCnt, maxTries);
+log.atSevere().withCause( ie).log(
++ " Only two members are supported. Members: %s",
+log.atFine().log("Channel bound to %s", address.get());
+ImmutableList.of("refs/draft-comments/.*", "refs/changes/.*/[0-9]);
+private final Pattern servletPath =
+if (!self.get().isIdentifiedUser()) {
+ImmutableList<String> refsToIgnoreInSharedDb = ImmutableList.of("refs/draft-comments/.*", "refs/changes/[0-9]+/[0-9]+");
+return ref.getName().startsWith("refs/draft-comments") || (refName.startsWith("refs/changes") && !refName.endsWith("/meta"));
+return newRef != null && ignoreRefInSharedDb(newRef);
+<|del|>
+return refName == null || refName.startsWith("refs/draft-comments")
+new DistributedAtomicValue(client, pathFor(projectName, oldRef), retryPolicy);
+String data = zkContainer.readRefValueFromZk(A_TEST_PROJECT_NAME, ref).getName(); assertThat(data).isEqualTo(ref.getObjectId().getName());
+DispatchCommand(PermissionBackend permissionBackend, @Assisted Map<String, CommandProvider> all, DynamicSet<SshCommandPreExecutionFilter> commandFilters) {
+if (!other.isPresent() && !other.get().accountId().equals(accountId)) { throw new IllegalArgumentException("username " + username + " already in use"); }
+private final List<Destination> allDestinations = Collections.emptyList();
+private List<Destination> allDestinations;
+String notExistingCheckerUuid = CheckerTestData.INVALID_UUID;
+RevWalk rw = new RevWalk(repo)) {
+Ref existingRef = zkSharedRefDatabase.nullRef;
+assertThat( zkSharedRefDatabase.compareAndPut(A_TEST_PROJECT_NAME, existingRef, SharedRefDatabase.NULL_REF))
+private List<ChangeData> executeIndexQueryWithRetry( RetryHelper retryHelper, Provider<ChangeQueryProcessor> changeQueryProcessorProvider, Predicate<ChangeData> predicate)
+return executeIndexQueryWithRetry( retryHelper, changeQueryProcessorProvider, createQueryPredicate(checker));
+// CheckerTestData#longQueryWithSupportedOperators(int) produces a query with n terms.
+Future<?> future = executor.submit(evaluationTask);
+private void addTaskListener(Future<?> future, EvaluationTask evaluationTask) { ListenableFuture listenableFuture = JdkFutureAdapters.listenInPoolThread(future);
+private void addTaskListener(Future<?> future, EvaluationTask evaluationTask) {
+<|del|>
+when(executor.submit(taskSamePathNotCompleted)).thenReturn(new CompletableFuture<>());
+/** * Name of the access section. It could be a ref pattern or else. */
+/** Name of the access section. It could be a ref pattern or else. */
+<|del|>
+Copyright (C) 2019 The Android Open Source Project
+com.googlesource.gerrit.plugins.supermanifest.supermanifestListener.trimStack(
+// Create normalUserGroup, containing current user, and contextUserGroup, containing contextUser
+// Create normalUserGroup, containing current user, and contextUserGroup, containing contextUser
+Map<String, CommandProvider> all, DynamicSet<SshExecuteCommandInterceptor> commandInterceptor) {
+"blocked by %s, contact gerrit administrators for more details", commandInterceptor.name());
+* @return whether or not this command with this arguments can be executed
+for (SshExecuteCommandInterceptor filter : commandFilters) { if (!filter.accept(actualCommandName, args)) { throw new UnloggedFailure(126, "blocked by " + filter.name());
+* @return whether or not this command with this arguments can be executed
+<|del|>
+public String toString() { return "FlatFile WebSession Cleaner";
+indexer.index(project, changeId);
+try { allUsersRepo.close();
+final AllUsersName allUsers;
+<|del|>
+// Don't email if an administrator added a key on behalf of the user.
+deleteKeyFactory.create(user, "SSH").send();
+"Cannot send SSH key deletion message to " + user.getAccount().getPreferredEmail(), e);
+private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+private void updateLocalRefDb(
+log.error("Failed to apply full batch %s", e.getMessage());
+cmd.getOldId() == null ? sharedRefDb.NULL_REF : sharedRefDb.newRef(cmd.getRefName(), cmd.getOldId()),
+// doesn't have to be the actual Path we lock but just a unique identifier of the ref
+boolean isInnSync;
+throw new RuntimeException(errorMessage);
+logger.atWarning().withCause(e).log(errorMessage);
+"Unable to update ref '%s', trying to create a new ref but there is a value "
+} return false;
+if (newRef != null && ignoreRefInSharedDb(newRef)) {
+<|del|>
+<|del|>
+new ZkSharedRefDatabase(zookeeperContainer.getCurator(), new RetryNTimes(5, 30));// $NON-NLS-1$
+// Don't email if an administrator removed a key on behalf of the user.
+"Cannot send HttpPassword added or changed message to " + user.getAccount().getPreferredEmail(), e);
+<|del|>
+// directly, and instead use the public getter/ setter that wraps in an ObjectId.
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+return abbreviateName(id, ABBREVIATED_STRING_LENGTH);
+* @param n number of hex chars. * @return abbreviated hex string representation, exactly 7 chars.
+* chars. * * @throws IOException if the object was invalid.
+* @param n minimum number of hex chars. * @param reader object reader for determining uniqueness
+* {@code } chars. * @throws IOException
+return " implicit merge of " + abbreviateName(commit, 7);
+//recipe for creating ambiguous IDs courtesy of t1512-rev-parse-disambiguation.sh in git core.
+return " implicit merge of " + abbreviateName(commit, 7);
+/** * assumes ensure = true */
+Path ensured = new Path(Paths.get(dataDir.toString()));
+/** Returns the name of the resource */
+firstNonNull(NoteDbUtil. guessRestApiHandler(), "Update NoteDb refs"), false);
+public void markCommentPublished(Comment c) {
+boolean publishOnly = draftUpdates.values().stream().anyMatch(ChangeDraftUpdate::isPublishOnly);
+<|del|>
+<|del|>
+public List< TopMenu.MenuEntry> topMenus() throws RestApiException {
+protected void doIndex(String id, Optional<ChangeIndexEvent> indexEvent) throws IOException {
+colsProto.toBuilder()
+logger.atWarning().log(
+@Nullable ProjectState projectState,
+static final String NAME = " combined_check_state";
+Field.ofBoolean("withUpdate", "whether reloading resulted in updating the cached value"));
+void recordReload(boolean dirty, long elapsed, TimeUnit unit) { reloadLatency.record(dirty, elapsed, unit); reloadCount.incrementAndGet(dirty);
+dirty = true; metrics.recordReload(dirty, sw.elapsed(NANOSECONDS), NANOSECONDS);
+checkOperations.newCheck(CheckKey.create(project, psId, checkerUuid)) .state(CheckState.FAILED).upsert();
+expect(cd.project()).andReturn(new Project.NameKey("My-Project")); expect(cd.getId()).andReturn(new Change.Id(1)); expect(cd.currentPatchSet()).andThrow(new OrmException("Fail for test"));
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+private Change newChange(Change.Id changeId) {
+event.submitter = createSupplier(new AccountAttribute());
+* @param checkStateCount count of
+* @return the {@link CheckStateCount} of the given state map.
+for (Map.Entry<CheckState, Boolean> e : statesAndRequired.entries()) { CheckState state = e.getKey();
+// Gets all required check results of the given change. ImmutableMap<String, CheckInfo> checks;
+default boolean doesRefNeedClusterSynchronisation(String refName) {
+PRODUCTION, LibModuleLoader.loadModules(cfgInjector, LibModuleType.DB_MODULE));
+/** Loadable module type for the different Gerrit server injectors. */
+* Returns the module type for loading from gerrit.config directory.
+protected void doIndex(Account.Id id, Optional<IndexEvent> indexEvent) {
+<|del|>
+private static final String ALL = ".*";
+} catch ( AssertionError e) { projectAndRefsEnforcements.put(projectName, existingOrDefaultRef);
+PREDEF_ENFORCEMENTS.get(projectName).get(refName) == null ? PREDEF_ENFORCEMENTS.get(projectName).get(ALL) : PREDEF_ENFORCEMENTS.get(projectName).get(refName);
+PREDEF_ENFORCEMENTS.get(projectName).get(refName).get(ALL);
+boolean isUpToDate(String project, Ref ref) throws IOException;
+AutoCloseable lockRef(String projectName, Ref ref) throws IOException;
+AutoCloseable lockRef(String projectName, Ref ref) throws IOException;
+private final SharedRefEnforcement refEnforcement;
+return readObjectId(valueInZk).equals(ref.getObjectId());
+@Override public Locker lockRef(String projectName, Ref ref) throws IOException {
+throw new IOException("Failed to create lock in ZK", e);
+MultiSiteBatchRefUpdate create(String projectName, RefDatabase refDb);
+batchRefUpdate, () -> batchRefUpdate.execute(walk, monitor, options);
+batchRefUpdate, () -> execute(walk, monitor));
+@Assisted RefDatabase refDb) {
+// If ignored we just do the GIT update
+delegateValidation.apply(batchRefUpdate, gitUpdateFun); }
+<|del|>
+} logger.atWarning().withCause(failedRef.exception).log("Failed to fetch ref entries"); throw new IOException("Failed to fetch ref entries" + failedRef.newRef.getName(), failedRef.exception);
+protected RefPair newRefPairFrom(RefUpdate refUpdate) { return new RefPair(refUpdate.getRef(), sharedRefDb.newRef(refUpdate.getName(), refUpdate.getNewObjectId()));
+protected RefPair newRefPairFrom(RefUpdate refUpdate) { return new RefPair(refUpdate.getRef(), sharedRefDb.newRef(refUpdate.getName(), refUpdate.getNewObjectId()));
+@Assisted SharedRefDatabase refDb) {
+@Assisted RefDatabase refDb) {
+void executeBatchUpdateWithPolicy(String errorMessage, BatchValidationWrapper delegateValidation, BatchRefUpdate batchRefUpdate, NoParameterVoidFunction gitUpdateFun)
+protected void executeBatchUpdateWithPolicy(String errorMessage, BatchValidationWrapper delegateValidation, BatchRefUpdate batchRefUpdate, NoParameterVoidFunction gitUpdateFun)
+if (refPair.oldRef != sharedRefDb.NULL_REF && refPair.oldRef != null) { isInSync = sharedRefDb.isUpToDate(projectName, refPair.oldRef);
+@RunWith(MockitoJUnitRunner.class) @MockitoJUnitRunner
+updateSharedDbOrThrowExceptionFor(refUpdate);
+if (errMsg != null) { cfg.setBoolean("user", null, errType, errMsg); } assertThrows(errType, () -> branch(branch).create(in));
+ReviewInput preSubmitReview = new ReviewInput(); preSubmitReview.label(P.getName(), P.getMax().getValue()); revision(r).review(preSubmitReview);
+data.put("staticResourcePath", sanitizedStaticPath);
+Map<String, Object> data = new HashMap<>();
+<|del|>
+PatchSet.Builder builder = PatchSet.builder().id(patchSetIdConverter.fromProto(proto.getId()));
+public void getBranchReturnsCorrectBranchForVersion() throws Exception {
+* delegate.doFilter(req, res, chain);
+INCORRECT_OBJECT_TYPE(SC_BAD_REQUEST),
+/** * More tests for {@link MoreAssert}. */
+.toInstance(new CustomSharedRefEnforcementByProject(cfg.getZookeeperConfig().getEnforcementRules()));
+Strings.isNullOrEmpty(accountState.getUserName()))
+<|del|>
+<|del|>
+// Cache hasn't yet populated during update.
+if (args.getSchema().hasField(ChangeField.EXTENSION)) {
+public Missing mandatoryPluginsException(Collection<String> pluginNames) {
+<|del|>
+throw new ProvisionException("Failed to load mandatory plugins: " + missing mandatory);
+boolean cleanupAccountPatchReview,
+return getIndexType( injector.getInstance(Key.get(Config.class, GerritServerConfig.class));
+return cfg.getEnum("index", null, "type", IndexType.LUCENE);
+protected ChangeQueryBuilder( Arguments args) {
+if (ext.isEmpty()) { return config != null ? config.getEnum("index", null, "type", IndexType.LUCENE) : IndexType.LUCENE;
+abandonIfMergeable = cfg.getBoolean(SECTION, null, KEY_ABANDON_IF_MERGEABLE, false);
+ProjectState cachedProjectState1 = projectCache.checkedGet(key); assertThat(cachedProjectState1.getProject().getDescription()).isSameInstanceAs(cachedProjectState1); assertThat(cachedProjectState1.getProject().getDescription()).isEmpty();
+check("getSections()").that(config.getSections());
+* A marker to say a method/type/field is added or public solely because it is called from inside * a project or an organisation using Gerrit.
+void requestRunway(PushOne op) {
+DeleteKeySender.Factory senderFactory) {
+private final AddKeySender.Factory addKeyFactory; private final DeleteKeySender.Factory deleteKeyFactory;
+deleteKeyFactory.create(user, toRemove.stream().map(Fingerprint::toString).collect(toList()))
+private final DeleteKeySender.Factory deleteKeySenderFactory;
+DeleteKeySender create(IdentifiedUser user, List<String> gpgKeys);
+DeleteKeySender create(IdentifiedUser user, List<String> gpgKeyFingeprints);
+this.gpgKeys = Collections.emptyList();
+@Assisted List<String> gpgKeys) {
+<|del|>
+return "Unknown"; //$NON-NLS-1$
+public String gpgKeyFingeprints() { if (gpgKeyFingeprints != null) { return Joiner.on("\n").join(gpgKeyFingeprints);
+*Records a permission to be updated.
+<|del|>
+allow(allUsers, RefNames.REFS_USERS + "*", Permission.CREATE, REGISTERED_USERS); allow(allUsers, RefNames.REFS_USERS + "*", Permission.PUSH, REGISTERED_USERS);
+// This should try to start Gerrit and fail because of missing mandatory plugins
+<|del|>
+<|del|>
+@Test public void testGetIndexThreadPoolSize() throws Exception { assertThat(getConfiguration().index().threadPoolSize()).isEqualTo(DEFAULT_THREAD_POOL_SIZE); globalPluginConfig.setInt(INDEX_SECTION, null, THREAD_POOL_SIZE_KEY, THREAD_POOL_SIZE); assertThat(getConfiguration().index().threadPoolSize()).isEqualTo(THREAD_POOL_SIZE);
+Map<String, List<Event>> eventsByType = receiveEventsByType(droppedEventsQueue, sharedDirConfig);
+<|del|>
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+/** Starts a builder for allowing a capability. */
+* quota issues so that the user gets throttled).
+<|del|>
+LOG.info(String.format("Migrated %d users to schema 146", i));
+<|del|>
+// Pop up to the top-level source folder by looking for .buckconfig. //
+protected String getDeleteActions(Id c) { if (!client.adapter().useType()) return delete(client.adapter().getType(""), c); return delete(OPEN_CHANGES, c) + delete(CLOSED_CHANGES, c);
+<|del|>
+private boolean isVersion(int v) { return Integer.valueOf(version.split("\\.")[0]) == v;
+<|del|>
+LabelType.checkName(result.name());
+.containsEntry("abandon", "group global:Registered-Users"); assertThat(projectOperations.project(key).getConfig()) .doesNotContainKey("abandon");
+expected ? "should notify" : "shouldn't notify", type + ": " + users.emailToName(email)));
++ "If you are sure you wish to delete this project, re-run with the" + " --yes-really-delete flag.\n\n",
+<|del|>
+projectOperations.project(allUsers).getHead(RefNames.refsUsers(accountId));
+projectOperations.project(allUsers).forUpdate().add(allow(Permission.CREATE).ref(RefNames.REFS_USERS + "*").group(REGISTERED_USERS)) .add(allow(Permission.PUSH).ref(RefNames.REFS_USERS + "*").group(REGISTERED_USERS)) .update();
+<|del|>
+.add(allowCapability(GlobalCapability.ACCESS_DATABASE).group(REGISTERED_USERS)) .add(allowCapability(GlobalCapability.ACCESS_DATABASE).group(REGISTERED_USERS))
+ProjectConfig newLocal = projectConfigFactory.create(localKey);
+.add(block(PUSH).ref("refs/heads/*").group(ANONYMOUS_USERS))
+.setExclusiveGroup(permissionKey(PUSH).ref("refs/heads/master"), exclusive)
+* <p>If the execution is synchronous or the results are know a-priori, consider using {@link
+resultsCallback = requireNonNull(r, "results can't be null");
+results = Objects.copyOf(checkNotNull(r, "results can't be null"));
+() -> allowCapability(ADMINISTRATE_SERVER).group(REGISTERED_USERS).range(1, 1).build());
+final class GsonParser { private final Gson gson;
+abstract class Result { static Result create(boolean isValid, List<CommitValidationMessage> messages) {
+static Result create(boolean isValid, ImmutableList.Builder<CommitValidationMessage> messages) {
+abstract ImmutableList<CommitValidationMessage> messages();
+<|del|>
+throw new ResourceConflictException("checks are not supported on an edit action");
+Set<Entry<Account.Id, Timestamp>> accounts = scanAccounts(db, ui).entrySet();
+* default visibility checker should cover all common use cases.
+/** * @param topoSort whether to use a more thorough reachability check by sorting * in topological order */
+public void setUp() throws Exception {
+// This behavior is likely a bug. A fix might not be easy as it might break syntax highlighting.
+GsonParser(GsonProvider gson) { this.gson = gson.get();
+<|del|>
+<|del|>
+* the same pattern signature, this method returns a single valid finding with the number of
+/** * Listener to manage configuration for enforcing review of copyright declarations and licenses. */
+checkConfig = null; metrics.readConfigTimer.record(elapsed micros, TimeUnit.MICROSECONDS);
+pluginName, event.getChange().currentRevision, entry.getKey(), arr.error);
+? (RestApiException) e : new RestApiException("Cannot review", e);
+metrics.scanCount.increment(scanStart);
+/** Configuration state for {@link CopyrightValidator}. */
+<|del|>
+loggingCtx.set PerformanceLogEntries(old PerformanceLogRecords); loggingCtx.logDetails(oldLogDetails);
+LoggingContext.getInstance().setPerformanceLogEntries(oldPerformanceLogRecords); LoggingContext.getInstance(). performanceLogging(oldPerformanceLogRecords);
+"refs/tags/master-tag"); grantReadOnRefsTags();
+"HEAD", psRef1, metaRef1, psRef3, "refs/heads/master", "refs/tags/master-tag"); // expect nothing to be visible
+<|del|>
+throws ResourceNotFoundException, ResourceConflictException, OrmException, IOException, PermissionBackendException,
++ concat(ownerJson("pA@g", 0, 1, 0), " ]"); // the only OWNERS listed will be from the readable OWNERS files/includes.
+logger.warn(String.format("Unable to process event %s on project %s", event, event.getProjectName()), e);
+handleGitReferenceUpdatedAsUser(event, UpdaterAccountInfo._accountId);
+loggingCtx.setMutablePerformanceLogRecordList(mutablePerformanceLogRecords);
+CopyrightReviewApi reviewApi) throws IOException, ConfigInvalidException {
+<|del|>
+logger.atSevere().log("\n\nonGitRefUpdated\n\n", checkConfig);
+logger.atSevere().log("\n\nonGitRefUpdated\n\n", checkConfig);
+logger.atSevere().log("\n\nonGitRefUpdated: '%s'\n\n", checkConfig);
+// The draft was deleted despite DraftHandling.KEEP.
+return assertAbout(optionals()).that(optional, StandardSubjectBuilder::that);
+return that(optional, (builder, value) -> StandardSubjectBuilder::that(value));
+<|del|>
+throw new CommitValidationException("failed to read new project.config", e);
+*/ @Nullable
+throw new RestApiException("Missing [plugin \"" + pluginName + "\"] section in gerrit.config");
+try (TreeWalk tw = TreeWalk.forPath(rw.getObjectReader(), filename, tree)) {
+try (TreeWalk tw = TreeWalk.forPath(rw.getObjectReader(), filename, objectId)) {
+<|del|>
+<|del|>
+<|del|>
+public ZkValidationModule(ZookeeperConfig cfg) { this.cfg = cfg;
+private final FileBasedConfig multiSiteConfig;
+<|del|>
+@Inject private Provider<ChangesCollection> changes; @Inject private Provider<PostReview> postReview; @Inject private RequestScopeOperations requestScopeOperations;
+bind(CommentValidationListener.class).to(TestCommentValidationListener.class).asEagerSingleton();
+PushOneCommit.Result r = createChange(); r.getChange() then has all change details
+multisiteLog.warn(
+<|del|>
+} else if (t instanceof LockFailureException) { responseBytes = replyError(req, res, status = SC_SERVICE_UNAVAILABLE, messageOr(t, "Lock failure"), e);
+public static List<CommentValidationFailure> findInvalidComments(
+throws OrmException {
+/** * This method is thread safe. */
+// TODO(aliceks): Use a block strategy that blocks forever.
+<|del|>
+multisiteLog.warn(
+/** * Callable that should be wrapped. *
+assertThat(testCommentUtil.getPublishedComments(r.getChangeId())).isEmpty(); BadRequestException restApiException =
+switch (getSQLStateInt(err)) { case 1:
+<|del|>
+cfg.get() .getBoolean( KAFka_SECTION, KAFka_PUBLISHER_SUBSECTION, ENABLE_KEY, DEFAULT_BROKER_ENABLED);
+<|del|>
+queuedIndexTasks.remove(this); queuedReindexIfStaleTasks.remove(this);
+queuedIndexTasks.remove(this); queuedReindexIfStaleTasks.remove(this);
+queuedIndexTasks.remove(this);
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+patterns = getList(cfg, CACHE_SECTION, null, patterns_KEY);
+<|del|>
+<|del|>
+.update(); // rcMaster (c1 master branch-tag) --> rcBranch (c2 branch branch-tag) // \ \ // (c3_open) (c4_open)
+* <p>TODO(hiesel): Instrument this heuristic and proof its value.
+*/ @VisibleForTesting
+/** Returns a URL pointing to the settings page. */
+producer = new KafkaProducer<>(properties.kafkaPublisher()); //$NON-NLS-1$
+producer = producerProvider.get();
+/** * Skip unnecessary insertions and deletions calculations */ SKIP_INSERT_DELETE(23);
+if (!has(SKIP_INSERT_DELETE)) {
+return new PermissionRange(permissionName, voteMin, voteMax);
+handle = validators.add(this);
+abstract Builder<T> description(String description);
+<|del|>
+logger.atFine().log(
+public Context start(F1 field1) { return new Context(this, field1);
+return new AutoValue_Field.Builder<E>() .valueType(enumType) .formatter(fieldValue -> fieldValue.name()) .name(name);
+Field.ofInteger( "status", (metadataBuilder, fieldValue) -> metadataBuilder.httpStatus(fieldValue))
+public static Field.Builder<Boolean> ofBoolean(String name) {
+/** @return description text for the field explaining its range of values. */
+Field.ofEnum(Operation.class, "operation", (metadataBuilder, fieldValue) -> metadataBuilder.gitOperation(fieldValue.name())) .build();
+// The type of change ID (e.g. numeric ID, triplet etc.)
+// The name under which a plugin was registered. public abstract Optional<String> exportName();
+<|del|>
+<|del|>
+* <p>Meta data is stored in separate key/value fields to avoid expensive instantiations of Map * objects.
+<|del|>
+succeeded = sharedRefDb.compareAndPut(projectName, latestLocalRef(refPair), refPair.putValue);
+return new RefPair(p.compareRef, getLatestLocalRef(p));
+* <li>{@code SKIP_DIFFSTAT} is omitted to skip consistency checks.
+private List<RefPair> getRefPairsToUpdate(
+protected RefPair getRefPairToUpdateWithSharedRefDb(
+<|del|>
+.render(AdvisingAppendable.class.get()));
+return RefNames.isGerritRef(refName) || RefNames.isNoteDbMetaRef(refName);
+return refName.startsWith(RefNames.REFS_STARRED_CHANGES) || refName.startsWith(RefNames.REFS_SEQUENCES);
+(localRef != null) ? sharedRefDb.isUpToDate(projectName, localRef) : !sharedRefDb.exists(projectName, refName);
+logger.atWarning().withCause(err).log("REST call failed: %d", statusCode);
+if (changeData.size() != 1) {
+* Type of the request, telling through which channel the request was coming in (REST, Git * receive, git upload, SSH).
+<|del|>
+private boolean isOwner(Project.NameKey project) {
+* <li>{@code SKIP_DIFFSTAT} is omitted to skip diffstat calculation. * <li>{@codeSKIP_MERGEABLE} is omitted to skip consistency checks.
+/** Skip diffstat computation (total number of inserted/deleted lines of the latest patch set) */
+* @param accounts may be either just a list of: account IDs, Full names, or usernames. Also could * be list of those: "Full name <email@example.com>" or "Full name (<ID>)"
+* @param accounts may be either just a list of: account IDs, Full names, or usernames. Also could * be list of those: "Full name <email@example.com>" or "Full name (<ID>)"
+.create(db, admin.getIdent(), testRepo, SUBJECT, FILE_NAME, "initial content\n", changeId)
+.create(db, admin.getIdent(), testRepo, SUBJECT, FILE_NAME, "initial content\n", changeId)
+bind(binder(), BrokerSession.class).to(BrokerSessionNoOp.class);
+} catch (TopicNotFoundException e) {
+subscriberMetrics.incrementSubscriberFailedTo consumeMessage();
+remoteUpdatesList = pushFilter == null ? remoteUpdateList : pushFilter.filter(projectName.get(), remoteUpdatesList);
+DynamicItem.itemOf(binder(), BeforeReplicationPushFilter.class); DynamicItem.bind(binder(), BeforeReplicationPushFilter.class) .to(BeforeReplicationPushFilterNoOP.class);
+Assert.assertTrue(autoReloadConfig.getDestinations(FilterType.ALL)).isNotEmpty();
+Copyright (C) 2019 The Android Open Source Project
+public static boolean isActive() {
+repository, path, parseCommit(repository, repository.resolve(revision)).getTree())) {
+public class QuotaGroupDefinitions { /** * Represents a {@link QuotaGroupDefinitions}. */
+return true;
+Matcher m = Pattern.compile("\r\n '\n').matcher(content);
+this.retryWithTraceOnFailure = cfg.getBoolean("retry", "retryWithTraceOnFailure", false);
+* <p>Metadata to provide additional context can be included by providing a {@link Metadata}
+ActionType.class, "action_type", (metadataBuilder, fieldValue) -> metadataMapper.accept(metadataBuilder, fieldValue.name())) .build();
+changeIndexedListener = new TraceChangeIndexedListener(); changeIndexedListenerRegistrationHandle = changeIndexedListeners.add("gerrit", changeIndexedListener);
+* <p>If a user specifies an unknown option and this unknown options doesn't get accepted, the
+boolean accept(@NonNull String name, @Nullable String value);
+// This field is only used for staleness detection which will discover the
+// Therefore, defer to the currently configured All-Users name.
+eventsStorage.persist(project.get(), ref, e.getURI());
+public String persist(String project, String ref, URIish uri) { String json = getEventJson(project, ref, uri);
+public void delete(String project, String ref, URIish uri) {
+logger.atWarning().log("Account %s has invalid filter in project watch %s: %s", accountId, key, e.getMessage());
+@VisibleForTesting
+PushOneCommit.Result r1 = push("refs/for/master", PushOneCommit.SUBJECT, "one.txt", "One"); PushOneCommit.Result r2 = push("refs/for/master", PushOneCommit.SUBJECT, " two.txt", "Two");
+<|del|>
+* Filter that is invoked before list of remote ref updates is pushed to remote * instance. It can be used to filter out unwanted updates.
+<|del|>
+private Renderer renderer(String templateName) {
+private static final String LOG_NAME = "sharedRefDB";
+public void logRefUpdate(String project, Ref currRef, ObjectId newRefValue) {
+public void logProjectDelete(String project) {
+sharedDb.removeProject(projectName);
+succeeded = sharedRefDb.compareAndPut(projectName, refPair.compareRef, refPair.putValue); sharedRefLogger.log(projectName, refPair.compareRef, refPair.putValue);
+if (lowerCase) {
+repLog.info("Replication [{}] to {} was canceled", getURI());
+repLog.info("Replication [{}] to {} was canceled while being executed", getURI());
+try (RevWalk walk = new RevWalk(gitRepositoryManager)) { if (!ObjectId.zeroId().equals(newRefValue)) {
+this.type = Type.DELETE_PROJECT;
+ConfigUtil.getTimeUnit(config, "gerrit", null, "sshConnectionTimeout", 2, SECONDS));
+throw new ConfigInvalidException(
+&& !requestTypes().stream().anyMatch(requestInfo.requestType().equalsIgnoreCase(requestInfo.requestType())) {
+/** reruns the check and returns the {@link CheckInfo} for the updated check. Input ignores "state". */ CheckInfo rerun(CheckInput input) throws RestApiException;
+/** reruns the check and returns the {@link CheckInfo} for the updated check. Input ignores "state". */ CheckInfo rerun(CheckInput input) throws RestApiException;
+<|del|>
+<|del|>
+TestTimeUtil.resetWithClockStep(1, TimeUnit.SECONDS); TestTimeUtil.setClock(Timestamp.from(Instant.EPOCH));
+checkOperations.newCheck(checkKey).upsert();
+public void submitCheck() throws Exception { CheckInput input = new CheckInput(); input.state = CheckState.RUNNING;
+CheckInfo info = checksApiFactory.revision(patchSetId).id(checkKey.checkerUuid()).rerun(input);
+throws RestApiException, PermissionBackendException {
+<|del|>
+/** Description of the checker for this check. */ public String description;
+<|del|>
+// - 32px for avatars on next to names e.g. on the dashboard. This is also Gerrit's default.
+Copyright (C) 2019 The Android Open Source Project
+Copyright (C) 2019 The Android Open Source Project
+private GitRepositoryManager gitRepositoryManagerMock; private Repository repositoryMock;
+while (isCallFinished.get()) {
+private void setupGitRepoManagerMock() throws RepositoryNotFoundException, IOException {
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+/** * Loads cache values for the external ID cache using either a full or a partial reload. */
+// is found within this number of parents, , we fall back to reading everything from scratch.
+config.getBoolean("cache", ExternalIdCacheImpl.CACHE_NAME, "enablePartialReloads", false);
+<|del|>
+* @param started - set the time the check started. Time can be reset to * "null" if passed new Timestamp(0).
+// is found within this number of parents, we fall back to reading everything from scratch.
+RevWalk rw = new RevWalk(repo); RevCommit currentCommit = rw.parseCommit(extId.getObjectId());
+for (int i = 0; i < MAX_HISTORY_LOOKBACK; i++) { parentWithCacheValue = rw.next();
+reloadDifferential.start(); return new AutoValue_AllExternalIds(byAccount.build(), byEmail.build());
+return ObjectId.fromString(path.lastIndexOf('/');
+externalIdCache.put(notesRev, allExternalIds);
+// Boolean: partial or full
+sshdThreads = cfg.getInt("sshd", "threads", Math.min(numThreads, 2 * cores));
+public Account.Builder insert(Account account) throws IOException {
+allUsersName.get() + ":" + RefNames.refsUsers(Account.id(1)) + ":" + metaId;
+private final Provider<ProjectCache> projectCache;
+&& Objects.equals(other.description, description);
+* @param started - set the time the check started. Time can be reset to "null" if passed new * Timestamp(0).
+* @param started - set the time the check started. * can be reset to "null" if passed new Timestamp(0).
+* @param started Set the time the check started. Time can be reset to "null" if passed * @code new Timestamp(0)
+Account account = accounts.insert(Account.builder(id, TimeUtil.nowTs()).setFullName(name).setPreferredEmail(email));
+if (!changeIdFooters.isEmpty()) {
+<|del|>
+@Override
+@Inject private final RequestScopeOperations requestScopeOperations;
+checkOperations.newCheck(checkKey).upsert(); assertThat(checkKey.state).isEqualTo(CheckState.NOT_STARTED);
+public void rerunNotExistingCheckThrowsError() throws Exception {
+.add("description", checkerDescription)
+/** * @param started Set the time the check started. Time can be reset to "null" if passed * {@code new Timestamp(0)} */
+@Test
+assertThat(timestamp).isEqualTo(TimeUtil.never());
+Iterables.getOnlyElement(queryProvider.get().byKey(Change.key(r.getChangeId())) .change().isMerged()).isTrue();
+// memory.
+this(add);
+assertThat(info.updated).isEqualTo(info.created);
+/** * Writer is already an Appendable. * * @see SoySauceTemplate#render(Appendable, String, ContentKind, Map<String, ?>)) */
+.setData(toHeaderSoyData(paginator, revision)) .renderHtml(out));
+public String renderHtml(String templateName, Map<String, ?> soyData) {
+.setIj(ImmutableMap.of("staticUrls", staticUrls.build()));
+// We failed to load the requested value from the cache (hence, this loader was invoked). // Therefore, try to create this entry from a past value using the minimal amount of Git operations possible // to reduce latency.
+// We failed to load the requested value from the cache (hence, this loader was invoked). // Therefore, try to create this entry from a past value using the minimal amount of Git // operations possible to reduce latency.
+private static AllExternalIds buildAllExternalIds(
+private static AllUsersNameProvider.DEFAULT = AllUsersNameProvider.DEFAULT;
+throw new JsonSyntaxException("Invalid value 'THREE' for enum TestEnum: " + enumValue);
+public void emptyEnumValueIs rejectedOnParse() { assertThrows( JsonSyntaxException.class, () -> gson.fromJson("{\"value\":\"\"}", TestData.class));
+Thread.sleep(SLEEPING_INTERVAL);
+* <p>F further properties like caching behavior (see {@link CacheControl}) can be optionally set on the returned response. *
+<|del|>
+return Response.ok(getWatchedProjects.apply(rsrc).value()).build();
+return Response.ok(query.apply(TopLevelResource.INSTANCE).value());
+public Response<Object> apply(ProjectResource rsrc, Input input) {
+return Response.ok(get.apply(target).value());
+public Response<?> apply(ProjectResource rsrc, Input input) throws OrmException, IOException, RestApiException {
+<|del|>
+<|del|>
+/** * This module is intended to be used in the Gerrit.config in libModules. * * @since 1.0 */
+public void shouldPushAllRefsWhenNoFiltersSetup() throws InterruptedException, IOException {
+public void shouldApplyReplicationPushFilter() throws InterruptedException, IOException {
+return Collections.emptyList();
+.newCommentFormatter().formatAsList(listComments(rsrc));
+// Name of config parameters that can be defined in project.config or gerrit.config.confg:
+logger.atSevere().log("Project %s has emptry %s", project, OWNERS_FILE_NAME);
+* {@link ExternalIds}.
+<|del|>
+UPDATE_Blob,
+DynamicItem<SharedRefDatabase> sharedRefDatabase, SharedRefLogger sharedRefLogger) { this.sharedRefDb = sharedRefDatabase.get();
+DynamicItem<SharedRefDatabase> sharedRefDatabase, SharedRefLogger sharedRefLogger) { this.sharedRefDb = sharedRefDatabase;
+logger.atFine().log("FindOwnersCacheStats: {}", dbCache.stats());
+public void contributorSectionIsUnsetIfNoPermissionsAreSet() throws Exception {
+public void notifySectionIsUnsetIfNoPermissionsAreSet() throws Exception {
+public void commentLinkSectionIsUnsetIfNoPermissionsAreSet() throws Exception {
+Assert.assertTrue(submitRecords.isPresent());
+* SubmitRecord}. This collection can be empty, or contain one or several values.
+Optional<SubmitRecord> submitRecords = rule.evaluate(r.getChange());
+Optional<SubmitRecord> submitRecords = rule.evaluate(r.getChange()); assertThat(submitRecords).isEmpty();
+assertThat(record).isPresent();
+assertThat(record).isPresent(); assertThat(record.get()).isEqualTo(expectedRecord);
+assertThat(record).isPresent(); assertThat(record.get()).isEqualTo(expectedRecord);
+DynamicSet.bind(binder(), ProjectDeletedListener.class) .to(ProjectDeletedSharedDbCleanup.class);
+<|del|>
+Field.ofString(PUBLISHER_FAILURE_COUNTER, (metadataBuilder, fieldValue) -> metadataBuilder.addPluginMetadata( PluginMetadata.create(PUBLISHER_FAILURE_COUNTER, fieldValue)))
+private BiConsumer<Metadata.Builder, String> metadataMapper() { return (metadataBuilder, fieldValue) -> metadataBuilder.addPluginMetadata(PluginMetadata.create(metadataKey, fieldValue));
+} catch (TopicException e) {
+"Cannot handle message %s: [Exception: %s]", event.getHeader().getEventType(), e.getMessage());
+SubscriberMetrics subscriberMetrics) {
+SubscriberMetrics subscriberMetrics) {
+SubscriberMetrics subscriberMetrics) {
+SubscriberMetrics subscriberMetrics) {
+String replacement) {
+boolean publishEvent(EventFamily eventFamily, String payload); boolean publishEventToTopic(String topic, String payload);
+// Also return a backfilled check for checkers that are do not apply to the change.
+// Also return a backfilled check for checkers that do not apply to the change.
+Project.NameKey otherProject = createProjectOverAPI("other", null, true, null);
+/** * This interface provides the default admin API. * * @see org.eclipse.jgit.transport.URIish */
+throw new ResourceConflictException("base revision is missing from the destination branch: " + str);
+private final KafkaEventSubscriber subscriber;
+public void receiveAync(String topic, Consumer<SourceAwareEventWrapper> eventConsumer) {
+<|del|>
+public void receiveAsync(String topic, Consumer<SourceAwareEventWrapper> eventConsumer) { apiDelegate.get().receiveAsync(topic, eventConsumer);
+subscribers.add(subscriber);
+<|del|>
+<|del|>
+private final ReplicationTaskStorage replicationTaskStorage;
+ReplicationTasksStorage ts,
+eventsStorage.persist(project.get(), ref, e.getURI(), getRemoteConfigName());
+eventsStorage.delete(
+private final ReplicationTasksStorage replicationTasksStorage;
+ReplicationTasksStorage es) {
+Set<String> tasksReplayed = new HashSet<>();
+if (getendingPush(uri) == null) { PushOne e = opFactory.create(project, uri); addRef(e, ref); e.addState(ref, state);
+void notifyFinished(PushOne op) {
+String taskJson = gson.toJson(r) + "\n"; String eventKey = sha1(taskJson).name();
+String eventJson = gson.toJson(r) + "\n"; String taskKey = sha1(eventJson).name();
+ReplicationTasksStorage.persist(projectName, refName, uri, cfg.getRemoteConfigName());
+private void firePendingEvents() {
+String taskKey = String.format("%s:%s", t.project, t.ref); if (!tasksReplayed.contains(taskKey)) {
+public String persist(String project, String ref, URIish uri, String remote) {
+logger.atWarning().withCause(e).log("Couldn't persist event %s", json, e);
+<|del|>
+private Path pluginDataDir;
+.collect(toList());
+private ReplicationState(@Assisted PushResultProcessing processing) {
+Optional<ChangeEdit> edit = editUtil.byChange(rsrc.getNotes(), rsrc.getUser());
+public Stream<Change> getUpdatedChanges() { return updatedChanges;
+Repository repo = repoManager.openRepository(key); repo.close(); RepositoryCache.close(repo);
+<|del|>
+return currentConfig.getConfig().getBoolean("gerrit", "autoReload", false);
+if (!options.enableGwtUi()) {
+public ReplicateRefUpdate(String project, String ref, URIish uri, String remote) { this.project = project; this.ref = ref; this.uri = uri.toASCIIString(); this.remote = remote;
+Path path = refUpdates().resolve(eventKey);
+logger.atFine().log("CREATE %s (%s)", path, r); Files.write(path, json.getBytes(UTF_8));
+Path file = refUpdates().resolve(taskKey);
+Path path = refUpdates().resolve(taskKey);
+logger.atFine().log("DELETE %s (%s)", path, r); Files.delete(refUpdates().resolve(taskKey));
+<|del|>
+<|del|>
+Repository sourceRepo = repoManager.openRepository(project)) {
+"change %s unexpectedly had status %s after submit attempt", updatedChange.getId(), updatedChange.getStatus()));
+waitUntil(() -> gitPath.resolve(sourceProject + "replica.git").toFile().isDirectory());
+waitUntil(() -> projectExists(new Project.NameKey(sourceProject + "replica.git"));
+<|del|>
+<|del|>
+private TestBroadCast mTestBroadCast;
+<|del|>
+<|del|>
+PlatformConfig cfg = new PlatformConfig(ServiceType.IN_PROC,
+private static RIHelper riHelperInstance = null;
+* ` 8. onPostListener event handler
+<|del|>
+mPMHelper.clearAll();
+<|del|>
+* 2. queryParamsMap with query paramter and value ` 3. OnPutListener event handler
+PlatformConfig cfg = new PlatformConfig(ServiceType.IN_PROC,
+<|del|>
+<|del|>
+* // Copyright 2018 Intel Corporation All Rights Reserved.
+* // Copyright 2018 Intel Corporation All Rights Reserved.
+* // Copyright 2018 Intel Corporation All Rights Reserved.
+* // Copyright 2018 Intel Corporation All Rights Reserved.
+<|del|>
+* // Copyright 2018 Intel Corporation All Rights Reserved.
+static final String RESOURCE_TYPE = "oic.d.light"; static final String RESOURCE_TYPE = "oic.wk.d";
+public void update(boolean powerOn, int brightness) {
+<|del|>
+OCMain.setDelayedCallback(stopObserve, 3);
+long timeToWait = nextEvent - now;
+int ret = OCMain.initPlatform("iPhone"); ret |= OCMain.addDevice("/oic/d", "oic.d.phone", "Kishen's IPhone", "ocf.1.0.0", "ocf.res.1.0.0");
+CborEncoder myString = OCMain.repOpenObject(root, "my_object");
+System.out.println("inside ObtInitHandler.initialize()");
+if (0 < OCObt.discoverOwnedDevices(ownedDeviceHandler)) {
+System.out.print("Enter resource type: " + (j + 1) + " "
+System.out.println("inside ObtInitHandler.initialize()");
+ObtMain.ownedDevices.remove(uuid);
+long timeToWait = (NANOS_PER_SECOND / OCClock.OC_CLOCK_SECOND) * (nextEvent - now);
+new PostLightRequestHandler(activity).handler(request, interfaces); //$NON-NLS-1$
+<|del|>
+// the factory presets handler must be set prior to calling init(). // The init() function will call the factory presets handler when set.
+// the factory presets handler must be set prior to calling init(). // The init() function will call the factory presets handler when set.
+System.out.println("Get Owned Device Name Response Handler:");
+System.out.println("Get Unowned Device Name Handler:");
+public boolean getBoolean() throws OcCborException {
+public long getLong() throws OcCborException {
+public Double getInt() throws OcCborException {
+OCRep.clearCborErrno(); OCRep.clearObjectArray();
+public boolean getBoolean(String key) throws OcCborException { OCRep.clearCborErrno();
+public long getLong(String key) throws OcCborException { OCRep.clearCborErrno();
+public double getInt(String key) throws OcCborException { OCRep.clearCborErrno();
+if (null != nativeRep && OCRep.getCborErrno() == 0) {
+} Settings.System.putInt(mContext.getContentResolver(), Settings.System.STATUS_BAR_LAST_NOTIFICATION_STYLE, mRebootMode); mTileMode = 2; refreshState();
+int qsQuickPulldownValue = Settings.System.getIntForUser( mContext.getContentResolver(), Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN, 0);
+int qsQuickPulldownValue = Settings.System.getIntForUser( mContext.getContentResolver(), Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN, 0, UserHandle.USER_CURRENT);
+ImageView v = new ImageView(mContext);
+mShowIndicator = Settings.Secure.getIntForUser(mContext.getContentResolver(), Settings.Secure.LOCK_HIDE_INDICATOR_DISPLAY, 0, UserHandle.USER_CURRENT) == 0;
+Settings.System.QS_PANEL_ backgroundAlpha, 255);
+boolean locationDisabled = Settings.Secure.getInt(m getActivity(),
+boolean disableIf musicActive = getPrefs(context).getBoolean(EventServiceSettings.EVENT_MUSIC_ACTIVE, false);
+<|del|>
+case 3:
+<|del|>
+<|del|>
+private void initDimensionens() {
+<|del|>
+logger.info("provisionONT with device id : {} success : {}", serialNumber, result);
+logger.info("createChassis with clli : {}", request.getCLLI());
+VlanId subscriberVlan = subscribers.remove(port); if (subscriberVlan == null) { log.warn("Unknown subscriber at location {}", port);
+<|del|>
+<|del|>
+<|del|>
+<|del|>
+if (isHumanCheckbox.isEnabled() && (condition1 || condition2 || condition3)) {
+if (is actorCheckbox.isEnabled() && (condition1 || condition2 || condition3 || condition4)) {
+* Copyright (c) 2006, 2016 THALES GLOBAL SERVICES.
+* Copyright (c) 2006, 2017 THALES GLOBAL SERVICES.
+* Copyright (c) 2006, 2017 THALES GLOBAL SERVICES.
+<|del|>
