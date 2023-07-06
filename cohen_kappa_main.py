@@ -1,10 +1,16 @@
 import random
 import pandas as pd
+from utils import read_raw_tufano_dataset_from_csv, read_dataset
 
 if __name__ == "__main__":
     random.seed(123)
     tufano_ground_truths_raw = open("outputs/tufano_ground_truths_raw.txt").readlines()
     tufano_ground_truths_abs = open("datasets/tufano/test_CC_tgt.txt").readlines()
+    TUFANO_RAW_DATASET_FILE_PATH = "datasets/tufano/raw_test.csv"
+    TUFANO_SOURCE_FILE_PATH = "datasets/tufano/test_CC_src.txt"
+    TUFANO_TARGET_FILE_PATH = "datasets/tufano/test_CC_tgt.txt"
+    R4R_SOURCE_FILE_PATH = "datasets/R4R/test_CC_src.txt"
+    R4R_TARGET_FILE_PATH = "datasets/R4R/test_CC_tgt.txt"
 
     r4r_ground_truths_em = open("outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt").readlines()
     r4r_ground_truths_raw = open("outputs/r4r_ground_truths_raw_no_heuristic_0_2954_formatted.txt").readlines()
@@ -25,12 +31,24 @@ if __name__ == "__main__":
     ).readlines()
     edit_r4r_preds = open("outputs/edit_r4r_predictions_raw_no_heuristic_full_formatted.txt").readlines()
 
+    raw_tufano_code_reviews, raw_tufano_buggy_codes, raw_r4r_target_codes = read_raw_tufano_dataset_from_csv(
+        TUFANO_RAW_DATASET_FILE_PATH
+    )
+    tufano_code_reviews, tufano_buggy_codes, tufano_target_codes = read_dataset(
+        dataset_name="tufano", source_file_path=TUFANO_SOURCE_FILE_PATH, target_file_path=TUFANO_TARGET_FILE_PATH
+    )
+    r4r_code_reviews, r4r_buggy_codes, r4r_target_codes = read_dataset(
+        dataset_name="R4R", source_file_path=R4R_SOURCE_FILE_PATH, target_file_path=R4R_TARGET_FILE_PATH
+    )
+
     column_names = [
         "sample no",
-        # "Review",
-        # "Buggy Code",
+        "Review",
+        "Review abs",
+        "Buggy Code",
+        "Buggy Code abs",
         "Ground Truth",
-        "GT abs or modified",
+        "Ground Truth abs or modified",
         "PLBART prediction",
         "score1",
         "score2",
@@ -4689,7 +4707,6 @@ if __name__ == "__main__":
         1718,
     ]
 
-
     tufano_ideal_sample_size = 314
     r4r_ideal_sample_size = 340
     tufano_random_elements = sorted(random.sample(tufano_samples, tufano_ideal_sample_size))
@@ -4700,6 +4717,10 @@ if __name__ == "__main__":
     for sample in tufano_random_elements:
         new_row = [
             sample,
+            raw_tufano_code_reviews[sample],
+            tufano_code_reviews[sample],
+            raw_tufano_buggy_codes[sample],
+            tufano_buggy_codes[sample],
             tufano_ground_truths_raw[sample],
             tufano_ground_truths_abs[sample],
             plbart_tufano_preds_abs[sample],
@@ -4727,6 +4748,10 @@ if __name__ == "__main__":
     for sample in r4r_random_elements:
         new_row = [
             sample,
+            r4r_code_reviews[sample],
+            "",
+            r4r_buggy_codes[sample],
+            "",
             r4r_ground_truths_raw[sample],
             r4r_ground_truths_em[sample],
             plbart_r4r_preds[sample],
