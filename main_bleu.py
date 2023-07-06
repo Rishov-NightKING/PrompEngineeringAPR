@@ -10,7 +10,7 @@ if __name__ == "__main__":
     #############################TUFANO_EDIT##################################
     tufano_prediction_path = "outputs/edit_tufano_predictions_raw_no_heuristic_full.txt"
     tufano_prediction_formatted_path = "outputs/edit_tufano_predictions_raw_no_heuristic_full_formatted.txt"
-    tufano_ground_truth_formatted_path = "outputs/edit_tufano_ground_truths_raw_no_heuristic_full.txt"
+    tufano_ground_truth_formatted_path = "edit_outputs/edit_tufano_ground_truths_raw_no_heuristic_full.txt"
     tufano_edit_log_file = "logs/EDIT_LOGS_edit_tufano_predictions_raw_no_heuristic_full.txt"
 
     # transfer_content_to_another_file(keyword="response:",
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     r4r_prediction_path = "outputs/edit_r4r_predictions_raw_no_heuristic_full.txt"
     r4r_ground_truths_path = "outputs/edit_r4r_ground_truths_raw_no_heuristic_full.txt"
     r4r_prediction_formatted_path = "outputs/edit_r4r_predictions_raw_no_heuristic_full_formatted.txt"
-    r4r_ground_truth_formatted_path = "outputs/edit_r4r_ground_truths_raw_no_heuristic_full_formatted.txt"
+    r4r_ground_truth_formatted_path = "edit_outputs/edit_r4r_ground_truths_raw_no_heuristic_full_formatted.txt"
     r4r_edit_log_file = "logs/EDIT_LOGS_edit_r4r_predictions_raw_no_heuristic_0_2955.txt"
 
     # transfer_content_to_another_file(keyword="response:",
@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     ##################################### R4R_EDIT_SAMPLE ############################
     r4r_ground_truths_gpt_em_formatted_file = "outputs/r4r_ground_truth_paths_modified_for_EM_formatted.txt"
-    r4r_ground_truths_edit_em_formatted_file = "outputs/edit_r4r_ground_truth_paths_modified_for_EM_formatted.txt"
+    r4r_ground_truths_edit_em_formatted_file = "edit_outputs/edit_r4r_ground_truth_paths_modified_for_EM_formatted.txt"
 
     # with open(r4r_edit_log_file, "r", encoding="UTF-8") as r4r_edit_log, open(r4r_ground_truths_gpt_em_formatted_file, "r", encoding="UTF-8") as r4r_ground_truths_gpt_em_formatted:
     #     r4r_edit_log_lines = r4r_edit_log.readlines()

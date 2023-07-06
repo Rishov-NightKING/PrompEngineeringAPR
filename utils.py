@@ -112,6 +112,18 @@ def heuristic_remove_redundant_words(line):
     return line.strip()
 
 
+def remove_redundant_words_edit_api(line):
+    redundant_words = [
+        "<START>",
+        "<END>",
+        "<|startfocus|>",
+        "<|endfocus|>"
+    ]
+    for redundant_word in redundant_words:
+        line = line.replace(redundant_word, "")
+    return line.strip()
+
+
 def heuristic_remove_starts_with_java(line):
     if line.startswith("java"):
         line = line[4:]
@@ -242,7 +254,7 @@ def get_EM(pred_file, ref_file, dataset):
 
     if dataset == "R4R":
         print(f"EM: {len(matches) / len(refs) * 100:.2f}%")
-    elif dataset == "tufano" :
+    elif dataset == "tufano":
         print(f"EM: {len(matches_r_equal_p) / len(refs) * 100:.2f}%")
 
 
@@ -554,6 +566,7 @@ def get_predictions_from_edit_api_and_write_to_file(
 
             # apply all heuristics
             # prediction = apply_heuristics(prediction)
+            prediction = remove_redundant_words_edit_api(prediction)
             prediction = adjust_spaces(prediction)
             prediction = remove_extra_spaces(prediction)
             prediction_list.append(prediction)
@@ -665,8 +678,8 @@ def get_few_shot_predictions_from_openai_and_write_to_file(
 
             # apply all heuristics
             # prediction = apply_heuristics(prediction)
+            prediction = adjust_spaces(prediction)
             prediction = remove_extra_spaces(prediction)
-            # prediction = adjust_spaces(prediction)
             prediction_list.append(prediction)
 
             SAMPLE_NO = f"sample: {i}"
