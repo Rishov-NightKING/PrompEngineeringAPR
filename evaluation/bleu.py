@@ -122,7 +122,7 @@ def _bleu(ref_file, trans_file, subword_option=None):
             reference_list.append(reference.strip().split())
         per_segment_references.append(reference_list)
     translations = []
-    with open(trans_file) as fh:
+    with open(trans_file, encoding="UTF-8") as fh:
         for line in fh:
             translations.append(line.strip().split())
 
@@ -152,4 +152,4 @@ if __name__ == '__main__':
 
     em = round(count / length * 100, 2)
     bleu_score = round(_bleu(args.references, args.predictions), 2)
-    print('BLEU:', bleu_score, '; EM:', em)
+    print('BLEU:', bleu_score)

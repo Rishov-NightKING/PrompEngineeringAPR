@@ -36,7 +36,7 @@ def remove_extra_spaces(line):
     return line.strip()
 
 
-def heuristic_adjust_spaces(text):
+def adjust_spaces(text):
     # Create a set of all the items to check for membership
     first_occurrence_list = [
         "%",
@@ -137,7 +137,7 @@ def heuristic_remove_code_explanation_at_the_end(line):
 
 def apply_heuristics(line):
     heuristics = [
-        heuristic_adjust_spaces,
+        adjust_spaces,
         heuristic_remove_redundant_words,
         heuristic_remove_starts_with_java,
         heuristic_remove_code_explanation_at_the_end,
@@ -155,7 +155,7 @@ def apply_heuristic_in_file(input_file):
         lines = f1.readlines()
 
     lines = [apply_heuristics(line) for line in lines]
-    output_file = f"{input_file.split('.')[0]}_heuristics_applied.txt"
+    output_file = f"{input_file.split('.')[0]}_applied_heuristics.txt"
     write_list_to_file(output_file, lines)
 
 
@@ -226,7 +226,27 @@ def heuristic_count_frequency(target_substring, target_string):
     return target_string.count(target_substring)
 
 
-def get_EM_R4R(ref_file, pred_file):
+def get_EM(pred_file, ref_file, dataset):
+    with open(ref_file, "r", encoding="UTF-8") as f1, open(pred_file, "r", encoding="UTF-8") as f2:
+        refs = f1.readlines()
+        preds = f2.readlines()
+
+    matches = []
+    matches_r_equal_p = []
+    for i, (r, p) in enumerate(zip(refs, preds)):
+        r, p = r.strip(), p.strip()
+        if r in p:
+            matches.append(i)
+        if r == p:
+            matches_r_equal_p.append(i)
+
+    if dataset == "R4R":
+        print(f"EM: {len(matches) / len(refs) * 100:.2f}%")
+    elif dataset == "tufano" :
+        print(f"EM: {len(matches_r_equal_p) / len(refs) * 100:.2f}%")
+
+
+def get_EM_R4R(pred_file, ref_file):
     with open(ref_file, "r", encoding="UTF-8") as f1, open(pred_file, "r", encoding="UTF-8") as f2:
         refs = f1.readlines()
         preds = f2.readlines()
@@ -256,20 +276,8 @@ def get_EM_R4R(ref_file, pred_file):
         if r == p:
             matches_r_equal_p.append(i)
 
-    set1 = set(matches)
-    set2 = set(matches_r_equal_p)
-    intersected_set = set1.intersection(set2)
-
-    r_in_p = list(set1 - intersected_set)
-    r_equal_p = list(set2 - intersected_set)
-    print(f"r in p: {sorted(r_in_p)} len: {len(r_in_p)}")
-    print(f"r == p: {r_equal_p}")
-
     print(f"EM: {len(matches) / len(refs) * 100:.2f}%")
-    print(f"matched indices: {matches}, len: {len(matches)}")
-    print(f"delete matches: {del_matches}, len: {len(del_matches)}")
-    print(f"possible_duplicates matches: {possible_duplicates}, len: {len(possible_duplicates)}")
-    print(f"focus null: {focus_null}")
+    print(f"possible del matches: {del_matches}, {len(del_matches)}, {len(matches)}")
 
 
 def read_dataset(dataset_name, source_file_path, target_file_path):
@@ -329,7 +337,7 @@ def read_raw_tufano_dataset_from_csv(file_path):
     target_codes = [
         target_code.replace("\n", " ").replace("\t", " ").replace("\r", " ") for target_code in target_codes
     ]
-    target_codes = [heuristic_adjust_spaces(target_code) for target_code in target_codes]
+    target_codes = [adjust_spaces(target_code) for target_code in target_codes]
 
     # write raw tufano csv file data to text files
     # raw_test_cc_src = [
@@ -342,7 +350,7 @@ def read_raw_tufano_dataset_from_csv(file_path):
     return code_reviews, buggy_codes, target_codes
 
 
-def run_python_file(bleu_type, python_file_path, ground_truths_file_path, predictions_file_path, lang="java"):
+def run_python_file(bleu_type, python_file_path, predictions_file_path, ground_truths_file_path, lang="java"):
     # Arguments to pass to the Python file
     arguments = []
     if bleu_type == "BLEU":
@@ -406,6 +414,7 @@ def get_predictions_from_openai_and_write_to_file(
 
             # apply all heuristics
             # prediction = apply_heuristics(prediction)
+            prediction = adjust_spaces(prediction)
             prediction = remove_extra_spaces(prediction)
             prediction_list.append(prediction)
 
@@ -690,7 +699,7 @@ def get_few_shot_predictions_from_openai_and_write_to_file(
             # apply all heuristics
             # prediction = apply_heuristics(prediction)
             prediction = remove_extra_spaces(prediction)
-            # prediction = heuristic_adjust_spaces(prediction)
+            # prediction = adjust_spaces(prediction)
             prediction_list.append(prediction)
 
             SAMPLE_NO = f"sample: {i}"
