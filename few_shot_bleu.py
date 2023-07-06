@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # transferring content
     r4r_few_shot_log_file = "logs/FEW_SHOT_LOGS_few_shot_r4r_predictions_raw_no_heuristic_full.txt"
     r4r_prediction_path = "few_shot_outputs/few_shot_r4r_predictions_raw_no_heuristic_full.txt"
-    r4r_prediction_formatted_path = "few_shot_outputs/few_shot_r4r_predictions_raw_no_heuristic_full_formatted.txt"
+    r4r_prediction_formatted_path = "few_shot_outputs/few_shot_r4r_predictions_raw.txt"
     
     r4r_pred_lines = open(r4r_prediction_path, "r", encoding="UTF-8").readlines()
     # write_list_to_file(r4r_prediction_formatted_path, [heuristic_adjust_spaces(line) for line in r4r_pred_lines])
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # transfer_content_to_another_file("response: ", r4r_few_shot_log_file, r4r_prediction_path)
     # apply_heuristic_in_file(r4r_prediction_path)
     
-    r4r_prediction_after_heuristics_formatted_path = "few_shot_outputs/few_shot_r4r_predictions_raw_no_heuristic_full_heuristics_applied.txt"
+    r4r_prediction_after_heuristics_formatted_path = "few_shot_outputs/few_shot_r4r_predictions_raw_applied_heuristics.txt"
     
     r4r_ground_truth_path = "outputs/r4r_ground_truths_raw_no_heuristic_0_2954.txt"
     r4r_ground_truth_formatted_path = "outputs/r4r_ground_truths_raw_no_heuristic_0_2954_formatted.txt"

@@ -246,40 +246,6 @@ def get_EM(pred_file, ref_file, dataset):
         print(f"EM: {len(matches_r_equal_p) / len(refs) * 100:.2f}%")
 
 
-def get_EM_R4R(pred_file, ref_file):
-    with open(ref_file, "r", encoding="UTF-8") as f1, open(pred_file, "r", encoding="UTF-8") as f2:
-        refs = f1.readlines()
-        preds = f2.readlines()
-
-    count = 0
-    matches = []
-    del_matches = []
-    possible_duplicates = []
-    matches_r_equal_p = []
-    del_token = "< |del| >"
-    focus_null = 0
-    for i, (r, p) in enumerate(zip(refs, preds)):
-        r, p = r.strip(), p.strip()
-        if r.startswith(del_token):
-            focus_part = r[len(del_token):]
-            if focus_part == "":
-                count += 1
-                focus_null += 1
-            elif heuristic_count_frequency(focus_part, p) == 0:
-                count += 0
-                del_matches.append(i)
-        if r in p:
-            if heuristic_count_frequency(r, p) > 1:
-                possible_duplicates.append(i)
-            count += 1
-            matches.append(i)
-        if r == p:
-            matches_r_equal_p.append(i)
-
-    print(f"EM: {len(matches) / len(refs) * 100:.2f}%")
-    print(f"possible del matches: {del_matches}, {len(del_matches)}, {len(matches)}")
-
-
 def read_dataset(dataset_name, source_file_path, target_file_path):
     with open(source_file_path, "r", encoding="UTF-8") as src_file, open(
             target_file_path, "r", encoding="UTF-8"
@@ -588,6 +554,7 @@ def get_predictions_from_edit_api_and_write_to_file(
 
             # apply all heuristics
             # prediction = apply_heuristics(prediction)
+            prediction = adjust_spaces(prediction)
             prediction = remove_extra_spaces(prediction)
             prediction_list.append(prediction)
 

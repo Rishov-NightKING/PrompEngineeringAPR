@@ -27,7 +27,7 @@ if __name__ == "__main__":
     codet5_r4r_preds = open("predictions/codet5_r4r_preds.txt").readlines()
     zero_shot_gpt_r4r_preds = open("outputs/r4r_predictions_raw_with_heuristic_0_2954_formatted.txt").readlines()
     few_shot_gpt_r4r_preds = open(
-        "few_shot_outputs/few_shot_r4r_predictions_raw_no_heuristic_full_heuristics_applied.txt"
+        "few_shot_outputs/few_shot_r4r_predictions_raw_applied_heuristics.txt"
     ).readlines()
     edit_r4r_preds = open("outputs/edit_r4r_predictions_raw_no_heuristic_full_formatted.txt").readlines()
 

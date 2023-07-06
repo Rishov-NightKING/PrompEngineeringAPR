@@ -26,59 +26,71 @@ R4R_SOURCE_FILE_PATH = "datasets/R4R/test_CC_src.txt"
 R4R_TARGET_FILE_PATH = "datasets/R4R/test_CC_tgt.txt"
 
 
-get_EM(
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt",
-    "tufano"
-)
+# get_EM(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt",
+#     "tufano"
+# )
+#
+# get_bleu_and_codebleu(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt"
+# )
+#
+# apply_heuristic_in_file(f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw.txt")
+#
+# get_EM(
+#     # f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics_also_manual.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt",
+#     "tufano"
+# )
+#
+#
+# get_bleu_and_codebleu(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt"
+# )
+#
+# print("AFTER MANUAL")
+#
+# get_EM(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics_also_manual.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt",
+#     "tufano"
+# )
+#
+# get_bleu_and_codebleu(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics_also_manual.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt"
+# )
+#
+#
+# print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n")
+# get_EM(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_ground_truths_raw.txt",
+#     "R4R"
+# )
+#
+# apply_heuristic_in_file(f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw.txt")
+#
+# get_EM(
+#     # f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw_applied_heuristics_also_manual.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw_applied_heuristics.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_ground_truths_raw_target_only.txt",
+#     "R4R"
+# )
 
-get_bleu_and_codebleu(
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt"
-)
+# get_bleu_and_codebleu(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_ground_truths_raw.txt"
+# )
+#
+# get_bleu_and_codebleu(
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw_applied_heuristics_also_manual.txt",
+#     # f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw_applied_heuristics.txt",
+#     f"{OUTPUT_DIRECTORY}/zero_shot_r4r_ground_truths_raw.txt",
+# )
 
-apply_heuristic_in_file(f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw.txt")
-
-get_EM(
-    # f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics_also_manual.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt",
-    "tufano"
-)
-
-
-get_bleu_and_codebleu(
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt"
-)
-
-print("AFTER MANUAL")
-
-get_EM(
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics_also_manual.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt",
-    "tufano"
-)
-
-get_bleu_and_codebleu(
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_predictions_raw_applied_heuristics_also_manual.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_tufano_ground_truths_raw.txt"
-)
-
-
-print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n")
-get_EM(
-    f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_r4r_ground_truths_raw.txt",
-    "R4R"
-)
-
-apply_heuristic_in_file(f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw.txt")
-
-get_EM(
-    # f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw_applied_heuristics_also_manual.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_r4r_predictions_raw_applied_heuristics.txt",
-    f"{OUTPUT_DIRECTORY}/zero_shot_r4r_ground_truths_raw_target_only.txt",
-    "R4R"
-)
-
+format_file("few_shot_outputs/few_shot_r4r_predictions_raw_no_heuristic_full.txt", adjust_spaces)
