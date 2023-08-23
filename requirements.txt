@@ -1,6 +1,11 @@
-pandas~=2.0.1
+pandas~=1.5.3
 black
 openai~=0.27.7
 tree_sitter==0.20.1
 scikit-learn==1.2.2
 chardet
+tqdm==4.65.0
+transformers==4.28.1
+datasets==2.11.0
+huggingface-hub==0.13.4
+accelerate==0.18.0
